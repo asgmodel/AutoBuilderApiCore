@@ -1,117 +1,175 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-namespace AutoGenerator.ApiFolder;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
-public class FolderStructureReader
+namespace AutoGenerator.ApiFolder
 {
-    // تمثيل العقدة في شجرة المجلدات
-    public class FolderNode
+    /// <summary>
+    /// يمثل قارئ هيكلية المجلدات من JSON.
+    /// </summary>
+    public class FolderStructureReader
     {
-        public string Name { get; set; }
-        public List<FolderNode> Children { get; set; } = new List<FolderNode>();
-
-        public FolderNode(string name)
+        /// <summary>
+        /// تمثيل العقدة في شجرة المجلدات.
+        /// </summary>
+        public class FolderNode
         {
-            Name = name;
-        }
-    }
+            public string Name { get; set; }
+            public List<FolderNode> Children { get; set; } = new List<FolderNode>();
 
-    private dynamic folderStructure; // استخدام dynamic لقراءة الـ JSON بشكل ديناميكي
-
-    // تحميل الهيكلية من ملف JSON
-    public void LoadFromJson(string filePath)
-    {
-        try
-        {
-            if (File.Exists(filePath))
+            public FolderNode(string name)
             {
-                string json = File.ReadAllText(filePath);
-                folderStructure = JsonConvert.DeserializeObject<dynamic>(json);
-                Console.WriteLine("تم تحميل الهيكلية من الملف.");
-            }
-            else
-            {
-                Console.WriteLine($"❌ الملف {filePath} غير موجود.");
+                Name = name;
             }
         }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"❌ حدث خطأ أثناء تحميل الهيكلية: {ex.Message}");
-        }
-    }
 
-    // تحويل الهيكلية إلى شجرة FolderNode
-    public FolderNode BuildFolderTree(string folderName, dynamic structure = null)
-    {
-        structure = structure ?? folderStructure;
-        FolderNode node = new FolderNode(folderName);
+        private dynamic folderStructure;
 
-        if (structure is JObject)
+        /// <summary>
+        /// تحميل الهيكلية من ملف JSON.
+        /// </summary>
+        public void LoadFromJson(string filePath)
         {
-            foreach (var property in ((JObject)structure).Properties())
+            try
             {
-                FolderNode childNode = BuildFolderTree(property.Name, property.Value);
-                node.Children.Add(childNode);
-            }
-        }
-        else if (structure is JArray)
-        {
-            foreach (var item in (JArray)structure)
-            {
-                if (item.Type == JTokenType.String)
+                if (File.Exists(filePath))
                 {
-                    FolderNode childNode = new FolderNode(item.ToString());
+                    string json = File.ReadAllText(filePath);
+                    folderStructure = JsonConvert.DeserializeObject<dynamic>(json);
+                    Console.WriteLine("✅ تم تحميل الهيكلية من الملف بنجاح.");
+                }
+                else
+                {
+                    Console.WriteLine($"❌ الملف {filePath} غير موجود.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ حدث خطأ أثناء تحميل الهيكلية: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// تحويل الهيكلية إلى شجرة FolderNode.
+        /// </summary>
+        public FolderNode BuildFolderTree(string folderName, dynamic structure = null)
+        {
+            structure = structure ?? folderStructure;
+            FolderNode node = new FolderNode(folderName);
+
+            if (structure is JObject)
+            {
+                foreach (var property in ((JObject)structure).Properties())
+                {
+                    FolderNode childNode = BuildFolderTree(property.Name, property.Value);
                     node.Children.Add(childNode);
                 }
-                else if (item is JObject)
+            }
+            else if (structure is JArray)
+            {
+                foreach (var item in (JArray)structure)
                 {
-                    foreach (var property in ((JObject)item).Properties())
+                    if (item.Type == JTokenType.String)
                     {
-                        FolderNode childNode = BuildFolderTree(property.Name, property.Value);
+                        FolderNode childNode = new FolderNode(item.ToString());
                         node.Children.Add(childNode);
+                    }
+                    else if (item is JObject)
+                    {
+                        foreach (var property in ((JObject)item).Properties())
+                        {
+                            FolderNode childNode = BuildFolderTree(property.Name, property.Value);
+                            node.Children.Add(childNode);
+                        }
                     }
                 }
             }
-        }
-        else if (structure is JValue)
-        {
-            // في حالة كانت القيمة مجرد نص
-            node.Children.Add(new FolderNode(structure.ToString()));
-        }
-
-        return node;
-    }
-
-    // طباعة الشجرة البيانية (للتأكد من الهيكلية)
-    public void PrintFolderTree(FolderNode node, string indent = "")
-    {
-        Console.WriteLine(indent + node.Name);
-        foreach (var child in node.Children)
-        {
-            PrintFolderTree(child, indent + "  ");
-        }
-    }
-
-    // إنشاء المجلدات على النظام بناءً على شجرة المجلدات
-    public void CreateFolders(string basePath, FolderNode node)
-    {
-        try
-        {
-            string folderPath = Path.Combine(basePath, node.Name);
-            if (!Directory.Exists(folderPath))
+            else if (structure is JValue)
             {
-                Directory.CreateDirectory(folderPath);
-                Console.WriteLine($"تم إنشاء المجلد: {folderPath}");
+                node.Children.Add(new FolderNode(structure.ToString()));
             }
 
+            return node;
+        }
+
+        /// <summary>
+        /// طباعة شجرة المجلدات للتأكد من صحتها.
+        /// </summary>
+        public void PrintFolderTree(FolderNode node, string indent = "")
+        {
+            Console.WriteLine(indent + node.Name);
             foreach (var child in node.Children)
             {
-                CreateFolders(folderPath, child);
+                PrintFolderTree(child, indent + "  ");
             }
         }
-        catch (Exception ex)
+
+        /// <summary>
+        /// إنشاء المجلدات على النظام وإضافة ملف Base.cs داخل كل منها.
+        /// </summary>
+        public void CreateFolders(string basePath, FolderNode node)
         {
-            Console.WriteLine($"❌ حدث خطأ أثناء إنشاء المجلدات: {ex.Message}");
+            try
+            {
+                string folderPath = Path.Combine(basePath, node.Name);
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                    Console.WriteLine($"📁 تم إنشاء المجلد: {folderPath}");
+                }
+                if (node.Children == null||node.Children.Count==0)
+                {
+                    // إنشاء ملف Base.cs داخل المجلد
+                    string baseFilePath = Path.Combine(folderPath, "Base.cs");
+                    if (!File.Exists(baseFilePath))
+                    {
+                        var parent = folderPath.Split("\\");
+                        if (parent.Length > 1)
+                        {
+                            var nameSpace =$"{parent[parent.Length - 1]}{parent[parent.Length - 2]}";
+                          
+
+
+                            File.WriteAllText(baseFilePath, GetBaseClassTemplate($"Base{node.Name}", nameSpace: $"{nameSpace}"));
+                            Console.WriteLine($"📝 تم إنشاء الملف: {baseFilePath}");
+                        }
+                    }
+                }
+                // تنفيذ نفس العملية لجميع المجلدات الفرعية
+                foreach (var child in node.Children)
+                {
+                    CreateFolders(folderPath, child);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ حدث خطأ أثناء إنشاء المجلدات والملفات: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// إرجاع كود `Base.cs` بناءً على اسم المجلد.
+        /// </summary>
+        private string GetBaseClassTemplate(string className,string nameSpace= "generatecode")
+        {
+            return $@"using System;
+
+namespace {nameSpace}
+{{
+    public class {className}
+    {{
+        public {className}()
+        {{
+            Console.WriteLine(""Base class initialized in {className}"");
+        }}
+    }}
+}}";
         }
     }
+
+  
+
 }

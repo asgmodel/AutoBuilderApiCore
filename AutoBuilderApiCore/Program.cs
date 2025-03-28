@@ -20,20 +20,27 @@ if (args.Contains("generate"))
         ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
         NameRootApi = "ApiCore"
     });
-}
-var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+
+}
+else
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
+
+    var app = builder.Build();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();

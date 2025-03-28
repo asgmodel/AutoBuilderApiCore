@@ -10,13 +10,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<ApiFolderGenerator>();
-
-builder.Services.AddAutoBuilderApiCore(new()
+if (args.Contains("generate"))
 {
-    ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
-    NameRootApi = "ApiCore"
-});
 
+    builder.Services.AddAutoBuilderApiCore(new()
+    {
+        ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
+        NameRootApi = "ApiCore"
+    });
+}
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

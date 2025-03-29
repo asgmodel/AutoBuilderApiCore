@@ -71,16 +71,16 @@ public class ApiFolderGenerator
     {
         if (e.Node.Name == "Dto")
         {
-           
 
-           DtoGenerator.GeneratWithFolder(e);
+
+            DtoGenerator.GeneratWithFolder(e);
 
 
         }
         else if (e.Node.Name == "Dso")
         {
 
-
+            DsoGenerator.GeneratWithFolder(e);
         }
     }
 

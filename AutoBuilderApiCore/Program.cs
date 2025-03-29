@@ -12,7 +12,7 @@ builder.Services.AddSwaggerGen();
 /// <summary>
 /// generate
 ///
-if (!args.Contains("generate"))
+if (args.Contains("generate"))
 {
 
     builder.Services.AddAutoBuilderApiCore(new()

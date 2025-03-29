@@ -12,17 +12,17 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 {
 
 
-   
+
 
 
     public static string getPTrns(string name)
     {
-        return  $@"
+        return $@"
             public ITranslationData? {name} {{ get; set; }}";
     }
 
-   
-    public static string getTampBuildRepo(string name,string type,string tag)
+
+    public static string getTampBuildRepo(string name, string type, string tag)
     {
         return $@"
                 public  class {name}{type}{tag} : BaseBuilderRepository<{name}, {name}BuildRequestDto, {name}BuildResponseDto>, I{name}BuilderRepository<{name}BuildRequestDto, {name}BuildResponseDto>
@@ -31,27 +31,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     public new string Generate(GenerationOptions options)
     {
 
-        
 
-        var properties = options.Properties;
-        var lsttemp=new List<PropertyInfo>();
-
-       
-
-
-        foreach (var property in properties)
-        {
-            if (property.GetCustomAttributes<ToTranslationAttribute>().Any())
-            {
-
-              
-                options.AdditionalCode += getPTrns(property.Name);
-            }
-            else
-                lsttemp.Add(property);
-        }
-
-        options.Properties = lsttemp.ToArray();
 
         string generatedCode = base.Generate(options);
 
@@ -62,13 +42,13 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
     public new void SaveToFile(string filePath)
     {
-       
+
 
         base.SaveToFile(filePath);
     }
 
-    
-    public   void GenrateandSave(GenerationOptions options,string path)
+
+    public void GenrateandSave(GenerationOptions options, string path)
     {
 
         Generate(options);
@@ -76,9 +56,9 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     }
 
 
-     
 
-    public static void GenerateAll(string type,string subtype,string NamespaceName,string pathfile)
+
+    public static void GenerateAll(string type, string subtype, string NamespaceName, string pathfile)
     {
 
 
@@ -88,7 +68,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
 
-        bool isbuild = subtype == "Build" ;
+        bool isbuild = subtype == "Build";
         Type type1 = isbuild ? typeof(ITBuildDto) : typeof(ITShareDto);
 
 
@@ -117,27 +97,27 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
             else
                 options.AdditionalCode += GenerateDtoProperties(options.Properties, models, $"{NamespaceName}{subtype}{type}");
-            
-            
-            options.Properties =new List<PropertyInfo>().ToArray();
+
+
+            options.Properties = new List<PropertyInfo>().ToArray();
             ITGenerator generator = new DtoGenerator();
             generator.Generate(options);
-         
+
             string jsonFile = Path.Combine(pathfile, $"{subtype}/{NamespaceName}/{options.ClassName}.cs");
             generator.SaveToFile(jsonFile);
 
             Console.WriteLine($"✅ {options.ClassName} has been created successfully!");
         }
 
-        
+
         //if (root == null)
         //{
         //    root = new FolderNode("DyModels");
         //    ApiFolderGenerator.ROOT.Children.Add(root);
-        
 
 
-        
+
+
 
         //var generator = new DtoGenerator();
         //string reqDtofile= Path.Combine(projectPath, $"{options.ClassName}.cs");
@@ -149,33 +129,33 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
     public static void GeneratWithFolder(FolderEventArgs e)
     {
-         foreach (var node in e.Node.Children)
+        foreach (var node in e.Node.Children)
+        {
+            foreach (var child in node.Children)
             {
-                foreach (var child in node.Children)
-                {
-                    GenerateAll(e.Node.Name, node.Name, child.Name, e.FullPath);
-                }
-                
-
+                GenerateAll(e.Node.Name, node.Name, child.Name, e.FullPath);
             }
+
+
+        }
     }
 
-    public static string GenerateDtoProperties(PropertyInfo[] properties,List<Type> models,string  end)
+    public static string GenerateDtoProperties(PropertyInfo[] properties, List<Type> models, string end)
     {
         var propertyDeclarations = new StringBuilder();
 
         foreach (var prop in properties)
         {
 
-        if (models.Contains(prop.PropertyType))
+            if (models.Contains(prop.PropertyType))
             {
                 propertyDeclarations.AppendLine($@"
                 public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }} ");
             }
 
-        else if (typeof(System.Collections.ICollection).IsAssignableFrom(prop.PropertyType))
-            { 
-                    StringBuilder temp = new StringBuilder();
+            else if (typeof(System.Collections.ICollection).IsAssignableFrom(prop.PropertyType))
+            {
+                StringBuilder temp = new StringBuilder();
                 int ln = prop.PropertyType.GenericTypeArguments.Length;
                 int c = 0;
                 foreach (var t in prop.PropertyType.GenericTypeArguments)
@@ -183,7 +163,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
                     var item = models.Where(x => x.Name == t.Name).FirstOrDefault();
 
-                    if (t.Name== "Subscription")
+                    if (t.Name == "Subscription")
                     {
                         temp.Append($@" {t.Name}{end}");
 
@@ -199,21 +179,21 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
                     {
                         temp.Append(",");
                     }
-                        c++;
+                    c++;
                 }
 
 
 
 
                 propertyDeclarations.AppendLine($"        public ICollection<{temp.ToString()}> {prop.Name} {{ get; set; }}");
-                
+
 
 
 
             }
 
 
-            else if(prop.GetCustomAttributes<ToTranslationAttribute>().Any())
+            else if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())
             {
 
 

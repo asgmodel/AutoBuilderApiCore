@@ -22,7 +22,7 @@ public class GenericClassGenerator : ITGenerator
             ");
         }
 
-        var baseClass = options.BaseClass != null ? $": {options.BaseClass.Name}" : "";
+        var baseClass = options.BaseClass != null ? $": {options.BaseClass}" : "";
         if (options.BaseClass != null && options.Interfaces.Any())
         {
             baseClass += ", ";

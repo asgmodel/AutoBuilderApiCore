@@ -22,7 +22,7 @@ public class GenerationOptions
     }
 
     public List<string> Usings { get; set; } = new List<string>();
-    public Type BaseClass { get; set; } = null;
+    public string BaseClass { get; set; } = null;
     public string Template { get; set; } = @"
         public class {ClassName} {BaseClass} {Interfaces}
         {

@@ -22,6 +22,12 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     }
 
    
+    public static string getTampBuildRepo(string name,string type,string tag)
+    {
+        return $@"
+                public  class {name}{type}{tag} : BaseBuilderRepository<{name}, {name}BuildRequestDto, {name}BuildResponseDto>, I{name}BuilderRepository<{name}BuildRequestDto, {name}BuildResponseDto>
+              ";
+    }
     public new string Generate(GenerationOptions options)
     {
 
@@ -72,7 +78,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
      
 
-    public static void GenerateBuild(string type,string subtype,string NamespaceName,string pathfile)
+    public static void GenerateAll(string type,string subtype,string NamespaceName,string pathfile)
     {
 
 
@@ -81,7 +87,11 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
-        
+
+        bool isbuild = subtype == "Build" ;
+        Type type1 = isbuild ? typeof(ITBuildDto) : typeof(ITShareDto);
+
+
 
 
         foreach (var model in models)
@@ -90,12 +100,25 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             {
                 NamespaceName = $"{type}.{subtype}.{NamespaceName}",
                 AdditionalCode = @"",
-                Interfaces = new List<Type> {subtype=="Build"?typeof(ITBuildDto): typeof(ITShareDto) },
+                Interfaces = new List<Type> { type1 },
                 Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" }
+
             };
 
+            if (!isbuild)
+            {
+                options.BaseClass = $"{model.Name}{NamespaceName}Build{type}";
 
-           options.AdditionalCode+= GenerateDtoProperties( options.Properties, models, $"{NamespaceName}{subtype}{type}");
+                options.Usings.Add($"{type}.Build.{NamespaceName}");
+
+
+
+            }
+
+            else
+                options.AdditionalCode += GenerateDtoProperties(options.Properties, models, $"{NamespaceName}{subtype}{type}");
+            
+            
             options.Properties =new List<PropertyInfo>().ToArray();
             ITGenerator generator = new DtoGenerator();
             generator.Generate(options);
@@ -124,21 +147,73 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     }
 
 
+    public static void GeneratWithFolder(FolderEventArgs e)
+    {
+         foreach (var node in e.Node.Children)
+            {
+                foreach (var child in node.Children)
+                {
+                    GenerateAll(e.Node.Name, node.Name, child.Name, e.FullPath);
+                }
+                
 
-    public static string GenerateDtoProperties(PropertyInfo[] properties,List<Type?> models,string  end)
+            }
+    }
+
+    public static string GenerateDtoProperties(PropertyInfo[] properties,List<Type> models,string  end)
     {
         var propertyDeclarations = new StringBuilder();
 
         foreach (var prop in properties)
         {
-             
-           if(models.Contains(prop.PropertyType))
+
+        if (models.Contains(prop.PropertyType))
             {
                 propertyDeclarations.AppendLine($@"
                 public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }} ");
             }
 
-            if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())
+        else if (typeof(System.Collections.ICollection).IsAssignableFrom(prop.PropertyType))
+            { 
+                    StringBuilder temp = new StringBuilder();
+                int ln = prop.PropertyType.GenericTypeArguments.Length;
+                int c = 0;
+                foreach (var t in prop.PropertyType.GenericTypeArguments)
+                {
+
+                    var item = models.Where(x => x.Name == t.Name).FirstOrDefault();
+
+                    if (t.Name== "Subscription")
+                    {
+                        temp.Append($@" {t.Name}{end}");
+
+
+
+                    }
+                    else
+                    {
+                        temp.Append($@"{t.Name}");
+                    }
+
+                    if (c < ln - 1)
+                    {
+                        temp.Append(",");
+                    }
+                        c++;
+                }
+
+
+
+
+                propertyDeclarations.AppendLine($"        public ICollection<{temp.ToString()}> {prop.Name} {{ get; set; }}");
+                
+
+
+
+            }
+
+
+            else if(prop.GetCustomAttributes<ToTranslationAttribute>().Any())
             {
 
 
@@ -154,7 +229,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// {prop.Name} property for DTO.
                     /// </summary>
-                    public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "?" : "")} {prop.Name} {{ get; set; }}
+                    public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "" : "")} {prop.Name} {{ get; set; }}
                 ");
 
             }

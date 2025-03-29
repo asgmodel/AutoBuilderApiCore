@@ -21,15 +21,12 @@ public static class ApiFolderInfo
 public class ApiFolderGenerator
 {
 
-    public static FolderNode? ROOT { get; set; }
-
-    private static string? absolutePath;
 
 
 
 
 
-    public static string? AbsolutePath { get => absolutePath; }
+
 
 
     public static void Build(string projectPath, string nameRoot = "Api")
@@ -39,7 +36,6 @@ public class ApiFolderGenerator
         {
             projectPath = Directory.GetCurrentDirectory().Split("bin")[0];
         }
-        absolutePath = projectPath;
         string jsonFilePath = Path.Combine(projectPath, "folderStructure.json");
 
         FolderStructureReader folderReader = new FolderStructureReader();
@@ -75,17 +71,14 @@ public class ApiFolderGenerator
     {
         if (e.Node.Name == "Dto")
         {
-            DtoGenerator generator = new DtoGenerator();
+           
 
-            foreach (var node in e.Node.Children)
-            {
-                foreach (var child in node.Children)
-                {
-                    DtoGenerator.GenerateBuild(e.Node.Name,node.Name ,child.Name, e.FullPath);
-                }
-                
+           DtoGenerator.GeneratWithFolder(e);
 
-            }
+
+        }
+        else if (e.Node.Name == "Dso")
+        {
 
 
         }

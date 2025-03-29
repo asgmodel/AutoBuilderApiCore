@@ -8,10 +8,11 @@ namespace AutoGenerator.Code;
 public class GenericClassGenerator : ITGenerator
 {
     private string generatedCode; //
-
+    public event EventHandler<string>? OnCodeGenerated;
+    public event EventHandler<string>? OnCodeSaved;
     public string Generate(GenerationOptions options)
     {
-        var properties = options.SourceType.GetProperties();
+        var properties = options.Properties;
         var propertyDeclarations = new List<string>();
 
         foreach (var prop in properties)

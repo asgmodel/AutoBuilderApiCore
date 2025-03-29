@@ -4,10 +4,8 @@ using System;
 
 namespace MyDtos
 {
-    public class InvoiceDto : BaseDto, ITDto
+    public class InvoiceDto : ITBuildDto
     {
-        public String Id { get; set; }
-        //
         public Int32 Itd { get; set; }
         //
         public String CustomerId { get; set; }
@@ -19,10 +17,6 @@ namespace MyDtos
         public Nullable<DateTime> InvoiceDate { get; set; }
         //
         public String Description { get; set; }
-
-        public void PrintDetails()
-        {
-            Console.WriteLine($"Id: {Id}, CustomerId: {CustomerId}, Status: {Status}");
-        }
+        public ITranslationData? Id { get; set; }
     }
 }

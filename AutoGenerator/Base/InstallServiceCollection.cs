@@ -14,8 +14,8 @@ namespace AutoGenerator
 
     public class AutoBuilderApiCoreOption
     {
-        public string ProjectPath { get; set; }= "GeneratedClasses";
-        public string ProjectName { get; set; } = "GeneratedClasses";
+        public string? ProjectPath { get; set; }
+        public string? ProjectName { get; set; } 
 
         public string NameRootApi { get; set; }= "Api";
     }

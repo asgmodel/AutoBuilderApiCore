@@ -1,6 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.ApiFolder;
-
+using Models;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -17,7 +17,7 @@ if (args.Contains("generate"))
 
     builder.Services.AddAutoBuilderApiCore(new()
     {
-        ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
+        //ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
         NameRootApi = "ApiCore"
     });
 

@@ -78,10 +78,10 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
         {
             var options = new GenerationOptions($"{model.Name}{NamespaceName}{subtype}{type}", model)
             {
-                NamespaceName = $"{type}.{subtype}.{NamespaceName}",
+                NamespaceName = $"{type}.{subtype}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
-                Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" }
+                Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" , "AutoGenerator.Models" }
 
             };
 
@@ -89,7 +89,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             {
                 options.BaseClass = $"{model.Name}{NamespaceName}Build{type}";
 
-                options.Usings.Add($"{type}.Build.{NamespaceName}");
+                options.Usings.Add($"{type}.Build.{NamespaceName}s");
 
 
 
@@ -163,7 +163,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
                     var item = models.Where(x => x.Name == t.Name).FirstOrDefault();
 
-                    if (t.Name == "Subscription")
+                    if (item!=null)
                     {
                         temp.Append($@" {t.Name}{end}");
 

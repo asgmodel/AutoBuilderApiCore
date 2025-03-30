@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AutoGenerator.Code;
 
-public class ServiceGenerator : GenericClassGenerator, ITGenerator
+public class ControllerGenerator : GenericClassGenerator, ITGenerator
 {
 
     public new string Generate(GenerationOptions options)
@@ -44,33 +44,33 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
 
 
 
-        NamespaceName = $"Services.{subtype}";
+        NamespaceName = $"Controllers.{subtype}";
 
         foreach (var model in models)
         {
             var options = new GenerationOptions($"{model.Name}{type}", model)
             {
                 NamespaceName= NamespaceName,
-                Template = GetTemplateService(null, NamespaceName, model.Name)
+                Template = GetTemplateController(null, subtype, model.Name)
                             ,
                 Usings = new List<string>
                         {
-                            "AutoGenerator.Data",
+                           
                             "AutoMapper",
                          
                             "Microsoft.Extensions.Logging",
                             "System.Collections.Generic",
 
-                            "AutoGenerator.Services.Base",
-                            "Dso.Requests",
-                            "Dso.Responses",
-                            "AutoGenerator.Models",
-                             "Dto.Share.Requests",
-                            "Dto.Share.Responses",
+                            "Services.Services",
+                            "Microsoft.AspNetCore.Mvc",
 
 
-                            "Repositorys.Share",
-                          
+
+
+
+
+
+
 
                         }
 
@@ -87,7 +87,7 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
             ITGenerator generator = new ServiceGenerator();
             generator.Generate(options);
 
-            string jsonFile = Path.Combine(pathfile, $"{model.Name}Service.cs");
+            string jsonFile = Path.Combine(pathfile, $"{subtype}/{model.Name}Controller.cs");
             generator.SaveToFile(jsonFile);
 
             Console.WriteLine($"✅ {options.ClassName} has been created successfully!");
@@ -98,8 +98,8 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
 
     }
 
-    
-    private static string GetTemplateService(List<string> usings, string nameSpace, string className)
+
+    private static string GetTemplateController(List<string> usings, string namespaceName, string className)
     {
         // Initialize a StringBuilder to accumulate the using statements.
         StringBuilder usingStatements = new StringBuilder();
@@ -116,58 +116,45 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
         // Generate and return the final template as a formatted string.
         return $@"
 {usingStatements.ToString()}
-public interface I{className}Service<TServiceRequestDso, TServiceResponseDso>
-    where TServiceRequestDso : class
-    where TServiceResponseDso : class
-{{
-  //  Task<TServiceResponseDso> CreateAsync(TServiceRequestDso entity);
-   // Task<TServiceResponseDso> GetByIdAsync(Guid id);
-    // يمكنك إضافة المزيد من الدوال هنا حسب الحاجة.
-}}
 
-
-   /////
- 
-    public interface IUse{className}Service: I{className}Service<{className}RequestDso, {className}ResponseDso>
-
+    [Route(""api/{namespaceName}/[controller]"")]
+    [ApiController]
+    public class {className}Controller : ControllerBase
     {{
-       ///
+        private readonly IUse{className}Service _{className.ToLower()}Service;
+        private readonly IMapper _mapper;
+        private readonly ILogger _logger;
 
-       /////
+        public {className}Controller(IUse{className}Service {className.ToLower()}Service, IMapper mapper, ILoggerFactory logger)
+        {{
+            _{className.ToLower()}Service = {className.ToLower()}Service;
+            _mapper = mapper;
+            _logger = logger.CreateLogger(typeof({className}Controller).FullName);
+        }}
 
+    
+                [HttpPost(""create"")]
+        public async Task<IActionResult> CreateInvoice()
+        {{
+            return Ok();
+        }}
+      
+        // You can add more actions like PUT, DELETE, etc., depending on the methods in your service interface.
     }}
 
-public class {className}Service : BaseService,IUse{className}Service  ///
-{{
-///
-    private readonly I{className}ShareRepository _{className.ToLower()}ShareRepository;
-///
-    public {className}Service(I{className}ShareRepository {className.ToLower()}ShareRepository, IMapper mapper, ILoggerFactory logger) ///
-        : base(mapper, logger)
-    {{
-
-         ///
-        _{className.ToLower()}ShareRepository = {className.ToLower()}ShareRepository;
-///
-    }} ///
-
-   
-
-    // يمكنك إضافة المزيد من الدوال مثل UpdateAsync أو DeleteAsync إذا كان ذلك مطلوبًا.
-}}
-
-     ";
+";
     }
 
 
 
 
-
-    private static string[] UseRepositorys = new string[] { "Builder", "Share" };
+    private static string[] UseControllers = new string[] { "Api" };
     public static void GeneratWithFolder(FolderEventArgs e)
     {
-        
-                GenerateAll(e.Node.Name, e.Node.Name, e.Node.Name, e.FullPath);
+
+        foreach (var node in e.Node.Children)
+                 if(UseControllers.Contains(node.Name))
+                 GenerateAll(e.Node.Name, node.Name, e.Node.Name, e.FullPath);
           
             //GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
 

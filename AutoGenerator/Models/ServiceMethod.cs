@@ -18,7 +18,6 @@ namespace AutoGenerator.Models
         public Service Service { get; set; }
 
 
-        public string[]? InputParams => JsonSerializer.Deserialize<string[]>(InputParameters!);
-        public string[]? OutputParams => JsonSerializer.Deserialize<string[]>(OutputParameters!);
+       
     }
 }

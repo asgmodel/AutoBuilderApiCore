@@ -59,7 +59,7 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
         {
             var options = new GenerationOptions($"{model.Name}{NamespaceName}{type}", model)
             {
-                NamespaceName = $"{type}.{NamespaceName}",
+                NamespaceName = $"{type}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
                 Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" }
@@ -68,7 +68,7 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
 
             options.BaseClass = $"{model.Name}{NamespaceName}ShareDto";
 
-            options.Usings.Add($"Dto.Share.{NamespaceName}");
+            options.Usings.Add($"Dto.Share.{NamespaceName}s");
 
 
 

@@ -92,6 +92,10 @@ public class ApiFolderGenerator
         {
             ServiceGenerator.GeneratWithFolder(e);
         }
+        else if (e.Node.Name == "Controllers")
+        {
+            ControllerGenerator.GeneratWithFolder(e);
+        }
     }
 
 

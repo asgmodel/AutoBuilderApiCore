@@ -58,7 +58,7 @@ namespace AutoGenerator.Models
         public string? Tag { get; set; } = "genarel";
 
     }
-    class CategoryTab : ITModel
+    public class CategoryTab : ITModel
     {
         [Key]
         public string? Id { get; set; } = $"catg_{Guid.NewGuid():N}";

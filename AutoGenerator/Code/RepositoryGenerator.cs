@@ -62,8 +62,8 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                             "System.Collections.Generic",
                     
                             "AutoGenerator.Repositorys.Builder",
-                            "Dto.Build.Request",
-                            "Dto.Build.Response",
+                            "Dto.Build.Requests",
+                            "Dto.Build.Responses",
                             "AutoGenerator.Models"
 
                         }
@@ -78,8 +78,8 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
                 options.Usings.AddRange(new List<string> {
                             
-                            "Dto.Share.Request",
-                            "Dto.Share.Response",
+                            "Dto.Share.Requests",
+                            "Dto.Share.Responses",
                           
                 
                             "Repositorys.Builder",

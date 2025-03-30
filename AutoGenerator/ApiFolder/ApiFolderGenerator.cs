@@ -96,6 +96,10 @@ public class ApiFolderGenerator
         {
             ControllerGenerator.GeneratWithFolder(e);
         }
+        else if (e.Node.Name == "VM")
+        {
+            VMGenerator.GeneratWithFolder(e);
+        }
     }
 
 

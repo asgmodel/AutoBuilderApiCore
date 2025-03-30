@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 namespace AutoGenerator.Repositorys.Builder
 {
 
-    public interface IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto>
+    public interface IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto> :ITBuildRepository
           where TBuildRequestDto : class
           where TBuildResponseDto : class
     {

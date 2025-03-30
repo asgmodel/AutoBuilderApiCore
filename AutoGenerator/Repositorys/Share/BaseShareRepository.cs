@@ -8,15 +8,16 @@ using System.Linq.Expressions;
 
 namespace AutoGenerator.Repositorys.Share
 {
-    public interface IBaseShareRepository<TShareRequestDto, TShareResponseDto>
+    public interface ITShareRepository<TShareRequestDto, TShareResponseDto> : ITBaseShareRepository
         where TShareRequestDto : class
         where TShareResponseDto : class
+  
     {
 
     }
 
     public abstract class BaseShareRepository<TShareRequestDto, TShareResponseDto, TBuildRequestDto, TBuildResponseDto>
-        : IBaseShareRepository<TShareRequestDto, TShareResponseDto>
+        : ITShareRepository<TShareRequestDto, TShareResponseDto>
         where TShareRequestDto : class
         where TShareResponseDto : class
         where TBuildRequestDto : class

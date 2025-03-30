@@ -1,0 +1,148 @@
+using Microsoft.CodeAnalysis;
+using AutoGenerator;
+using AutoGenerator.Models;
+using System;
+
+namespace Dto.Build.Responses
+{
+    public class ApplicationUserResponseBuildDto : ITBuildDto
+    {
+        /// <summary>
+        /// CustomerId property for DTO.
+        /// </summary>
+        public String CustomerId { get; set; }
+        /// <summary>
+        /// FirstName property for DTO.
+        /// </summary>
+        public String FirstName { get; set; }
+        /// <summary>
+        /// LastName property for DTO.
+        /// </summary>
+        public String LastName { get; set; }
+        /// <summary>
+        /// DisplayName property for DTO.
+        /// </summary>
+        public String DisplayName { get; set; }
+        /// <summary>
+        /// ProfileUrl property for DTO.
+        /// </summary>
+        public String ProfileUrl { get; set; }
+        /// <summary>
+        /// Image property for DTO.
+        /// </summary>
+        public String Image { get; set; }
+        /// <summary>
+        /// IsArchived property for DTO.
+        /// </summary>
+        public Boolean IsArchived { get; set; }
+        /// <summary>
+        /// ArchivedDate property for DTO.
+        /// </summary>
+        public Nullable<DateTime> ArchivedDate { get; set; }
+        /// <summary>
+        /// LastLoginIp property for DTO.
+        /// </summary>
+        public String LastLoginIp { get; set; }
+        /// <summary>
+        /// LastLoginDate property for DTO.
+        /// </summary>
+        public Nullable<DateTime> LastLoginDate { get; set; }
+        /// <summary>
+        /// CreatedAt property for DTO.
+        /// </summary>
+        public DateTime CreatedAt { get; set; }
+        /// <summary>
+        /// UpdatedAt property for DTO.
+        /// </summary>
+        public DateTime UpdatedAt { get; set; }
+        public SubscriptionResponseBuildDto? Subscription { get; set; }
+        /// <summary>
+        /// UserModelAis property for DTO.
+        /// </summary>
+        public ICollection<UserModelAi> UserModelAis { get; set; }
+        /// <summary>
+        /// UserServices property for DTO.
+        /// </summary>
+        public ICollection<UserService> UserServices { get; set; }
+        /// <summary>
+        /// Requests property for DTO.
+        /// </summary>
+        public ICollection<Request> Requests { get; set; }
+        /// <summary>
+        /// Claims property for DTO.
+        /// </summary>
+        public ICollection<ApplicationUserClaim> Claims { get; set; }
+        /// <summary>
+        /// Logins property for DTO.
+        /// </summary>
+        public ICollection<ApplicationUserLogin> Logins { get; set; }
+        /// <summary>
+        /// Tokens property for DTO.
+        /// </summary>
+        public ICollection<ApplicationUserToken> Tokens { get; set; }
+        /// <summary>
+        /// UserRoles property for DTO.
+        /// </summary>
+        public ICollection<ApplicationUserRole> UserRoles { get; set; }
+        /// <summary>
+        /// Id property for DTO.
+        /// </summary>
+        public String Id { get; set; }
+        /// <summary>
+        /// UserName property for DTO.
+        /// </summary>
+        public String UserName { get; set; }
+        /// <summary>
+        /// NormalizedUserName property for DTO.
+        /// </summary>
+        public String NormalizedUserName { get; set; }
+        /// <summary>
+        /// Email property for DTO.
+        /// </summary>
+        public String Email { get; set; }
+        /// <summary>
+        /// NormalizedEmail property for DTO.
+        /// </summary>
+        public String NormalizedEmail { get; set; }
+        /// <summary>
+        /// EmailConfirmed property for DTO.
+        /// </summary>
+        public Boolean EmailConfirmed { get; set; }
+        /// <summary>
+        /// PasswordHash property for DTO.
+        /// </summary>
+        public String PasswordHash { get; set; }
+        /// <summary>
+        /// SecurityStamp property for DTO.
+        /// </summary>
+        public String SecurityStamp { get; set; }
+        /// <summary>
+        /// ConcurrencyStamp property for DTO.
+        /// </summary>
+        public String ConcurrencyStamp { get; set; }
+        /// <summary>
+        /// PhoneNumber property for DTO.
+        /// </summary>
+        public String PhoneNumber { get; set; }
+        /// <summary>
+        /// PhoneNumberConfirmed property for DTO.
+        /// </summary>
+        public Boolean PhoneNumberConfirmed { get; set; }
+        /// <summary>
+        /// TwoFactorEnabled property for DTO.
+        /// </summary>
+        public Boolean TwoFactorEnabled { get; set; }
+        /// <summary>
+        /// LockoutEnd property for DTO.
+        /// </summary>
+        public Nullable<DateTimeOffset> LockoutEnd { get; set; }
+        /// <summary>
+        /// LockoutEnabled property for DTO.
+        /// </summary>
+        public Boolean LockoutEnabled { get; set; }
+        /// <summary>
+        /// AccessFailedCount property for DTO.
+        /// </summary>
+        public Int32 AccessFailedCount { get; set; }
+    }
+}

@@ -15,7 +15,7 @@
   ],
   "DyModels": [
     {
-      "VM": [ "Create", "Outputs" ],
+      "VM": [ ],
       "Dto": {
         "Build": [
           "Request",

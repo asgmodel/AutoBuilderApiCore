@@ -40,9 +40,9 @@ namespace AutoGenerator
 
     public interface ITBuildRepository : ITRepository { }
 
-    public interface ITShareRepository : ITRepository { }
+    public interface ITBaseShareRepository : ITRepository, ITScope { }
 
-    public interface ITService : ITBase { }
+    public interface ITService : ITBase,ITScope { }
 
     public interface ITBaseService : ITService { }
 

@@ -29,5 +29,13 @@ namespace AutoBuilderApiCore.Controllers
             })
             .ToArray();
         }
+
+
+        // POST: api/WeatherForecast   
+        [HttpPost(Name = "CreateWeatherForecast")]
+        public IActionResult Post([FromBody] WeatherForecast weatherForecast)
+        {
+            return Ok();
+        }
     }
 }

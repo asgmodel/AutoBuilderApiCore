@@ -29,75 +29,6 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
     }
 
 
-    public static void GenerateAll2(string type, string subtype, string NamespaceName, string pathfile)
-    {
-
-
-        var assembly = Assembly.GetExecutingAssembly();
-
-
-        var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
-
-
-
-
-
-
-
-        NamespaceName = "Repositorys.Share";
-
-        foreach (var model in models)
-        {
-            var options = new GenerationOptions($"{model.Name}{type}", model)
-            {
-                NamespaceName = NamespaceName,
-                Template = GetTemplatShare(null, NamespaceName, model.Name),
-                Usings = new List<string>
-                        {
-                            "AutoGenerator.Data",
-                            "AutoMapper",
-                            "Microsoft.Data.SqlClient",
-                            "Microsoft.EntityFrameworkCore",
-                            "Microsoft.Extensions.Logging",
-                            "System.Collections.Generic",
-                            "System.Linq",
-                            "System.Linq.Expressions",
-                            "System.Threading.Tasks",
-                            "AutoGenerator.Repositorys.Share",
-                            "Dto.Build.Request",
-                            "Dto.Build.Response",
-                            "Dto.Share.Request",
-                            "Dto.Share.Response",
-                            "AutoGenerator.Models",
-                            "AutoGenerator.Repositorys.Builder",
-                            "Repositorys.Builder"
-
-                        }
-
-            };
-
-
-
-
-
-
-
-
-
-            ITGenerator generator = new RepositoryGenerator();
-            generator.Generate(options);
-
-            string jsonFile = Path.Combine(pathfile, $"{subtype}/{model.Name}ShareRepository.cs");
-            generator.SaveToFile(jsonFile);
-
-            Console.WriteLine($"✅ {options.ClassName} has been created successfully!");
-        }
-
-
-
-
-    }
-
     public static void GenerateAll(string type, string subtype, string NamespaceName, string pathfile)
     {
 
@@ -113,25 +44,23 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
 
 
-        NamespaceName = "Repositorys.Builder";
+        NamespaceName = $"Repositorys.{subtype}";
 
         foreach (var model in models)
         {
             var options = new GenerationOptions($"{model.Name}{type}", model)
             {
                 NamespaceName= NamespaceName,
-                Template = GetTemplateBuilder(null, NamespaceName, model.Name),
+                Template = subtype != "Share"?GetTemplateBuilder(null, NamespaceName, model.Name):
+                            GetTemplatShare(null, NamespaceName, model.Name),
                 Usings = new List<string>
                         {
                             "AutoGenerator.Data",
                             "AutoMapper",
-                            "Microsoft.Data.SqlClient",
-                            "Microsoft.EntityFrameworkCore",
+                         
                             "Microsoft.Extensions.Logging",
                             "System.Collections.Generic",
-                            "System.Linq",
-                            "System.Linq.Expressions",
-                            "System.Threading.Tasks",
+                    
                             "AutoGenerator.Repositorys.Builder",
                             "Dto.Build.Request",
                             "Dto.Build.Response",
@@ -139,20 +68,33 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
                         }
 
+
             };
 
            
 
+            if(subtype == "Share")
+            {
+
+                options.Usings.AddRange(new List<string> {
+                            
+                            "Dto.Share.Request",
+                            "Dto.Share.Response",
+                          
+                
+                            "Repositorys.Builder",
+                            "AutoGenerator.Repositorys.Share"
+                });
+            }
 
 
 
 
 
-          
             ITGenerator generator = new RepositoryGenerator();
             generator.Generate(options);
 
-            string jsonFile = Path.Combine(pathfile, $"{subtype}/{model.Name}BuilderRepository.cs");
+            string jsonFile = Path.Combine(pathfile, $"{subtype}/{model.Name}{subtype}Repository.cs");
             generator.SaveToFile(jsonFile);
 
             Console.WriteLine($"✅ {options.ClassName} has been created successfully!");
@@ -299,16 +241,16 @@ public class {className}ShareRepository   //
         ";
     }
 
+    private static string[] UseRepositorys = new string[] { "Builder", "Share" };
     public static void GeneratWithFolder(FolderEventArgs e)
     {
         foreach (var node in e.Node.Children)
         {
-        
 
-            if(node.Name == "Builder")
+            if (UseRepositorys.Contains(node.Name))
+
                 GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
-            else if (node.Name == "Share")
-                GenerateAll2(e.Node.Name, node.Name, node.Name, e.FullPath);
+          
             //GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
 
 

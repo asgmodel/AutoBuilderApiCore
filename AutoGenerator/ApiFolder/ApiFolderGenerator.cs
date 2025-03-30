@@ -87,6 +87,11 @@ public class ApiFolderGenerator
         {
             RepositoryGenerator.GeneratWithFolder(e);
         }
+
+        else if (e.Node.Name == "Services")
+        {
+            ServiceGenerator.GeneratWithFolder(e);
+        }
     }
 
 

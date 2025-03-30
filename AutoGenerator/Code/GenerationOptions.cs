@@ -12,12 +12,12 @@ public class GenerationOptions
 
     public PropertyInfo[] Properties { get; set; } 
 
-    public GenerationOptions(string className, Type sourceType)
+    public GenerationOptions(string className, Type sourceType,bool isProperties=true)
     {
         ClassName = className;
         SourceType = sourceType;
-
-        Properties=sourceType.GetProperties();
+        if(isProperties)
+             Properties =sourceType.GetProperties();
 
     }
 

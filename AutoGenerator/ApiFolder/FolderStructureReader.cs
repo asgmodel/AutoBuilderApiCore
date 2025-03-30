@@ -297,7 +297,6 @@ namespace AutoGenerator.ApiFolder
         }
 
         /// <summary>
-        /// إرجاع كود `Base.cs` بناءً على اسم المجلد.
         /// </summary>
         private string GetBaseClassTemplate(string className, string nameSpace)
         {

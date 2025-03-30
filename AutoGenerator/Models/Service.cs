@@ -1,7 +1,7 @@
 ﻿using AutoGenerator;
 using System.ComponentModel.DataAnnotations;
 
-namespace Models
+namespace AutoGenerator.Models
 {
     public class Service : ITModel
     {

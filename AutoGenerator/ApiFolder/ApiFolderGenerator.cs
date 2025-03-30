@@ -82,6 +82,11 @@ public class ApiFolderGenerator
 
             DsoGenerator.GeneratWithFolder(e);
         }
+
+        else if(e.Node.Name == "Repositories")
+        {
+            RepositoryGenerator.GeneratWithFolder(e);
+        }
     }
 
 

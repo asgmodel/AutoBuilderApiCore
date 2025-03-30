@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Models
+namespace AutoGenerator.Models
 {
     public class AuthorizationSession : ITModel
     {

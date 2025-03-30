@@ -12,16 +12,19 @@ public class GenericClassGenerator : ITGenerator
     public event EventHandler<string>? OnCodeSaved;
     public string Generate(GenerationOptions options)
     {
-        var properties = options.Properties;
         var propertyDeclarations = new List<string>();
-
-        foreach (var prop in properties)
+        if (options.Properties != null)
         {
-            propertyDeclarations.Add($@"
+            var properties = options.Properties;
+
+
+            foreach (var prop in properties)
+            {
+                propertyDeclarations.Add($@"
                 public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "" : "")} {prop.Name} {{ get; set; }}
             ");
+            }
         }
-
         var baseClass = options.BaseClass != null ? $": {options.BaseClass}" : "";
         if (options.BaseClass != null && options.Interfaces.Any())
         {

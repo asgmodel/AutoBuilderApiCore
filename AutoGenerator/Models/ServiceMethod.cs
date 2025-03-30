@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 
-namespace Models
+namespace AutoGenerator.Models
 {
     public class ServiceMethod : ITModel
     {

@@ -1,6 +1,6 @@
 ﻿using AutoGenerator;
 
-namespace Models
+namespace AutoGenerator.Models
 {
     public class UserService : ITModel
     {

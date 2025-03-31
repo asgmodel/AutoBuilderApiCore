@@ -56,6 +56,15 @@ namespace VM.Request
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Request  property for VM Filter.
+    /// </summary>
+     public  class  RequestFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

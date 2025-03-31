@@ -56,6 +56,15 @@ namespace VM.UserService
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// UserService  property for VM Filter.
+    /// </summary>
+     public  class  UserServiceFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

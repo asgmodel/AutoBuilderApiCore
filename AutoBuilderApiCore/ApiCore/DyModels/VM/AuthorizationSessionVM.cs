@@ -56,6 +56,15 @@ namespace VM.AuthorizationSession
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// AuthorizationSession  property for VM Filter.
+    /// </summary>
+     public  class  AuthorizationSessionFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

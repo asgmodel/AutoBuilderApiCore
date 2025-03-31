@@ -56,6 +56,15 @@ namespace VM.Subscription
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Subscription  property for VM Filter.
+    /// </summary>
+     public  class  SubscriptionFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

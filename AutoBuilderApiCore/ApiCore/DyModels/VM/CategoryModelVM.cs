@@ -56,6 +56,15 @@ namespace VM.CategoryModel
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// CategoryModel  property for VM Filter.
+    /// </summary>
+     public  class  CategoryModelFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

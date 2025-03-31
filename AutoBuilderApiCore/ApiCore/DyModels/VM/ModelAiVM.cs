@@ -56,6 +56,15 @@ namespace VM.ModelAi
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// ModelAi  property for VM Filter.
+    /// </summary>
+     public  class  ModelAiFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

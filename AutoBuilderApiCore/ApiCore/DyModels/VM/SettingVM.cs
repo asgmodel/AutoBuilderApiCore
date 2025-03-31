@@ -56,6 +56,15 @@ namespace VM.Setting
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Setting  property for VM Filter.
+    /// </summary>
+     public  class  SettingFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

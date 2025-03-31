@@ -56,6 +56,15 @@ namespace VM.Invoice
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Invoice  property for VM Filter.
+    /// </summary>
+     public  class  InvoiceFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

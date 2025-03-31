@@ -56,6 +56,15 @@ namespace VM.Plan
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Plan  property for VM Filter.
+    /// </summary>
+     public  class  PlanFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

@@ -56,6 +56,15 @@ namespace VM.AdvertisementTab
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// AdvertisementTab  property for VM Filter.
+    /// </summary>
+     public  class  AdvertisementTabFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

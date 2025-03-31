@@ -56,6 +56,15 @@ namespace VM.UserModelAi
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// UserModelAi  property for VM Filter.
+    /// </summary>
+     public  class  UserModelAiFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

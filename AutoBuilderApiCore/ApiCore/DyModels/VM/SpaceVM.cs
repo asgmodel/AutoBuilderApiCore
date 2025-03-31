@@ -56,6 +56,15 @@ namespace VM.Space
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Space  property for VM Filter.
+    /// </summary>
+     public  class  SpaceFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

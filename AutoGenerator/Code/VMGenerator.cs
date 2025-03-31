@@ -108,8 +108,10 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
                 usingStatements.AppendLine($"using {u};");
             }
         }
+        StringBuilder pros= new StringBuilder();
+        if (nameSpace == "Filter")
+            pros.AppendLine(" public string?  Lg { get; set; }");
 
-        // Generate and return the final template as a formatted string.
         return $@"
 {usingStatements.ToString()}
 
@@ -119,6 +121,7 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
 public class {className}{nameSpace}VM :ITVM  ///
 {{
 ///
+      {pros.ToString()}
    
   ////
 }}
@@ -132,7 +135,7 @@ public class {className}{nameSpace}VM :ITVM  ///
 
 
 
-    private static string[] UseVM = new string[] { "Create", "Output", "Update", "Delete", "Info", "Share" };
+    private static string[] UseVM = new string[] { "Create", "Output", "Update", "Delete", "Info", "Share","Filter" };
     public static void GeneratWithFolder(FolderEventArgs e)
     {
 

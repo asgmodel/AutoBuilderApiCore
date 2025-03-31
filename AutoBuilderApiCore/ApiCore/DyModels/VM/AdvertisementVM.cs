@@ -56,6 +56,15 @@ namespace VM.Advertisement
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Advertisement  property for VM Filter.
+    /// </summary>
+     public  class  AdvertisementFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

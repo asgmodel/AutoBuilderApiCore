@@ -56,6 +56,15 @@ namespace VM.FAQItem
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// FAQItem  property for VM Filter.
+    /// </summary>
+     public  class  FAQItemFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

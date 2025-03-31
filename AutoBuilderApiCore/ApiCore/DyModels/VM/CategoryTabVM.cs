@@ -56,6 +56,15 @@ namespace VM.CategoryTab
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// CategoryTab  property for VM Filter.
+    /// </summary>
+     public  class  CategoryTabFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

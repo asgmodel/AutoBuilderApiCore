@@ -56,6 +56,15 @@ namespace VM.TypeModel
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// TypeModel  property for VM Filter.
+    /// </summary>
+     public  class  TypeModelFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

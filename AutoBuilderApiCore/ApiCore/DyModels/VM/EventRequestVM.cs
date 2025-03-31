@@ -56,6 +56,15 @@ namespace VM.EventRequest
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// EventRequest  property for VM Filter.
+    /// </summary>
+     public  class  EventRequestFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

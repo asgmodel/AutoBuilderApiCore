@@ -56,6 +56,15 @@ namespace VM.ModelGateway
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// ModelGateway  property for VM Filter.
+    /// </summary>
+     public  class  ModelGatewayFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

@@ -56,6 +56,15 @@ namespace VM.ApplicationUser
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// ApplicationUser  property for VM Filter.
+    /// </summary>
+     public  class  ApplicationUserFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

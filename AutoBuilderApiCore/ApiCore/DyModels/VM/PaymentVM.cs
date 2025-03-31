@@ -56,6 +56,15 @@ namespace VM.Payment
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Payment  property for VM Filter.
+    /// </summary>
+     public  class  PaymentFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

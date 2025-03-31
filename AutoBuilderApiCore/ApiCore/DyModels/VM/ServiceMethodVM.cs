@@ -56,6 +56,15 @@ namespace VM.ServiceMethod
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// ServiceMethod  property for VM Filter.
+    /// </summary>
+     public  class  ServiceMethodFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

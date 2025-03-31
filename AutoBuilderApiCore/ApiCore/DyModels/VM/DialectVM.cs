@@ -56,6 +56,15 @@ namespace VM.Dialect
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Dialect  property for VM Filter.
+    /// </summary>
+     public  class  DialectFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

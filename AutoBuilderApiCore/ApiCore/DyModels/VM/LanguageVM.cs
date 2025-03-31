@@ -56,6 +56,15 @@ namespace VM.Language
      { 
     ///
      ////
+    } //
+    /// <summary>
+    /// Language  property for VM Filter.
+    /// </summary>
+     public  class  LanguageFilterVM :  ITVM 
+    ///
+     { 
+    ///
+     public  string ? Lg { get ;  set ;  } ////
     }
 
 }

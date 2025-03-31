@@ -52,9 +52,6 @@ namespace Dto.Build.Responses
         /// </summary>
         public String SubscriptionId { get; set; }
         public SubscriptionResponseBuildDto? Subscription { get; set; }
-        /// <summary>
-        /// Requests property for DTO.
-        /// </summary>
-        public ICollection<Request> Requests { get; set; }
+        public ICollection<RequestResponseBuildDto>? Requests { get; set; }
     }
 }

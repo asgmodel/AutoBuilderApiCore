@@ -65,13 +65,7 @@ namespace Dto.Build.Requests
         /// </summary>
         public String UserId { get; set; }
         public ApplicationUserRequestBuildDto? User { get; set; }
-        /// <summary>
-        /// Requests property for DTO.
-        /// </summary>
-        public ICollection<Request> Requests { get; set; }
-        /// <summary>
-        /// Spaces property for DTO.
-        /// </summary>
-        public ICollection<Space> Spaces { get; set; }
+        public ICollection<RequestRequestBuildDto>? Requests { get; set; }
+        public ICollection<SpaceRequestBuildDto>? Spaces { get; set; }
     }
 }

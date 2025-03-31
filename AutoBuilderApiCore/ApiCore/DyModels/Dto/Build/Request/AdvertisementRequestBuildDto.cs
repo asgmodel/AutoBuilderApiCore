@@ -31,9 +31,6 @@ namespace Dto.Build.Requests
         /// Url property for DTO.
         /// </summary>
         public String Url { get; set; }
-        /// <summary>
-        /// AdvertisementTabs property for DTO.
-        /// </summary>
-        public ICollection<AdvertisementTab> AdvertisementTabs { get; set; }
+        public ICollection<AdvertisementTabRequestBuildDto>? AdvertisementTabs { get; set; }
     }
 }

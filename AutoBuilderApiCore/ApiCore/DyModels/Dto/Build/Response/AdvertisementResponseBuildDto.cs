@@ -31,9 +31,6 @@ namespace Dto.Build.Responses
         /// Url property for DTO.
         /// </summary>
         public String Url { get; set; }
-        /// <summary>
-        /// AdvertisementTabs property for DTO.
-        /// </summary>
-        public ICollection<AdvertisementTab> AdvertisementTabs { get; set; }
+        public ICollection<AdvertisementTabResponseBuildDto>? AdvertisementTabs { get; set; }
     }
 }

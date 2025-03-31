@@ -59,9 +59,6 @@ namespace Dto.Build.Requests
         /// </summary>
         public String SpaceId { get; set; }
         public SpaceRequestBuildDto? Space { get; set; }
-        /// <summary>
-        /// Events property for DTO.
-        /// </summary>
-        public ICollection<EventRequest> Events { get; set; }
+        public ICollection<EventRequestRequestBuildDto>? Events { get; set; }
     }
 }

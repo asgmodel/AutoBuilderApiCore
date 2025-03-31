@@ -1,7 +1,9 @@
 ﻿using AutoGenerator.ApiFolder;
 using AutoGenerator.Helper.Translation;
+using AutoMapper.Internal;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
+using System.Collections;
 using System.Reflection;
 using System.Text;
 
@@ -146,77 +148,40 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
         foreach (var prop in properties)
         {
-
+            // إذا كان النوع من ضمن القائمة models
             if (models.Contains(prop.PropertyType))
             {
                 propertyDeclarations.AppendLine($@"
-                public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }} ");
+        public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }}");
             }
-
-            else if (typeof(System.Collections.ICollection).IsAssignableFrom(prop.PropertyType))
+            // إذا كانت الخاصية من نوع Collection
+            else if (prop.PropertyType.IsCollection())
             {
-                StringBuilder temp = new StringBuilder();
-                int ln = prop.PropertyType.GenericTypeArguments.Length;
-                int c = 0;
-                foreach (var t in prop.PropertyType.GenericTypeArguments)
-                {
-
-                    var item = models.Where(x => x.Name == t.Name).FirstOrDefault();
-
-                    if (item!=null)
-                    {
-                        temp.Append($@" {t.Name}{end}");
-
-
-
-                    }
-                    else
-                    {
-                        temp.Append($@"{t.Name}");
-                    }
-
-                    if (c < ln - 1)
-                    {
-                        temp.Append(",");
-                    }
-                    c++;
-                }
-
-
-
-
-                propertyDeclarations.AppendLine($"        public ICollection<{temp.ToString()}> {prop.Name} {{ get; set; }}");
-
-
-
-
-            }
-
-
-            else if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())
-            {
-
-
-                propertyDeclarations.AppendLine(getPTrns(prop.Name));
-            }
-            else
-            {
-                //propertyDeclarations.AppendLine($@"
-                //public {prop.PropertyType.Name}? {prop.Name} {{ get; set; }} ");
-
+                var genericArguments = prop.PropertyType.GenericTypeArguments;
+                var typeNames = genericArguments.Select(t => models.Any(m => m.Name == t.Name) ? $"{t.Name}{end}" : t.Name);
 
                 propertyDeclarations.AppendLine($@"
-                    /// <summary>
-                    /// {prop.Name} property for DTO.
-                    /// </summary>
-                    public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "" : "")} {prop.Name} {{ get; set; }}
-                ");
-
+        public ICollection<{string.Join(", ", typeNames)}>? {prop.Name} {{ get; set; }}");
+            }
+            // إذا كان لديها `ToTranslationAttribute`
+            else if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())
+            {
+                propertyDeclarations.AppendLine(getPTrns(prop.Name));
+            }
+            // الحالات الأخرى (الافتراضية)
+            else
+            {
+                propertyDeclarations.AppendLine($@"
+        /// <summary>
+        /// {prop.Name} property for DTO.
+        /// </summary>
+        public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)} {prop.Name} {{ get; set; }}");
             }
         }
 
         return propertyDeclarations.ToString();
     }
+
 
 
 }

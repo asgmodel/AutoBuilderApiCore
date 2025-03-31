@@ -65,13 +65,7 @@ namespace Dto.Build.Responses
         /// </summary>
         public String UserId { get; set; }
         public ApplicationUserResponseBuildDto? User { get; set; }
-        /// <summary>
-        /// Requests property for DTO.
-        /// </summary>
-        public ICollection<Request> Requests { get; set; }
-        /// <summary>
-        /// Spaces property for DTO.
-        /// </summary>
-        public ICollection<Space> Spaces { get; set; }
+        public ICollection<RequestResponseBuildDto>? Requests { get; set; }
+        public ICollection<SpaceResponseBuildDto>? Spaces { get; set; }
     }
 }

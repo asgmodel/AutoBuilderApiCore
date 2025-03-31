@@ -56,34 +56,13 @@ namespace Dto.Build.Responses
         /// </summary>
         public DateTime UpdatedAt { get; set; }
         public SubscriptionResponseBuildDto? Subscription { get; set; }
-        /// <summary>
-        /// UserModelAis property for DTO.
-        /// </summary>
-        public ICollection<UserModelAi> UserModelAis { get; set; }
-        /// <summary>
-        /// UserServices property for DTO.
-        /// </summary>
-        public ICollection<UserService> UserServices { get; set; }
-        /// <summary>
-        /// Requests property for DTO.
-        /// </summary>
-        public ICollection<Request> Requests { get; set; }
-        /// <summary>
-        /// Claims property for DTO.
-        /// </summary>
-        public ICollection<ApplicationUserClaim> Claims { get; set; }
-        /// <summary>
-        /// Logins property for DTO.
-        /// </summary>
-        public ICollection<ApplicationUserLogin> Logins { get; set; }
-        /// <summary>
-        /// Tokens property for DTO.
-        /// </summary>
-        public ICollection<ApplicationUserToken> Tokens { get; set; }
-        /// <summary>
-        /// UserRoles property for DTO.
-        /// </summary>
-        public ICollection<ApplicationUserRole> UserRoles { get; set; }
+        public ICollection<UserModelAiResponseBuildDto>? UserModelAis { get; set; }
+        public ICollection<UserServiceResponseBuildDto>? UserServices { get; set; }
+        public ICollection<RequestResponseBuildDto>? Requests { get; set; }
+        public ICollection<ApplicationUserClaim>? Claims { get; set; }
+        public ICollection<ApplicationUserLogin>? Logins { get; set; }
+        public ICollection<ApplicationUserToken>? Tokens { get; set; }
+        public ICollection<ApplicationUserRole>? UserRoles { get; set; }
         /// <summary>
         /// Id property for DTO.
         /// </summary>

@@ -28,17 +28,8 @@ namespace Dto.Build.Requests
         /// </summary>
         public String ModelAiId { get; set; }
         public ModelAiRequestBuildDto? ModelAi { get; set; }
-        /// <summary>
-        /// ServiceMethods property for DTO.
-        /// </summary>
-        public ICollection<ServiceMethod> ServiceMethods { get; set; }
-        /// <summary>
-        /// UserServices property for DTO.
-        /// </summary>
-        public ICollection<UserService> UserServices { get; set; }
-        /// <summary>
-        /// Requests property for DTO.
-        /// </summary>
-        public ICollection<Request> Requests { get; set; }
+        public ICollection<ServiceMethodRequestBuildDto>? ServiceMethods { get; set; }
+        public ICollection<UserServiceRequestBuildDto>? UserServices { get; set; }
+        public ICollection<RequestRequestBuildDto>? Requests { get; set; }
     }
 }

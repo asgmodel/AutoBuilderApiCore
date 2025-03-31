@@ -23,7 +23,7 @@ namespace Dto.Build.Requests
         /// Description property for DTO.
         /// </summary>
         public String Description { get; set; }
-        public ICollection<String> Images { get; set; }
+        public ICollection<String>? Images { get; set; }
         /// <summary>
         /// BillingPeriod property for DTO.
         /// </summary>
@@ -44,13 +44,7 @@ namespace Dto.Build.Requests
         /// CreatedAt property for DTO.
         /// </summary>
         public DateTime CreatedAt { get; set; }
-        /// <summary>
-        /// Subscriptions property for DTO.
-        /// </summary>
-        public ICollection<Subscription> Subscriptions { get; set; }
-        /// <summary>
-        /// PlanFeatures property for DTO.
-        /// </summary>
-        public ICollection<PlanFeature> PlanFeatures { get; set; }
+        public ICollection<SubscriptionRequestBuildDto>? Subscriptions { get; set; }
+        public ICollection<PlanFeatureRequestBuildDto>? PlanFeatures { get; set; }
     }
 }

@@ -51,5 +51,8 @@ namespace Dto.Build.Requests
         /// ModelGatewayId property for DTO.
         /// </summary>
         public String ModelGatewayId { get; set; }
+        public ModelGatewayRequestBuildDto? ModelGateway { get; set; }
+        public ICollection<ServiceRequestBuildDto>? Services { get; set; }
+        public ICollection<UserModelAiRequestBuildDto>? UserModelAis { get; set; }
     }
 }

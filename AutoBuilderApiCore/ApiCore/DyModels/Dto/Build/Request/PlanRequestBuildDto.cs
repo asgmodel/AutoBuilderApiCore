@@ -15,14 +15,8 @@ namespace Dto.Build.Requests
         /// ProductId property for DTO.
         /// </summary>
         public String ProductId { get; set; }
-        /// <summary>
-        /// ProductName property for DTO.
-        /// </summary>
-        public String ProductName { get; set; }
-        /// <summary>
-        /// Description property for DTO.
-        /// </summary>
-        public String Description { get; set; }
+        public ITranslationData? ProductName { get; set; }
+        public ITranslationData? Description { get; set; }
         public ICollection<String>? Images { get; set; }
         /// <summary>
         /// BillingPeriod property for DTO.

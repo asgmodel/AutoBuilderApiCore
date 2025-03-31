@@ -51,10 +51,11 @@ namespace AutoGenerator.Models
     {
         [Key]
         public string? Id { get; set; } = $"faq_{Guid.NewGuid():N}";
-
+        [ToTranslation]
         public string? Question { get; set; }
+        [ToTranslation]
         public string? Answer { get; set; }
-
+        [ToTranslation]
         public string? Tag { get; set; } = "genarel";
 
     }
@@ -64,7 +65,9 @@ namespace AutoGenerator.Models
         public string? Id { get; set; } = $"catg_{Guid.NewGuid():N}";
 
         [Required]
+        [ToTranslation]
         public string? Name { get; set; }
+        [ToTranslation]
         public string? Description { get; set; }
 
         public bool Active { get; set; }
@@ -84,8 +87,9 @@ namespace AutoGenerator.Models
         public string Id { get; set; } = $"type_{Guid.NewGuid():N}";
 
         [Required]
+        [ToTranslation]
         public string? Name { get; set; } // مثل "Text-to-Speech", "API", "Dialect Conversion"
-
+        [ToTranslation]
         public string? Description { get; set; }
 
         public bool Active { get; set; }
@@ -99,7 +103,9 @@ namespace AutoGenerator.Models
         public string Id { get; set; } = $"dialect_{Guid.NewGuid():N}";
 
         [Required]
+        [ToTranslation]
         public string? Name { get; set; } // مثل "Najdi", "Hijazi", "Egyptian"
+        [ToTranslation]
         public string? Description { get; set; }
 
         [Required]
@@ -113,8 +119,9 @@ namespace AutoGenerator.Models
         public string Id { get; set; } = $"adv_{Guid.NewGuid():N}";
 
         [Required]
+        [ToTranslation]
         public string? Title { get; set; }
-
+        [ToTranslation]
         public string? Description { get; set; }
 
         public string? Image { get; set; }
@@ -133,10 +140,10 @@ namespace AutoGenerator.Models
 
         [Required]
         public string? AdvertisementId { get; set; }
-
+        [ToTranslation]
 
         public string? Title { get; set; }
-
+        [ToTranslation]
         public string? Description { get; set; }
 
         public string? ImageAlt { get; set; }

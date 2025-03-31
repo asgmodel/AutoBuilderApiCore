@@ -7,11 +7,10 @@ namespace Dto.Build.Requests
 {
     public class InvoiceRequestBuildDto : ITBuildDto
     {
-        public ITranslationData? Id { get; set; }
         /// <summary>
-        /// Itd property for DTO.
+        /// Id property for DTO.
         /// </summary>
-        public Int32 Itd { get; set; }
+        public String Id { get; set; }
         /// <summary>
         /// CustomerId property for DTO.
         /// </summary>
@@ -28,9 +27,5 @@ namespace Dto.Build.Requests
         /// InvoiceDate property for DTO.
         /// </summary>
         public Nullable<DateTime> InvoiceDate { get; set; }
-        /// <summary>
-        /// Description property for DTO.
-        /// </summary>
-        public String Description { get; set; }
     }
 }

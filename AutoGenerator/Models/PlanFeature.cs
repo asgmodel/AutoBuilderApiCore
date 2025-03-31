@@ -13,7 +13,9 @@ namespace AutoGenerator.Models
         public int Id { get; set; }
 
         [Required]
+        [ToTranslation]
         public string? Name { get; set; }
+        [ToTranslation]
         [Required] public string? Description { get; set; }
         public string? PlanId { get; set; }
 

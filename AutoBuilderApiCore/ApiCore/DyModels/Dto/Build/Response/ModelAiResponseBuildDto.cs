@@ -51,5 +51,8 @@ namespace Dto.Build.Responses
         /// ModelGatewayId property for DTO.
         /// </summary>
         public String ModelGatewayId { get; set; }
+        public ModelGatewayResponseBuildDto? ModelGateway { get; set; }
+        public ICollection<ServiceResponseBuildDto>? Services { get; set; }
+        public ICollection<UserModelAiResponseBuildDto>? UserModelAis { get; set; }
     }
 }

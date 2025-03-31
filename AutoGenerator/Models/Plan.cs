@@ -9,8 +9,9 @@ namespace AutoGenerator.Models
         [Key]
         public string Id { get; set; } = $"plan_{Guid.NewGuid():N}";
         public string ProductId { get; set; } = "price_1Pst3IKMQ7LabgRTZV9VgPex";
+        [ToTranslation]
         public required string ProductName { get; set; }
-        //public required long NumberRequests { get; set; }
+        [ToTranslation]
         public string? Description { get; set; }
         public List<string>? Images { get; set; }
         public string BillingPeriod { get; set; } = "monthly";       // daily , weekly , monthly ,.. 

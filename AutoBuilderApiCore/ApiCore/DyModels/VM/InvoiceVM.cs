@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Invoice
+namespace ApiCore.DyModels.VM.Invoice
 {
     /// <summary>
     /// Invoice  property for VM Create.

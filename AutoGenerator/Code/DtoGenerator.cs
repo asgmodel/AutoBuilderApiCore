@@ -72,7 +72,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
         bool isbuild = subtype == "Build";
         Type type1 = isbuild ? typeof(ITBuildDto) : typeof(ITShareDto);
-
+        var root = ApiFolderInfo.ROOT.Name;
 
 
 
@@ -80,7 +80,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
         {
             var options = new GenerationOptions($"{model.Name}{NamespaceName}{subtype}{type}", model)
             {
-                NamespaceName = $"{type}.{subtype}.{NamespaceName}s",
+                NamespaceName = $"{root}.DyModels.{type}.{subtype}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
                 Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" , "AutoGenerator.Models" }
@@ -91,7 +91,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             {
                 options.BaseClass = $"{model.Name}{NamespaceName}Build{type}";
 
-                options.Usings.Add($"{type}.Build.{NamespaceName}s");
+                options.Usings.Add($"{root}.DyModels.{type}.Build.{NamespaceName}s");
 
 
 

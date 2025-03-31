@@ -3,7 +3,7 @@ using AutoGenerator;
 using AutoGenerator.Models;
 using System;
 
-namespace Dto.Build.Requests
+namespace ApiCore.DyModels.Dto.Build.Requests
 {
     public class PlanRequestBuildDto : ITBuildDto
     {

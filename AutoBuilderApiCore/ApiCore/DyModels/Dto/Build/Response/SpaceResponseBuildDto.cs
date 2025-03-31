@@ -3,7 +3,7 @@ using AutoGenerator;
 using AutoGenerator.Models;
 using System;
 
-namespace Dto.Build.Responses
+namespace ApiCore.DyModels.Dto.Build.Responses
 {
     public class SpaceResponseBuildDto : ITBuildDto
     {

@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Advertisement
+namespace ApiCore.DyModels.VM.Advertisement
 {
     /// <summary>
     /// Advertisement  property for VM Create.

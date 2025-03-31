@@ -1,14 +1,14 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
-using Services.Services;
+using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using VM.Service;
+using ApiCore.DyModels.VM.Service;
 using System.Linq.Expressions;
-using Dso.Requests;
+using ApiCore.DyModels.Dso.Requests;
 using System;
 
-namespace Controllers.Api
+namespace ApiCore.Controllers.Api
 {
     [Route("api/Api/[controller]")]
     [ApiController]

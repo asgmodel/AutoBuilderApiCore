@@ -3,12 +3,12 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using AutoGenerator.Repositorys.Builder;
-using Dto.Build.Requests;
-using Dto.Build.Responses;
+using ApiCore.DyModels.Dto.Build.Requests;
+using ApiCore.DyModels.Dto.Build.Responses;
 using AutoGenerator.Models;
 using System;
 
-namespace Repositorys.Builder
+namespace ApiCore.Repositorys.Builder
 {
     /// <summary>
     /// EventRequest interface property for BuilderRepository.

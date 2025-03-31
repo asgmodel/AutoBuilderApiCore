@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Service
+namespace ApiCore.DyModels.VM.Service
 {
     /// <summary>
     /// Service  property for VM Create.

@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.CategoryTab
+namespace ApiCore.DyModels.VM.CategoryTab
 {
     /// <summary>
     /// CategoryTab  property for VM Create.

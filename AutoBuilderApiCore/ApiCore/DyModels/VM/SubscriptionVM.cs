@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Subscription
+namespace ApiCore.DyModels.VM.Subscription
 {
     /// <summary>
     /// Subscription  property for VM Create.

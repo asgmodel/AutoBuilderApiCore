@@ -38,13 +38,13 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
-        
 
 
 
 
+        var root = ApiFolderInfo.ROOT.Name;
 
-        NamespaceName = $"Controllers.{subtype}";
+        NamespaceName = $"{root}.Controllers.{subtype}";
 
         foreach (var model in models)
         {
@@ -61,11 +61,11 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
                             "Microsoft.Extensions.Logging",
                             "System.Collections.Generic",
 
-                            "Services.Services",
+                            $"{root}.Services.Services",
                             "Microsoft.AspNetCore.Mvc",
-                            $"VM.{model.Name}",
+                            $"{root}.DyModels.VM.{model.Name}",
                             "System.Linq.Expressions",
-                            "Dso.Requests",
+                            $"{root}.DyModels.Dso.Requests",
 
 
 

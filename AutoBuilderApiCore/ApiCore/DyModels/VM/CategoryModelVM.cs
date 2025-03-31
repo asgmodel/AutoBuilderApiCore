@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.CategoryModel
+namespace ApiCore.DyModels.VM.CategoryModel
 {
     /// <summary>
     /// CategoryModel  property for VM Create.

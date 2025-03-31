@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.TypeModel
+namespace ApiCore.DyModels.VM.TypeModel
 {
     /// <summary>
     /// TypeModel  property for VM Create.

@@ -7,11 +7,12 @@ using static AutoGenerator.ApiFolder.FolderStructureReader;
 namespace AutoGenerator.ApiFolder;
 
 
-public static class ApiFolderInfo
+public  class ApiFolderInfo
 {
 
+
     public static FolderNode? ROOT { get; set; }
-    private static string? absolutePath;
+    public static string? AbsolutePath;
 
 
 
@@ -45,6 +46,10 @@ public class ApiFolderGenerator
         folderReader.LoadFromJson(jsonFilePath);
 
         var root = folderReader.BuildFolderTree(nameRoot);
+
+        ApiFolderInfo.ROOT = root;
+        ApiFolderInfo.AbsolutePath = projectPath;
+
 
         folderReader.PrintFolderTree(root);
         folderReader.CreateFolders(projectPath, root);

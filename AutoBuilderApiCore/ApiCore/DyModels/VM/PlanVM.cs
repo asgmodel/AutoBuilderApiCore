@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Plan
+namespace ApiCore.DyModels.VM.Plan
 {
     /// <summary>
     /// Plan  property for VM Create.

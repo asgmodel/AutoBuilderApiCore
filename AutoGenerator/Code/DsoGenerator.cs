@@ -52,14 +52,14 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
 
         Type type1 = typeof(ITDso);
 
-
+        var root = ApiFolderInfo.ROOT.Name;
 
 
         foreach (var model in models)
         {
             var options = new GenerationOptions($"{model.Name}{NamespaceName}{type}", model)
             {
-                NamespaceName = $"{type}.{NamespaceName}s",
+                NamespaceName = $"{root}.DyModels.{type}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
                 Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" }
@@ -68,7 +68,7 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
 
             options.BaseClass = $"{model.Name}{NamespaceName}ShareDto";
 
-            options.Usings.Add($"Dto.Share.{NamespaceName}s");
+            options.Usings.Add($"{root}.DyModels.Dto.Share.{NamespaceName}s");
 
 
 

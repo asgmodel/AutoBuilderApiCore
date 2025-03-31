@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Dialect
+namespace ApiCore.DyModels.VM.Dialect
 {
     /// <summary>
     /// Dialect  property for VM Create.

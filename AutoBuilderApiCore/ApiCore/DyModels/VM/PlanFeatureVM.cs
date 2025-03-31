@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.PlanFeature
+namespace ApiCore.DyModels.VM.PlanFeature
 {
     /// <summary>
     /// PlanFeature  property for VM Create.

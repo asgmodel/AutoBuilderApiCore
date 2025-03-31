@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.FAQItem
+namespace ApiCore.DyModels.VM.FAQItem
 {
     /// <summary>
     /// FAQItem  property for VM Create.

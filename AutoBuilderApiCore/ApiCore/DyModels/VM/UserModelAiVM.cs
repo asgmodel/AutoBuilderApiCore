@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.UserModelAi
+namespace ApiCore.DyModels.VM.UserModelAi
 {
     /// <summary>
     /// UserModelAi  property for VM Create.

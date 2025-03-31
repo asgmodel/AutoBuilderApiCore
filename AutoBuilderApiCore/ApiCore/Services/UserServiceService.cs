@@ -3,17 +3,17 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using AutoGenerator.Services.Base;
-using Dso.Requests;
-using Dso.Responses;
+using ApiCore.DyModels.Dso.Requests;
+using ApiCore.DyModels.Dso.Responses;
 using AutoGenerator.Models;
-using Dto.Share.Requests;
-using Dto.Share.Responses;
-using Repositorys.Share;
+using ApiCore.DyModels.Dto.Share.Requests;
+using ApiCore.DyModels.Dto.Share.Responses;
+using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
-using Repositorys.Builder;
+using ApiCore.Repositorys.Builder;
 using System;
 
-namespace Services.Services
+namespace ApiCore.Services.Services
 {
     public interface IUserServiceService<TServiceRequestDso, TServiceResponseDso>
         where TServiceRequestDso : class where TServiceResponseDso : class

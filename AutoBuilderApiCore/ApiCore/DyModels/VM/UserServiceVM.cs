@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.UserService
+namespace ApiCore.DyModels.VM.UserService
 {
     /// <summary>
     /// UserService  property for VM Create.

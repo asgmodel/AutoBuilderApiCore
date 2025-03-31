@@ -1,10 +1,10 @@
 using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Models;
-using Dto.Build.Requests;
+using ApiCore.DyModels.Dto.Build.Requests;
 using System;
 
-namespace Dto.Share.Requests
+namespace ApiCore.DyModels.Dto.Share.Requests
 {
     public class SpaceRequestShareDto : SpaceRequestBuildDto, ITShareDto
     {

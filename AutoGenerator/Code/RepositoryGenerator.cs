@@ -29,7 +29,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
     }
 
 
-    public static void GenerateAll(string type, string subtype, string NamespaceName, string pathfile)
+    public static void GenerateAll(string root,string type, string subtype, string NamespaceName, string pathfile)
     {
 
 
@@ -44,7 +44,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
 
 
-        NamespaceName = $"Repositorys.{subtype}";
+        NamespaceName = $"{root}.Repositorys.{subtype}";
 
         foreach (var model in models)
         {
@@ -62,8 +62,8 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                             "System.Collections.Generic",
                     
                             "AutoGenerator.Repositorys.Builder",
-                            "Dto.Build.Requests",
-                            "Dto.Build.Responses",
+                            $"{root}.DyModels.Dto.Build.Requests",
+                           $"{root}.DyModels.Dto.Build.Responses",
                             "AutoGenerator.Models"
 
                         }
@@ -77,12 +77,12 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
             {
 
                 options.Usings.AddRange(new List<string> {
-                            
-                            "Dto.Share.Requests",
-                            "Dto.Share.Responses",
-                          
-                
-                            "Repositorys.Builder",
+
+                            $"{root}.DyModels.Dto.Share.Requests",
+                           $"{root}.DyModels.Dto.Share.Responses",
+
+
+                            $"{root}.Repositorys.Builder",
                             "AutoGenerator.Repositorys.Share",
                             "System.Linq.Expressions"
                 });
@@ -407,7 +407,7 @@ public class {className}ShareRepository   //
 
             if (UseRepositorys.Contains(node.Name))
 
-                GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
+                GenerateAll(ApiFolderInfo.ROOT.Name, e.Node.Name, node.Name, node.Name, e.FullPath);
           
             //GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
 

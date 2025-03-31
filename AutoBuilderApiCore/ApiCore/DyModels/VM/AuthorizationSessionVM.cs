@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.AuthorizationSession
+namespace ApiCore.DyModels.VM.AuthorizationSession
 {
     /// <summary>
     /// AuthorizationSession  property for VM Create.

@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.ModelGateway
+namespace ApiCore.DyModels.VM.ModelGateway
 {
     /// <summary>
     /// ModelGateway  property for VM Create.

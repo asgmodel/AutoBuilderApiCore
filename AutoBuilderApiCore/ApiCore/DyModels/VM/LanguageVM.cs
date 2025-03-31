@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Language
+namespace ApiCore.DyModels.VM.Language
 {
     /// <summary>
     /// Language  property for VM Create.

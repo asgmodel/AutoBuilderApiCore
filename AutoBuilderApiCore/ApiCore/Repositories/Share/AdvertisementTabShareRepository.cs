@@ -3,17 +3,17 @@ using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using AutoGenerator.Repositorys.Builder;
-using Dto.Build.Requests;
-using Dto.Build.Responses;
+using ApiCore.DyModels.Dto.Build.Requests;
+using ApiCore.DyModels.Dto.Build.Responses;
 using AutoGenerator.Models;
-using Dto.Share.Requests;
-using Dto.Share.Responses;
-using Repositorys.Builder;
+using ApiCore.DyModels.Dto.Share.Requests;
+using ApiCore.DyModels.Dto.Share.Responses;
+using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using System;
 
-namespace Repositorys.Share
+namespace ApiCore.Repositorys.Share
 {
     /// <summary>
     /// AdvertisementTab interface for ShareRepository.

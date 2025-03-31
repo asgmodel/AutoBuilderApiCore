@@ -1,9 +1,9 @@
 using Microsoft.CodeAnalysis;
 using AutoGenerator;
-using Dto.Share.Requests;
+using ApiCore.DyModels.Dto.Share.Requests;
 using System;
 
-namespace Dso.Requests
+namespace ApiCore.DyModels.Dso.Requests
 {
     public class PaymentRequestDso : PaymentRequestShareDto, ITDso
     {

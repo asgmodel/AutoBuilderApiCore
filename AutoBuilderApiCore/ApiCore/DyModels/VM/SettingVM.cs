@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Setting
+namespace ApiCore.DyModels.VM.Setting
 {
     /// <summary>
     /// Setting  property for VM Create.

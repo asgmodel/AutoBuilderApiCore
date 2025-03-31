@@ -38,13 +38,13 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
-        
 
 
 
+        var root = ApiFolderInfo.ROOT.Name;
 
 
-        NamespaceName = $"Services.{subtype}";
+        NamespaceName = $"{root}.Services.{subtype}";
 
         foreach (var model in models)
         {
@@ -62,16 +62,16 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
                             "System.Collections.Generic",
 
                             "AutoGenerator.Services.Base",
-                            "Dso.Requests",
-                            "Dso.Responses",
+                            $"{root}.DyModels.Dso.Requests",
+                            $"{root}.DyModels.Dso.Responses",
                             "AutoGenerator.Models",
-                             "Dto.Share.Requests",
-                            "Dto.Share.Responses",
+                            $"{root}.DyModels.Dto.Share.Requests",
+                            $"{root}.DyModels.Dto.Share.Responses",
 
 
-                            "Repositorys.Share",
+                            $"{root}.Repositorys.Share",
                             "System.Linq.Expressions",
-                            "Repositorys.Builder"
+                            $"{root}.Repositorys.Builder"
 
 
 

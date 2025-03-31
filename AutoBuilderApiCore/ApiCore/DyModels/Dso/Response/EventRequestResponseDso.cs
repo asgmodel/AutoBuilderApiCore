@@ -1,9 +1,9 @@
 using Microsoft.CodeAnalysis;
 using AutoGenerator;
-using Dto.Share.Responses;
+using ApiCore.DyModels.Dto.Share.Responses;
 using System;
 
-namespace Dso.Responses
+namespace ApiCore.DyModels.Dso.Responses
 {
     public class EventRequestResponseDso : EventRequestResponseShareDto, ITDso
     {

@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Space
+namespace ApiCore.DyModels.VM.Space
 {
     /// <summary>
     /// Space  property for VM Create.

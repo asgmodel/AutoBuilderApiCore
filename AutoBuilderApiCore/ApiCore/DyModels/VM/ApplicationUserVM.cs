@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.ApplicationUser
+namespace ApiCore.DyModels.VM.ApplicationUser
 {
     /// <summary>
     /// ApplicationUser  property for VM Create.

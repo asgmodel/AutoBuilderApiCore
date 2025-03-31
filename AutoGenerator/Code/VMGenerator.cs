@@ -46,11 +46,12 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
 
        
         StringBuilder  temp= new StringBuilder();
+        var root = ApiFolderInfo.ROOT.Name;
 
         foreach (var model in models)
 
         {
-            NamespaceName = $"{type}.{model.Name}";
+            NamespaceName = $"{root}.DyModels.{type}.{model.Name}";
             foreach (var subvm in UseVM)
             {
 

@@ -1,7 +1,7 @@
 using AutoGenerator;
 using System;
 
-namespace VM.Payment
+namespace ApiCore.DyModels.VM.Payment
 {
     /// <summary>
     /// Payment  property for VM Create.

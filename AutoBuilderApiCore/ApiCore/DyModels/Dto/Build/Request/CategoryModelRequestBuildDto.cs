@@ -11,13 +11,7 @@ namespace Dto.Build.Requests
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        /// <summary>
-        /// Name property for DTO.
-        /// </summary>
-        public String? Name { get; set; }
-        /// <summary>
-        /// Description property for DTO.
-        /// </summary>
-        public String? Description { get; set; }
+        public ITranslationData? Name { get; set; }
+        public ITranslationData? Description { get; set; }
     }
 }

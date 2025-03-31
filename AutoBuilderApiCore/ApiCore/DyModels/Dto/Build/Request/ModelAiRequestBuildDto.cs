@@ -11,10 +11,7 @@ namespace Dto.Build.Requests
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        /// <summary>
-        /// Name property for DTO.
-        /// </summary>
-        public String? Name { get; set; }
+        public ITranslationData? Name { get; set; }
         /// <summary>
         /// Token property for DTO.
         /// </summary>
@@ -23,26 +20,11 @@ namespace Dto.Build.Requests
         /// AbsolutePath property for DTO.
         /// </summary>
         public String? AbsolutePath { get; set; }
-        /// <summary>
-        /// Category property for DTO.
-        /// </summary>
-        public String? Category { get; set; }
-        /// <summary>
-        /// Language property for DTO.
-        /// </summary>
-        public String? Language { get; set; }
-        /// <summary>
-        /// IsStandard property for DTO.
-        /// </summary>
-        public Nullable<Boolean> IsStandard { get; set; }
-        /// <summary>
-        /// Gender property for DTO.
-        /// </summary>
-        public String? Gender { get; set; }
-        /// <summary>
-        /// Dialect property for DTO.
-        /// </summary>
-        public String? Dialect { get; set; }
+        public ITranslationData? Category { get; set; }
+        public ITranslationData? Language { get; set; }
+        public ITranslationData? IsStandard { get; set; }
+        public ITranslationData? Gender { get; set; }
+        public ITranslationData? Dialect { get; set; }
         /// <summary>
         /// Type property for DTO.
         /// </summary>

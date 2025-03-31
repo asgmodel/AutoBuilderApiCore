@@ -8,7 +8,7 @@ public class GenericClassGenerator : ITGenerator
     private string generatedCode = string.Empty; // «· √ﬂœ „‰ ⁄œ„ ÊÃÊœ ﬁÌ„… €Ì— „ÂÌ√…
     public event EventHandler<string>? OnCodeGenerated;
     public event EventHandler<string>? OnCodeSaved;
-    public bool IsEditFile { get; private set; } = true;
+    public bool IsEditFile { get; private set; } = false;
 
     public string Generate(GenerationOptions options)
     {
@@ -94,7 +94,7 @@ public class GenericClassGenerator : ITGenerator
         {
 
 
-            if (File.Exists(filePath) && IsEditFile)
+            if (!File.Exists(filePath) || IsEditFile)
             {
                 File.WriteAllText(filePath, generatedCode);
                 Console.WriteLine($"Generated code saved to {filePath}");

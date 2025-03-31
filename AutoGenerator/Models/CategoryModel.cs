@@ -9,8 +9,9 @@ namespace AutoGenerator.Models
         public string? Id { get; set; } = $"catm_{Guid.NewGuid():N}";
 
         [Required]
+        [ToTranslation]
         public string? Name { get; set; }
-
+        [ToTranslation]
         public string? Description { get; set; }
 
 

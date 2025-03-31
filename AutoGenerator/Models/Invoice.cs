@@ -3,6 +3,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AutoGenerator.Models
 {
+
+    
     public class Invoice: ITModel
     {
         [Key]
@@ -12,4 +14,9 @@ namespace AutoGenerator.Models
         public required string Url { get; set; }
         public DateTime? InvoiceDate { get; set; }
     }
+
+
+
+
+   
 }

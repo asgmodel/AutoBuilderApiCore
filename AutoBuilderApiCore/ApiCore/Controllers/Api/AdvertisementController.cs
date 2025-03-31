@@ -10,7 +10,8 @@ using System;
 
 namespace ApiCore.Controllers.Api
 {
-    [Route("api/Api/[controller]")]
+    //[ApiExplorerSettings(GroupName = "ApiCore")]
+    [Route("api/ApiCore/Api/[controller]")]
     [ApiController]
     public class AdvertisementController : ControllerBase
     {
@@ -25,7 +26,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get all Advertisements.
-        [HttpGet]
+        [HttpGet(Name = "GetAdvertisements")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<AdvertisementOutputVM>>> GetAll()
         {
             var result = await _advertisementService.GetAllAsync();
@@ -34,7 +38,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get a Advertisement by ID.
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetAdvertisement")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AdvertisementInfoVM>> GetById(int id)
         {
             if (id <= 0)
@@ -48,6 +55,9 @@ namespace ApiCore.Controllers.Api
 
         //// Find a Advertisement by a specific predicate.
         //[HttpGet("find")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<AdvertisementInfoVM>> Find([FromQuery] Expression<Func<AdvertisementOutputVM, bool>> predicate)
         //{
         //     return NotFound();
@@ -57,7 +67,10 @@ namespace ApiCore.Controllers.Api
         //   // return Ok(item);
         //}
         // Create a new Advertisement.
-        [HttpPost]
+        [HttpPost(Name = "CreateAdvertisement")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AdvertisementCreateVM>> Create([FromBody] AdvertisementCreateVM model)
         {
             if (model == null)
@@ -72,6 +85,9 @@ namespace ApiCore.Controllers.Api
 
         // Create multiple Advertisements.
         [HttpPost("createRange")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<AdvertisementCreateVM>>> CreateRange([FromBody] IEnumerable<AdvertisementCreateVM> models)
         {
             if (models == null)
@@ -85,7 +101,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Update an existing Advertisement.
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateAdvertisement")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] AdvertisementUpdateVM model)
         {
             if (id <= 0 || model == null)
@@ -101,7 +120,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Delete a Advertisement.
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteAdvertisement")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -125,7 +147,10 @@ namespace ApiCore.Controllers.Api
         //    return Ok();
         //}
         // Get count of Advertisements.
-        [HttpGet("count")]
+        [HttpGet("CountAdvertisement")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
             var count = await _advertisementService.CountAsync();

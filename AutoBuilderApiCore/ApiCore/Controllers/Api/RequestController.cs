@@ -10,7 +10,8 @@ using System;
 
 namespace ApiCore.Controllers.Api
 {
-    [Route("api/Api/[controller]")]
+    //[ApiExplorerSettings(GroupName = "ApiCore")]
+    [Route("api/ApiCore/Api/[controller]")]
     [ApiController]
     public class RequestController : ControllerBase
     {
@@ -25,7 +26,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get all Requests.
-        [HttpGet]
+        [HttpGet(Name = "GetRequests")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<RequestOutputVM>>> GetAll()
         {
             var result = await _requestService.GetAllAsync();
@@ -34,7 +38,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get a Request by ID.
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetRequest")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RequestInfoVM>> GetById(int id)
         {
             if (id <= 0)
@@ -48,6 +55,9 @@ namespace ApiCore.Controllers.Api
 
         //// Find a Request by a specific predicate.
         //[HttpGet("find")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<RequestInfoVM>> Find([FromQuery] Expression<Func<RequestOutputVM, bool>> predicate)
         //{
         //     return NotFound();
@@ -57,7 +67,10 @@ namespace ApiCore.Controllers.Api
         //   // return Ok(item);
         //}
         // Create a new Request.
-        [HttpPost]
+        [HttpPost(Name = "CreateRequest")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RequestCreateVM>> Create([FromBody] RequestCreateVM model)
         {
             if (model == null)
@@ -72,6 +85,9 @@ namespace ApiCore.Controllers.Api
 
         // Create multiple Requests.
         [HttpPost("createRange")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<RequestCreateVM>>> CreateRange([FromBody] IEnumerable<RequestCreateVM> models)
         {
             if (models == null)
@@ -85,7 +101,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Update an existing Request.
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateRequest")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] RequestUpdateVM model)
         {
             if (id <= 0 || model == null)
@@ -101,7 +120,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Delete a Request.
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteRequest")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -125,7 +147,10 @@ namespace ApiCore.Controllers.Api
         //    return Ok();
         //}
         // Get count of Requests.
-        [HttpGet("count")]
+        [HttpGet("CountRequest")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
             var count = await _requestService.CountAsync();

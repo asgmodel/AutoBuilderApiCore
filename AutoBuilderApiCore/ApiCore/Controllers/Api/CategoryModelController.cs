@@ -10,7 +10,8 @@ using System;
 
 namespace ApiCore.Controllers.Api
 {
-    [Route("api/Api/[controller]")]
+    //[ApiExplorerSettings(GroupName = "ApiCore")]
+    [Route("api/ApiCore/Api/[controller]")]
     [ApiController]
     public class CategoryModelController : ControllerBase
     {
@@ -25,7 +26,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get all CategoryModels.
-        [HttpGet]
+        [HttpGet(Name = "GetCategoryModels")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<CategoryModelOutputVM>>> GetAll()
         {
             var result = await _categorymodelService.GetAllAsync();
@@ -34,7 +38,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get a CategoryModel by ID.
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetCategoryModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CategoryModelInfoVM>> GetById(int id)
         {
             if (id <= 0)
@@ -48,6 +55,9 @@ namespace ApiCore.Controllers.Api
 
         //// Find a CategoryModel by a specific predicate.
         //[HttpGet("find")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<CategoryModelInfoVM>> Find([FromQuery] Expression<Func<CategoryModelOutputVM, bool>> predicate)
         //{
         //     return NotFound();
@@ -57,7 +67,10 @@ namespace ApiCore.Controllers.Api
         //   // return Ok(item);
         //}
         // Create a new CategoryModel.
-        [HttpPost]
+        [HttpPost(Name = "CreateCategoryModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<CategoryModelCreateVM>> Create([FromBody] CategoryModelCreateVM model)
         {
             if (model == null)
@@ -72,6 +85,9 @@ namespace ApiCore.Controllers.Api
 
         // Create multiple CategoryModels.
         [HttpPost("createRange")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<CategoryModelCreateVM>>> CreateRange([FromBody] IEnumerable<CategoryModelCreateVM> models)
         {
             if (models == null)
@@ -85,7 +101,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Update an existing CategoryModel.
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateCategoryModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] CategoryModelUpdateVM model)
         {
             if (id <= 0 || model == null)
@@ -101,7 +120,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Delete a CategoryModel.
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteCategoryModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -125,7 +147,10 @@ namespace ApiCore.Controllers.Api
         //    return Ok();
         //}
         // Get count of CategoryModels.
-        [HttpGet("count")]
+        [HttpGet("CountCategoryModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
             var count = await _categorymodelService.CountAsync();

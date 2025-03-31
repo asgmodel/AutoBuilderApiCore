@@ -10,7 +10,8 @@ using System;
 
 namespace ApiCore.Controllers.Api
 {
-    [Route("api/Api/[controller]")]
+    //[ApiExplorerSettings(GroupName = "ApiCore")]
+    [Route("api/ApiCore/Api/[controller]")]
     [ApiController]
     public class FAQItemController : ControllerBase
     {
@@ -25,7 +26,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get all FAQItems.
-        [HttpGet]
+        [HttpGet(Name = "GetFAQItems")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<FAQItemOutputVM>>> GetAll()
         {
             var result = await _faqitemService.GetAllAsync();
@@ -34,7 +38,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get a FAQItem by ID.
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetFAQItem")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<FAQItemInfoVM>> GetById(int id)
         {
             if (id <= 0)
@@ -48,6 +55,9 @@ namespace ApiCore.Controllers.Api
 
         //// Find a FAQItem by a specific predicate.
         //[HttpGet("find")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<FAQItemInfoVM>> Find([FromQuery] Expression<Func<FAQItemOutputVM, bool>> predicate)
         //{
         //     return NotFound();
@@ -57,7 +67,10 @@ namespace ApiCore.Controllers.Api
         //   // return Ok(item);
         //}
         // Create a new FAQItem.
-        [HttpPost]
+        [HttpPost(Name = "CreateFAQItem")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<FAQItemCreateVM>> Create([FromBody] FAQItemCreateVM model)
         {
             if (model == null)
@@ -72,6 +85,9 @@ namespace ApiCore.Controllers.Api
 
         // Create multiple FAQItems.
         [HttpPost("createRange")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<FAQItemCreateVM>>> CreateRange([FromBody] IEnumerable<FAQItemCreateVM> models)
         {
             if (models == null)
@@ -85,7 +101,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Update an existing FAQItem.
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateFAQItem")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] FAQItemUpdateVM model)
         {
             if (id <= 0 || model == null)
@@ -101,7 +120,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Delete a FAQItem.
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteFAQItem")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -125,7 +147,10 @@ namespace ApiCore.Controllers.Api
         //    return Ok();
         //}
         // Get count of FAQItems.
-        [HttpGet("count")]
+        [HttpGet("CountFAQItem")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
             var count = await _faqitemService.CountAsync();

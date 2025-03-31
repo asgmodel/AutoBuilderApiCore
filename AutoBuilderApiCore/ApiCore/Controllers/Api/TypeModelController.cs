@@ -10,7 +10,8 @@ using System;
 
 namespace ApiCore.Controllers.Api
 {
-    [Route("api/Api/[controller]")]
+    //[ApiExplorerSettings(GroupName = "ApiCore")]
+    [Route("api/ApiCore/Api/[controller]")]
     [ApiController]
     public class TypeModelController : ControllerBase
     {
@@ -25,7 +26,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get all TypeModels.
-        [HttpGet]
+        [HttpGet(Name = "GetTypeModels")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<TypeModelOutputVM>>> GetAll()
         {
             var result = await _typemodelService.GetAllAsync();
@@ -34,7 +38,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Get a TypeModel by ID.
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetTypeModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TypeModelInfoVM>> GetById(int id)
         {
             if (id <= 0)
@@ -48,6 +55,9 @@ namespace ApiCore.Controllers.Api
 
         //// Find a TypeModel by a specific predicate.
         //[HttpGet("find")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<TypeModelInfoVM>> Find([FromQuery] Expression<Func<TypeModelOutputVM, bool>> predicate)
         //{
         //     return NotFound();
@@ -57,7 +67,10 @@ namespace ApiCore.Controllers.Api
         //   // return Ok(item);
         //}
         // Create a new TypeModel.
-        [HttpPost]
+        [HttpPost(Name = "CreateTypeModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TypeModelCreateVM>> Create([FromBody] TypeModelCreateVM model)
         {
             if (model == null)
@@ -72,6 +85,9 @@ namespace ApiCore.Controllers.Api
 
         // Create multiple TypeModels.
         [HttpPost("createRange")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<TypeModelCreateVM>>> CreateRange([FromBody] IEnumerable<TypeModelCreateVM> models)
         {
             if (models == null)
@@ -85,7 +101,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Update an existing TypeModel.
-        [HttpPut("{id}")]
+        [HttpPut("{id}", Name = "UpdateTypeModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] TypeModelUpdateVM model)
         {
             if (id <= 0 || model == null)
@@ -101,7 +120,10 @@ namespace ApiCore.Controllers.Api
         }
 
         // Delete a TypeModel.
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}", Name = "DeleteTypeModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {
             if (id <= 0)
@@ -125,7 +147,10 @@ namespace ApiCore.Controllers.Api
         //    return Ok();
         //}
         // Get count of TypeModels.
-        [HttpGet("count")]
+        [HttpGet("CountTypeModel")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
             var count = await _typemodelService.CountAsync();

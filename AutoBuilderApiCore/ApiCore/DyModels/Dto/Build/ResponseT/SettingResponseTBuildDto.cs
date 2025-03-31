@@ -1,0 +1,19 @@
+using Microsoft.CodeAnalysis;
+using AutoGenerator;
+using AutoGenerator.Models;
+using System;
+
+namespace ApiCore.DyModels.Dto.Build.ResponseTs
+{
+    public class SettingResponseTBuildDto : ITBuildDto
+    {
+        /// <summary>
+        /// Name property for DTO.
+        /// </summary>
+        public String? Name { get; set; }
+        /// <summary>
+        /// Value property for DTO.
+        /// </summary>
+        public String? Value { get; set; }
+    }
+}

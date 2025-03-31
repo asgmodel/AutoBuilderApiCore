@@ -231,7 +231,7 @@ namespace AutoGenerator.ApiFolder
                 if (node.Children == null || node.Children.Count == 0)
                 {
                     // ✅ إنشاء ملف Base.cs داخل المجلد
-                    string baseFilePath = Path.Combine(folderPath, "Base.cs");
+                    string baseFilePath = Path.Combine(folderPath, "README.md");
 
                     // 🔥 تشغيل الحدث عند إنشاء الملف
                     FileCreating?.Invoke(this, new FileEventArgs(node, folderPath));
@@ -257,7 +257,7 @@ namespace AutoGenerator.ApiFolder
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ حدث خطأ أثناء إنشاء المجلدات والملفات: {ex.Message}");
+                Console.WriteLine($"❌ {ex.Message}");
             }
         }
 

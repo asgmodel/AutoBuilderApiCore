@@ -106,7 +106,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
     {
         // Initialize StringBuilder to accumulate the using statements dynamically.
         StringBuilder usingStatements = new StringBuilder();
-
+        var root = ApiFolderInfo.ROOT.Name;
         // Add using statements to the StringBuilder if provided.
         if (usings != null)
         {
@@ -119,8 +119,8 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         // Generate and return the controller template by replacing the namespace and className variables.
         return $@"
 {usingStatements.ToString()}
-
-    [Route(""api/{namespaceName}/[controller]"")]
+    //[ApiExplorerSettings(GroupName = ""{root}"")]
+    [Route(""api/{root}/{namespaceName}/[controller]"")]
     [ApiController]
     public class {className}Controller : ControllerBase
     {{
@@ -136,7 +136,11 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }}
 
         // Get all {className}s.
-        [HttpGet]
+       
+        [HttpGet(Name = ""Get{className}s"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<{className}OutputVM>>> GetAll()
         {{
             var result = await _{className.ToLower()}Service.GetAllAsync();
@@ -145,7 +149,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }}
 
         // Get a {className} by ID.
-        [HttpGet(""{{id}}"")]
+        [HttpGet(""{{id}}"", Name = ""Get{className}"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<{className}InfoVM>> GetById(int id)
         {{
             if (id <= 0) return BadRequest(""Invalid {className} ID."");
@@ -158,6 +165,9 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
 
         //// Find a {className} by a specific predicate.
         //[HttpGet(""find"")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         //public async Task<ActionResult<{className}InfoVM>> Find([FromQuery] Expression<Func<{className}OutputVM, bool>> predicate)
         //{{
         //     return NotFound();
@@ -168,7 +178,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         //}}
 
         // Create a new {className}.
-        [HttpPost]
+        [HttpPost(Name = ""Create{className}"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<{className}CreateVM>> Create([FromBody] {className}CreateVM model)
         {{
             if (model == null) return BadRequest(""{className} data is required."");
@@ -182,6 +195,9 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
 
         // Create multiple {className}s.
         [HttpPost(""createRange"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<{className}CreateVM>>> CreateRange([FromBody] IEnumerable<{className}CreateVM> models)
         {{
             if (models == null) return BadRequest(""Data is required."");
@@ -194,7 +210,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }}
 
         // Update an existing {className}.
-        [HttpPut(""{{id}}"")]
+        [HttpPut(""{{id}}"", Name = ""Update{className}"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] {className}UpdateVM model)
         {{
             if (id <= 0 || model == null) return BadRequest(""Invalid data."");
@@ -208,7 +227,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }}
 
         // Delete a {className}.
-        [HttpDelete(""{{id}}"")]
+        [HttpDelete(""{{id}}"", Name = ""Delete{className}"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
         {{
             if (id <= 0) return BadRequest(""Invalid {className} ID."");
@@ -234,7 +256,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         //}}
 
         // Get count of {className}s.
-        [HttpGet(""count"")]
+        [HttpGet(""Count{className}"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {{
             var count = await _{className.ToLower()}Service.CountAsync();

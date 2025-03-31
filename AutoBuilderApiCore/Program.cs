@@ -3,6 +3,7 @@ using AutoGenerator.ApiFolder;
 using AutoGenerator.Config;
 using AutoGenerator.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using Models;
 
 using System.Reflection;
@@ -14,21 +15,34 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 /// <summary>
 /// generate
 ///
 
 
-if (args.Contains("generate"))
+if (args.Length>0&&args[0].Contains("generate"))
 {
+    if(args.Length>1)
+    for (int i = 1; i < args.Length; i++)
+       builder.Services.AddAutoBuilderApiCore(new()
+       {
 
-    builder.Services.AddAutoBuilderApiCore(new()
-    {
         //ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
-        NameRootApi = "ApiCore",
+        NameRootApi = args[i],
         IsAutoBuild = true,
        
-    });
+        });
+    else
+        builder.Services.AddAutoBuilderApiCore(new()
+        {
+
+            //ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
+            NameRootApi = "ApiCore",
+            IsAutoBuild = true,
+
+        });
+
 
 
 }
@@ -59,8 +73,9 @@ else
         app.UseSwagger();
         app.UseSwaggerUI();
     }
-
+ 
     app.UseHttpsRedirection();
+    
 
     app.UseAuthorization();
 

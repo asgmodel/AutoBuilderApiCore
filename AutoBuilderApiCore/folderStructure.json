@@ -19,7 +19,8 @@
       "Dto": {
         "Build": [
           "Request",
-          "Response"
+          "Response",
+          "ResponseT"
         ],
         "Share": [
           "Request",

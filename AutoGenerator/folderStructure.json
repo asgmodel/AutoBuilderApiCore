@@ -1,9 +1,5 @@
 {
-  "Controllers": [
-    "Api",
-    "Auth",
-    "Admin"
-  ],
+
   "Repositories": [
     "Base",
     "Builder",

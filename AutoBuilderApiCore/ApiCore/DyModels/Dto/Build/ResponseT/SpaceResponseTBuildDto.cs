@@ -3,9 +3,9 @@ using AutoGenerator;
 using AutoGenerator.Models;
 using System;
 
-namespace ApiCore.DyModels.Dto.Build.Responses
+namespace ApiCore.DyModels.Dto.Build.ResponseTs
 {
-    public class SpaceResponseBuildDto : ITBuildDto
+    public class SpaceResponseTBuildDto : ITBuildDto
     {
         /// <summary>
         /// Id property for DTO.
@@ -51,9 +51,9 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// SubscriptionId property for DTO.
         /// </summary>
         public String? SubscriptionId { get; set; }
-        public SubscriptionResponseBuildDto? Subscription { get; set; }
-        public ICollection<RequestResponseBuildDto>? Requests { get; set; }
-        public ICollection<RequestResponseBuildDto>? Requests2 { get; set; }
-        public RequestResponseBuildDto[]? Requests3 { get; set; }
+        public SubscriptionResponseTBuildDto? Subscription { get; set; }
+        public ICollection<RequestResponseTBuildDto>? Requests { get; set; }
+        public ICollection<RequestResponseTBuildDto>? Requests2 { get; set; }
+        public RequestResponseTBuildDto[]? Requests3 { get; set; }
     }
 }

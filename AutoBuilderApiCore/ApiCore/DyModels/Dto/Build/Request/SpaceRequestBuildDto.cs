@@ -53,5 +53,7 @@ namespace ApiCore.DyModels.Dto.Build.Requests
         public String? SubscriptionId { get; set; }
         public SubscriptionRequestBuildDto? Subscription { get; set; }
         public ICollection<RequestRequestBuildDto>? Requests { get; set; }
+        public ICollection<RequestRequestBuildDto>? Requests2 { get; set; }
+        public RequestRequestBuildDto[]? Requests3 { get; set; }
     }
 }

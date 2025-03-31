@@ -32,7 +32,10 @@ namespace AutoGenerator.Models
         public Subscription Subscription { get; set; }
         public ICollection<Request> Requests { get; set; } = [];
 
-   
+
+        public List<Request> Requests2 { get; set; } = [];
+        public Request[] Requests3 { get; set; } = [];
+
 
     }
 }

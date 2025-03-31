@@ -10,19 +10,19 @@ namespace Dto.Build.Requests
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// CustomerId property for DTO.
         /// </summary>
-        public String CustomerId { get; set; }
+        public String? CustomerId { get; set; }
         /// <summary>
         /// Status property for DTO.
         /// </summary>
-        public String Status { get; set; }
+        public String? Status { get; set; }
         /// <summary>
         /// Url property for DTO.
         /// </summary>
-        public String Url { get; set; }
+        public String? Url { get; set; }
         /// <summary>
         /// InvoiceDate property for DTO.
         /// </summary>

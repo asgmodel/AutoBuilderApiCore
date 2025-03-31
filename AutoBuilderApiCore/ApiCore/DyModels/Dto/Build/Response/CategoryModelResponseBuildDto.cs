@@ -10,14 +10,14 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// Name property for DTO.
         /// </summary>
-        public String Name { get; set; }
+        public String? Name { get; set; }
         /// <summary>
         /// Description property for DTO.
         /// </summary>
-        public String Description { get; set; }
+        public String? Description { get; set; }
     }
 }

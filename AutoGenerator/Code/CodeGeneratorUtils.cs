@@ -17,6 +17,8 @@ public static class CodeGeneratorUtils
             var underlyingType = Nullable.GetUnderlyingType(propertyType);
             return underlyingType != null ? underlyingType.Name : propertyType.Name;
         }
+        else if (propertyType == typeof(string))
+            return propertyType.Name+"?";
         else
         {
             return propertyType.Name;

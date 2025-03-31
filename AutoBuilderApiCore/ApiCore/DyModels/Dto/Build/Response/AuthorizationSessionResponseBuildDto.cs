@@ -10,19 +10,19 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// SessionToken property for DTO.
         /// </summary>
-        public String SessionToken { get; set; }
+        public String? SessionToken { get; set; }
         /// <summary>
         /// UserToken property for DTO.
         /// </summary>
-        public String UserToken { get; set; }
+        public String? UserToken { get; set; }
         /// <summary>
         /// AuthorizationType property for DTO.
         /// </summary>
-        public String AuthorizationType { get; set; }
+        public String? AuthorizationType { get; set; }
         /// <summary>
         /// StartTime property for DTO.
         /// </summary>
@@ -38,19 +38,19 @@ namespace Dto.Build.Responses
         /// <summary>
         /// UserId property for DTO.
         /// </summary>
-        public String UserId { get; set; }
+        public String? UserId { get; set; }
         public ApplicationUserResponseBuildDto? User { get; set; }
         /// <summary>
         /// IpAddress property for DTO.
         /// </summary>
-        public String IpAddress { get; set; }
+        public String? IpAddress { get; set; }
         /// <summary>
         /// DeviceInfo property for DTO.
         /// </summary>
-        public String DeviceInfo { get; set; }
+        public String? DeviceInfo { get; set; }
         /// <summary>
         /// ServicesIds property for DTO.
         /// </summary>
-        public String ServicesIds { get; set; }
+        public String? ServicesIds { get; set; }
     }
 }

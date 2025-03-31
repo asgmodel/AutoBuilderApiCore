@@ -10,27 +10,27 @@ namespace Dto.Build.Requests
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// Name property for DTO.
         /// </summary>
-        public String Name { get; set; }
+        public String? Name { get; set; }
         /// <summary>
         /// Token property for DTO.
         /// </summary>
-        public String Token { get; set; }
+        public String? Token { get; set; }
         /// <summary>
         /// AbsolutePath property for DTO.
         /// </summary>
-        public String AbsolutePath { get; set; }
+        public String? AbsolutePath { get; set; }
         /// <summary>
         /// Category property for DTO.
         /// </summary>
-        public String Category { get; set; }
+        public String? Category { get; set; }
         /// <summary>
         /// Language property for DTO.
         /// </summary>
-        public String Language { get; set; }
+        public String? Language { get; set; }
         /// <summary>
         /// IsStandard property for DTO.
         /// </summary>
@@ -38,19 +38,19 @@ namespace Dto.Build.Requests
         /// <summary>
         /// Gender property for DTO.
         /// </summary>
-        public String Gender { get; set; }
+        public String? Gender { get; set; }
         /// <summary>
         /// Dialect property for DTO.
         /// </summary>
-        public String Dialect { get; set; }
+        public String? Dialect { get; set; }
         /// <summary>
         /// Type property for DTO.
         /// </summary>
-        public String Type { get; set; }
+        public String? Type { get; set; }
         /// <summary>
         /// ModelGatewayId property for DTO.
         /// </summary>
-        public String ModelGatewayId { get; set; }
+        public String? ModelGatewayId { get; set; }
         public ModelGatewayRequestBuildDto? ModelGateway { get; set; }
         public ICollection<ServiceRequestBuildDto>? Services { get; set; }
         public ICollection<UserModelAiRequestBuildDto>? UserModelAis { get; set; }

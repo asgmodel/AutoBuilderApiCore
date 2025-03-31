@@ -10,27 +10,27 @@ namespace Dto.Build.Responses
         /// <summary>
         /// CustomerId property for DTO.
         /// </summary>
-        public String CustomerId { get; set; }
+        public String? CustomerId { get; set; }
         /// <summary>
         /// FirstName property for DTO.
         /// </summary>
-        public String FirstName { get; set; }
+        public String? FirstName { get; set; }
         /// <summary>
         /// LastName property for DTO.
         /// </summary>
-        public String LastName { get; set; }
+        public String? LastName { get; set; }
         /// <summary>
         /// DisplayName property for DTO.
         /// </summary>
-        public String DisplayName { get; set; }
+        public String? DisplayName { get; set; }
         /// <summary>
         /// ProfileUrl property for DTO.
         /// </summary>
-        public String ProfileUrl { get; set; }
+        public String? ProfileUrl { get; set; }
         /// <summary>
         /// Image property for DTO.
         /// </summary>
-        public String Image { get; set; }
+        public String? Image { get; set; }
         /// <summary>
         /// IsArchived property for DTO.
         /// </summary>
@@ -42,7 +42,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// LastLoginIp property for DTO.
         /// </summary>
-        public String LastLoginIp { get; set; }
+        public String? LastLoginIp { get; set; }
         /// <summary>
         /// LastLoginDate property for DTO.
         /// </summary>
@@ -66,23 +66,23 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// UserName property for DTO.
         /// </summary>
-        public String UserName { get; set; }
+        public String? UserName { get; set; }
         /// <summary>
         /// NormalizedUserName property for DTO.
         /// </summary>
-        public String NormalizedUserName { get; set; }
+        public String? NormalizedUserName { get; set; }
         /// <summary>
         /// Email property for DTO.
         /// </summary>
-        public String Email { get; set; }
+        public String? Email { get; set; }
         /// <summary>
         /// NormalizedEmail property for DTO.
         /// </summary>
-        public String NormalizedEmail { get; set; }
+        public String? NormalizedEmail { get; set; }
         /// <summary>
         /// EmailConfirmed property for DTO.
         /// </summary>
@@ -90,19 +90,19 @@ namespace Dto.Build.Responses
         /// <summary>
         /// PasswordHash property for DTO.
         /// </summary>
-        public String PasswordHash { get; set; }
+        public String? PasswordHash { get; set; }
         /// <summary>
         /// SecurityStamp property for DTO.
         /// </summary>
-        public String SecurityStamp { get; set; }
+        public String? SecurityStamp { get; set; }
         /// <summary>
         /// ConcurrencyStamp property for DTO.
         /// </summary>
-        public String ConcurrencyStamp { get; set; }
+        public String? ConcurrencyStamp { get; set; }
         /// <summary>
         /// PhoneNumber property for DTO.
         /// </summary>
-        public String PhoneNumber { get; set; }
+        public String? PhoneNumber { get; set; }
         /// <summary>
         /// PhoneNumberConfirmed property for DTO.
         /// </summary>

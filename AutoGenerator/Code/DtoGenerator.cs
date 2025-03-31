@@ -208,11 +208,11 @@ public class TypeInspector
         // فحص النوع وإعادة الكود المناسب بناءً على النوع
         if (propertyType == typeof(string))
         {
-            sb.AppendLine($"        public string {propertyName} {{ get; set; }}");
+            return "string";
         }
         else if (propertyType == typeof(int))
         {
-            sb.AppendLine($"        public int {propertyName} {{ get; set; }}");
+            return "int";
         }
         else if (propertyType == typeof(DateTime))
         {

@@ -10,23 +10,23 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// Name property for DTO.
         /// </summary>
-        public String Name { get; set; }
+        public String? Name { get; set; }
         /// <summary>
         /// AbsolutePath property for DTO.
         /// </summary>
-        public String AbsolutePath { get; set; }
+        public String? AbsolutePath { get; set; }
         /// <summary>
         /// Token property for DTO.
         /// </summary>
-        public String Token { get; set; }
+        public String? Token { get; set; }
         /// <summary>
         /// ModelAiId property for DTO.
         /// </summary>
-        public String ModelAiId { get; set; }
+        public String? ModelAiId { get; set; }
         public ModelAiResponseBuildDto? ModelAi { get; set; }
         public ICollection<ServiceMethodResponseBuildDto>? ServiceMethods { get; set; }
         public ICollection<UserServiceResponseBuildDto>? UserServices { get; set; }

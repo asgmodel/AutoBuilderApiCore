@@ -16,7 +16,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// PlanId property for DTO.
         /// </summary>
-        public String PlanId { get; set; }
+        public String? PlanId { get; set; }
         public PlanResponseBuildDto? Plan { get; set; }
     }
 }

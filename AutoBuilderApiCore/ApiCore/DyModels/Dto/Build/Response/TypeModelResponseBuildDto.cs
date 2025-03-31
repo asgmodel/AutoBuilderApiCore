@@ -10,7 +10,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         public ITranslationData? Name { get; set; }
         public ITranslationData? Description { get; set; }
         /// <summary>
@@ -20,6 +20,6 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Image property for DTO.
         /// </summary>
-        public String Image { get; set; }
+        public String? Image { get; set; }
     }
 }

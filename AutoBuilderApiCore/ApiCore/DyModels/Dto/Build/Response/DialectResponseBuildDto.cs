@@ -10,13 +10,13 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         public ITranslationData? Name { get; set; }
         public ITranslationData? Description { get; set; }
         /// <summary>
         /// LanguageId property for DTO.
         /// </summary>
-        public String LanguageId { get; set; }
+        public String? LanguageId { get; set; }
         public LanguageResponseBuildDto? Language { get; set; }
     }
 }

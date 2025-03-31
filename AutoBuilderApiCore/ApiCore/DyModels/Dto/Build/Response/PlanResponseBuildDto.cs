@@ -10,18 +10,18 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// ProductId property for DTO.
         /// </summary>
-        public String ProductId { get; set; }
+        public String? ProductId { get; set; }
         public ITranslationData? ProductName { get; set; }
         public ITranslationData? Description { get; set; }
         public ICollection<String>? Images { get; set; }
         /// <summary>
         /// BillingPeriod property for DTO.
         /// </summary>
-        public String BillingPeriod { get; set; }
+        public String? BillingPeriod { get; set; }
         /// <summary>
         /// Amount property for DTO.
         /// </summary>

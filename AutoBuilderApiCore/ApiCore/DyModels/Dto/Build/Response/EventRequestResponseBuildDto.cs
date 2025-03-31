@@ -10,15 +10,15 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// Status property for DTO.
         /// </summary>
-        public String Status { get; set; }
+        public String? Status { get; set; }
         /// <summary>
         /// Details property for DTO.
         /// </summary>
-        public String Details { get; set; }
+        public String? Details { get; set; }
         /// <summary>
         /// CreatedAt property for DTO.
         /// </summary>
@@ -26,7 +26,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// RequestId property for DTO.
         /// </summary>
-        public String RequestId { get; set; }
+        public String? RequestId { get; set; }
         public RequestResponseBuildDto? Request { get; set; }
     }
 }

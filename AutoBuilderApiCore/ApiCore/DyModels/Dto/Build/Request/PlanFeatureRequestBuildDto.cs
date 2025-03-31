@@ -16,7 +16,7 @@ namespace Dto.Build.Requests
         /// <summary>
         /// PlanId property for DTO.
         /// </summary>
-        public String PlanId { get; set; }
+        public String? PlanId { get; set; }
         public PlanRequestBuildDto? Plan { get; set; }
     }
 }

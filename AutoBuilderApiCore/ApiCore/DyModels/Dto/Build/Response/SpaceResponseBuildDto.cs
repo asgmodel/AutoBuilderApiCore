@@ -10,15 +10,15 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// Name property for DTO.
         /// </summary>
-        public String Name { get; set; }
+        public String? Name { get; set; }
         /// <summary>
         /// Description property for DTO.
         /// </summary>
-        public String Description { get; set; }
+        public String? Description { get; set; }
         /// <summary>
         /// Ram property for DTO.
         /// </summary>
@@ -46,11 +46,11 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Token property for DTO.
         /// </summary>
-        public String Token { get; set; }
+        public String? Token { get; set; }
         /// <summary>
         /// SubscriptionId property for DTO.
         /// </summary>
-        public String SubscriptionId { get; set; }
+        public String? SubscriptionId { get; set; }
         public SubscriptionResponseBuildDto? Subscription { get; set; }
         public ICollection<RequestResponseBuildDto>? Requests { get; set; }
     }

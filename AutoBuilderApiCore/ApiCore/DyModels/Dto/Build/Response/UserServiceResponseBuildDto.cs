@@ -14,12 +14,12 @@ namespace Dto.Build.Responses
         /// <summary>
         /// UserId property for DTO.
         /// </summary>
-        public String UserId { get; set; }
+        public String? UserId { get; set; }
         public ApplicationUserResponseBuildDto? User { get; set; }
         /// <summary>
         /// ServiceId property for DTO.
         /// </summary>
-        public String ServiceId { get; set; }
+        public String? ServiceId { get; set; }
         public ServiceResponseBuildDto? Service { get; set; }
     }
 }

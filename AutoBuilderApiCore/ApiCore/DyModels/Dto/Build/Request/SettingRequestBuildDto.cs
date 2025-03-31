@@ -10,10 +10,10 @@ namespace Dto.Build.Requests
         /// <summary>
         /// Name property for DTO.
         /// </summary>
-        public String Name { get; set; }
+        public String? Name { get; set; }
         /// <summary>
         /// Value property for DTO.
         /// </summary>
-        public String Value { get; set; }
+        public String? Value { get; set; }
     }
 }

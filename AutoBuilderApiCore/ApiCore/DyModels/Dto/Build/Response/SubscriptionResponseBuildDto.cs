@@ -10,11 +10,11 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         /// <summary>
         /// CustomerId property for DTO.
         /// </summary>
-        public String CustomerId { get; set; }
+        public String? CustomerId { get; set; }
         /// <summary>
         /// StartDate property for DTO.
         /// </summary>
@@ -30,7 +30,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Status property for DTO.
         /// </summary>
-        public String Status { get; set; }
+        public String? Status { get; set; }
         /// <summary>
         /// CancelAtPeriodEnd property for DTO.
         /// </summary>
@@ -58,12 +58,12 @@ namespace Dto.Build.Responses
         /// <summary>
         /// PlanId property for DTO.
         /// </summary>
-        public String PlanId { get; set; }
+        public String? PlanId { get; set; }
         public PlanResponseBuildDto? Plan { get; set; }
         /// <summary>
         /// UserId property for DTO.
         /// </summary>
-        public String UserId { get; set; }
+        public String? UserId { get; set; }
         public ApplicationUserResponseBuildDto? User { get; set; }
         public ICollection<RequestResponseBuildDto>? Requests { get; set; }
         public ICollection<SpaceResponseBuildDto>? Spaces { get; set; }

@@ -10,13 +10,13 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Id property for DTO.
         /// </summary>
-        public String Id { get; set; }
+        public String? Id { get; set; }
         public ITranslationData? Title { get; set; }
         public ITranslationData? Description { get; set; }
         /// <summary>
         /// Image property for DTO.
         /// </summary>
-        public String Image { get; set; }
+        public String? Image { get; set; }
         /// <summary>
         /// Active property for DTO.
         /// </summary>
@@ -24,7 +24,7 @@ namespace Dto.Build.Responses
         /// <summary>
         /// Url property for DTO.
         /// </summary>
-        public String Url { get; set; }
+        public String? Url { get; set; }
         public ICollection<AdvertisementTabResponseBuildDto>? AdvertisementTabs { get; set; }
     }
 }

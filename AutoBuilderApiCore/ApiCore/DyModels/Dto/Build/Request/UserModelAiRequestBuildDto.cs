@@ -18,12 +18,12 @@ namespace Dto.Build.Requests
         /// <summary>
         /// UserId property for DTO.
         /// </summary>
-        public String UserId { get; set; }
+        public String? UserId { get; set; }
         public ApplicationUserRequestBuildDto? User { get; set; }
         /// <summary>
         /// ModelAiId property for DTO.
         /// </summary>
-        public String ModelAiId { get; set; }
+        public String? ModelAiId { get; set; }
         public ModelAiRequestBuildDto? ModelAi { get; set; }
     }
 }

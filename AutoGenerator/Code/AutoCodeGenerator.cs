@@ -8,6 +8,7 @@ public class GenericClassGenerator : ITGenerator
     private string generatedCode = string.Empty; // «· √ﬂœ „‰ ⁄œ„ ÊÃÊœ ﬁÌ„… €Ì— „ÂÌ√…
     public event EventHandler<string>? OnCodeGenerated;
     public event EventHandler<string>? OnCodeSaved;
+    public bool IsEditFile { get; private set; } = true;
 
     public string Generate(GenerationOptions options)
     {
@@ -91,20 +92,20 @@ public class GenericClassGenerator : ITGenerator
 
         try
         {
-            var directory = Path.GetDirectoryName(filePath);
-            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
 
-            File.WriteAllText(filePath, generatedCode);
-            Console.WriteLine($"Generated code saved to {filePath}");
-            OnCodeSaved?.Invoke(this, filePath);
+
+            if (File.Exists(filePath) && IsEditFile)
+            {
+                File.WriteAllText(filePath, generatedCode);
+                Console.WriteLine($"Generated code saved to {filePath}");
+                OnCodeSaved?.Invoke(this, filePath);
+
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error saving file: {ex.Message}");
-            throw;
+           
         }
     }
 }

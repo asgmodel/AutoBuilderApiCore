@@ -70,7 +70,10 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
 
 
                             "Repositorys.Share",
-                          
+                            "System.Linq.Expressions",
+                            "Repositorys.Builder"
+
+
 
                         }
 
@@ -128,7 +131,7 @@ public interface I{className}Service<TServiceRequestDso, TServiceResponseDso>
 
    /////
  
-    public interface IUse{className}Service: I{className}Service<{className}RequestDso, {className}ResponseDso>
+    public interface IUse{className}Service:I{className}BuilderRepository<{className}RequestDso, {className}ResponseDso>, I{className}Service<{className}RequestDso, {className}ResponseDso>  , IBaseService
 
     {{
        ///
@@ -140,20 +143,174 @@ public interface I{className}Service<TServiceRequestDso, TServiceResponseDso>
 public class {className}Service : BaseService,IUse{className}Service  ///
 {{
 ///
-    private readonly I{className}ShareRepository _{className.ToLower()}ShareRepository;
+    private readonly I{className}ShareRepository _builder;
 ///
     public {className}Service(I{className}ShareRepository {className.ToLower()}ShareRepository, IMapper mapper, ILoggerFactory logger) ///
         : base(mapper, logger)
     {{
 
          ///
-        _{className.ToLower()}ShareRepository = {className.ToLower()}ShareRepository;
+        _builder = {className.ToLower()}ShareRepository;
 ///
     }} ///
 
    
 
     // يمكنك إضافة المزيد من الدوال مثل UpdateAsync أو DeleteAsync إذا كان ذلك مطلوبًا.
+
+ // Additional methods can be added as needed.
+    //
+
+    /// <summary>
+    /// Method to count the number of entities.
+    /// </summary>
+    public Task<int> CountAsync() //
+    {{
+        // Throw an exception indicating the method is not implemented.
+        //
+        throw new NotImplementedException(); 
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to create a new entity asynchronously.
+    /// </summary>
+    public async Task<{className}ResponseDso> CreateAsync({className}RequestDso entity) //
+    {{
+        // Call the create method in the builder repository.
+        //
+        var result = await _builder.CreateAsync(entity);
+        // Convert the result to ResponseDso type.
+        //
+        var output = ({className}ResponseDso)result;
+        // Return the final result.
+        //
+        return output; 
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to create a range of entities asynchronously.
+    /// </summary>
+    public Task<IEnumerable<{className}ResponseDso>> CreateRangeAsync(IEnumerable<{className}RequestDso> entities)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to delete a specific entity.
+    /// </summary>
+    public Task DeleteAsync(int id)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to delete a range of entities based on a condition.
+    /// </summary>
+    public Task DeleteRangeAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to check if an entity exists based on a condition.
+    /// </summary>
+    public Task<bool> ExistsAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to find an entity based on a condition.
+    /// </summary>
+    public Task<{className}ResponseDso?> FindAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to retrieve all entities.
+    /// </summary>
+    public Task<IEnumerable<{className}ResponseDso>> GetAllAsync()
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to get an entity by its unique ID.
+    /// </summary>
+    public Task<{className}ResponseDso?> GetByIdAsync(int id)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to get data using a specific ID.
+    /// </summary>
+    public Task<{className}ResponseDso> getData(int id)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to retrieve data as an IQueryable object.
+    /// </summary>
+    public IQueryable<{className}ResponseDso> GetQueryable()
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to save changes to the database.
+    /// </summary>
+    public Task SaveChangesAsync()
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
+
+    /// <summary>
+    /// Method to update a specific entity.
+    /// </summary>
+    public Task<{className}ResponseDso> UpdateAsync({className}RequestDso entity)
+    {{
+        //
+        throw new NotImplementedException();
+        //
+    }}
+    //
 }}
 
      ";

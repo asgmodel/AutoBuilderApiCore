@@ -10,39 +10,125 @@ using Dto.Share.Requests;
 using Dto.Share.Responses;
 using Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
+using System.Linq.Expressions;
 using System;
 
 namespace Repositorys.Share
 {
     /// <summary>
-    /// Invoice interface property for ShareRepository.
+    /// Invoice interface for ShareRepository.
     /// </summary>
-    public interface IInvoiceShareRepository : ITShareRepository<InvoiceRequestShareDto, InvoiceResponseShareDto>
-    //, IInvoiceBuilderRepository<InvoiceRequestShareDto, InvoiceResponseShareDto> 
-    //  يمكنك   تزويد  بكل دوال   Ibuilder  هنا   بحيث يمكنك استخدامها في الكلاس الذي سيتم توليده
+    public interface IInvoiceShareRepository : IBaseShareRepository<InvoiceRequestShareDto, InvoiceResponseShareDto>, IInvoiceBuilderRepository<InvoiceRequestShareDto, InvoiceResponseShareDto>
+    //  You can add all IBuilder functions here to use them in the generated class.
     {
     // Define methods or properties specific to the share repository interface.
-    } 
+    //
+    } //
     /// <summary>
-    /// Invoice class property for ShareRepository.
+    /// Invoice class for ShareRepository.
     /// </summary>
      public  class  InvoiceShareRepository //
     :  BaseShareRepository < InvoiceRequestShareDto ,  InvoiceResponseShareDto ,  InvoiceRequestBuildDto ,  InvoiceResponseBuildDto > ,  //
     IInvoiceShareRepository //
-    { 
-    /// <summary>
-    /// BuilderRepository 
-    /// </summary>
-     private  readonly  InvoiceBuilderRepository  _builder ;  
+    { // Declare the builder repository.
+    //
+    private  readonly  InvoiceBuilderRepository  _builder ;  //
     /// <summary>
     /// Constructor for InvoiceShareRepository.
     /// </summary>
-     public  InvoiceShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) //
-    { // Initialize constructor.
-    _builder  =  new  InvoiceBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( InvoiceShareRepository ) . FullName ) ) ;  //
+     public  InvoiceShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) // Pass parameters to the base class.
+    { // Initialize the builder repository.
     //
+    _builder  =  new  InvoiceBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( InvoiceShareRepository ) . FullName ) ) ;  //
     } //
-    // Add additional methods or properties as needed.
+    // Additional methods can be added as needed.
+    //
+    /// <summary>
+    /// Method to count the number of entities.
+    /// </summary>
+     public  Task < int > CountAsync ( ) //
+    { // Throw an exception indicating the method is not implemented.
+    //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to create a new entity asynchronously.
+    /// </summary>
+     public  async  Task < InvoiceResponseShareDto > CreateAsync ( InvoiceRequestShareDto  entity ) //
+    { // Call the create method in the builder repository.
+    //
+    var  result  =  await  _builder . CreateAsync ( entity ) ;  // Convert the result to ResponseShareDto type.
+    //
+    var  output  =  ( InvoiceResponseShareDto ) result ;  // Return the final result.
+    //
+    return  output ;  //
+    } //
+    /// <summary>
+    /// Method to create a range of entities asynchronously.
+    /// </summary>
+     public  Task < IEnumerable < InvoiceResponseShareDto > > CreateRangeAsync ( IEnumerable < InvoiceRequestShareDto > entities ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a specific entity.
+    /// </summary>
+     public  Task  DeleteAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a range of entities based on a condition.
+    /// </summary>
+     public  Task  DeleteRangeAsync ( Expression < Func < InvoiceResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to check if an entity exists based on a condition.
+    /// </summary>
+     public  Task < bool > ExistsAsync ( Expression < Func < InvoiceResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to find an entity based on a condition.
+    /// </summary>
+     public  Task < InvoiceResponseShareDto ? > FindAsync ( Expression < Func < InvoiceResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve all entities.
+    /// </summary>
+     public  Task < IEnumerable < InvoiceResponseShareDto > > GetAllAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get an entity by its unique ID.
+    /// </summary>
+     public  Task < InvoiceResponseShareDto ? > GetByIdAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get data using a specific ID.
+    /// </summary>
+     public  Task < InvoiceResponseShareDto > getData ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve data as an IQueryable object.
+    /// </summary>
+     public  IQueryable < InvoiceResponseShareDto > GetQueryable ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to save changes to the database.
+    /// </summary>
+     public  Task  SaveChangesAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to update a specific entity.
+    /// </summary>
+     public  Task < InvoiceResponseShareDto > UpdateAsync ( InvoiceRequestShareDto  entity ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
     }
 
 }

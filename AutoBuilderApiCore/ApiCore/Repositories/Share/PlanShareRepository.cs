@@ -10,39 +10,125 @@ using Dto.Share.Requests;
 using Dto.Share.Responses;
 using Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
+using System.Linq.Expressions;
 using System;
 
 namespace Repositorys.Share
 {
     /// <summary>
-    /// Plan interface property for ShareRepository.
+    /// Plan interface for ShareRepository.
     /// </summary>
-    public interface IPlanShareRepository : ITShareRepository<PlanRequestShareDto, PlanResponseShareDto>
-    //, IPlanBuilderRepository<PlanRequestShareDto, PlanResponseShareDto> 
-    //  يمكنك   تزويد  بكل دوال   Ibuilder  هنا   بحيث يمكنك استخدامها في الكلاس الذي سيتم توليده
+    public interface IPlanShareRepository : IBaseShareRepository<PlanRequestShareDto, PlanResponseShareDto>, IPlanBuilderRepository<PlanRequestShareDto, PlanResponseShareDto>
+    //  You can add all IBuilder functions here to use them in the generated class.
     {
     // Define methods or properties specific to the share repository interface.
-    } 
+    //
+    } //
     /// <summary>
-    /// Plan class property for ShareRepository.
+    /// Plan class for ShareRepository.
     /// </summary>
      public  class  PlanShareRepository //
     :  BaseShareRepository < PlanRequestShareDto ,  PlanResponseShareDto ,  PlanRequestBuildDto ,  PlanResponseBuildDto > ,  //
     IPlanShareRepository //
-    { 
-    /// <summary>
-    /// BuilderRepository 
-    /// </summary>
-     private  readonly  PlanBuilderRepository  _builder ;  
+    { // Declare the builder repository.
+    //
+    private  readonly  PlanBuilderRepository  _builder ;  //
     /// <summary>
     /// Constructor for PlanShareRepository.
     /// </summary>
-     public  PlanShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) //
-    { // Initialize constructor.
-    _builder  =  new  PlanBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( PlanShareRepository ) . FullName ) ) ;  //
+     public  PlanShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) // Pass parameters to the base class.
+    { // Initialize the builder repository.
     //
+    _builder  =  new  PlanBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( PlanShareRepository ) . FullName ) ) ;  //
     } //
-    // Add additional methods or properties as needed.
+    // Additional methods can be added as needed.
+    //
+    /// <summary>
+    /// Method to count the number of entities.
+    /// </summary>
+     public  Task < int > CountAsync ( ) //
+    { // Throw an exception indicating the method is not implemented.
+    //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to create a new entity asynchronously.
+    /// </summary>
+     public  async  Task < PlanResponseShareDto > CreateAsync ( PlanRequestShareDto  entity ) //
+    { // Call the create method in the builder repository.
+    //
+    var  result  =  await  _builder . CreateAsync ( entity ) ;  // Convert the result to ResponseShareDto type.
+    //
+    var  output  =  ( PlanResponseShareDto ) result ;  // Return the final result.
+    //
+    return  output ;  //
+    } //
+    /// <summary>
+    /// Method to create a range of entities asynchronously.
+    /// </summary>
+     public  Task < IEnumerable < PlanResponseShareDto > > CreateRangeAsync ( IEnumerable < PlanRequestShareDto > entities ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a specific entity.
+    /// </summary>
+     public  Task  DeleteAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a range of entities based on a condition.
+    /// </summary>
+     public  Task  DeleteRangeAsync ( Expression < Func < PlanResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to check if an entity exists based on a condition.
+    /// </summary>
+     public  Task < bool > ExistsAsync ( Expression < Func < PlanResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to find an entity based on a condition.
+    /// </summary>
+     public  Task < PlanResponseShareDto ? > FindAsync ( Expression < Func < PlanResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve all entities.
+    /// </summary>
+     public  Task < IEnumerable < PlanResponseShareDto > > GetAllAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get an entity by its unique ID.
+    /// </summary>
+     public  Task < PlanResponseShareDto ? > GetByIdAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get data using a specific ID.
+    /// </summary>
+     public  Task < PlanResponseShareDto > getData ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve data as an IQueryable object.
+    /// </summary>
+     public  IQueryable < PlanResponseShareDto > GetQueryable ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to save changes to the database.
+    /// </summary>
+     public  Task  SaveChangesAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to update a specific entity.
+    /// </summary>
+     public  Task < PlanResponseShareDto > UpdateAsync ( PlanRequestShareDto  entity ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
     }
 
 }

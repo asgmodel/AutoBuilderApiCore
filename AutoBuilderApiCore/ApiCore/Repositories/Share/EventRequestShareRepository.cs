@@ -10,39 +10,125 @@ using Dto.Share.Requests;
 using Dto.Share.Responses;
 using Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
+using System.Linq.Expressions;
 using System;
 
 namespace Repositorys.Share
 {
     /// <summary>
-    /// EventRequest interface property for ShareRepository.
+    /// EventRequest interface for ShareRepository.
     /// </summary>
-    public interface IEventRequestShareRepository : ITShareRepository<EventRequestRequestShareDto, EventRequestResponseShareDto>
-    //, IEventRequestBuilderRepository<EventRequestRequestShareDto, EventRequestResponseShareDto> 
-    //  يمكنك   تزويد  بكل دوال   Ibuilder  هنا   بحيث يمكنك استخدامها في الكلاس الذي سيتم توليده
+    public interface IEventRequestShareRepository : IBaseShareRepository<EventRequestRequestShareDto, EventRequestResponseShareDto>, IEventRequestBuilderRepository<EventRequestRequestShareDto, EventRequestResponseShareDto>
+    //  You can add all IBuilder functions here to use them in the generated class.
     {
     // Define methods or properties specific to the share repository interface.
-    } 
+    //
+    } //
     /// <summary>
-    /// EventRequest class property for ShareRepository.
+    /// EventRequest class for ShareRepository.
     /// </summary>
      public  class  EventRequestShareRepository //
     :  BaseShareRepository < EventRequestRequestShareDto ,  EventRequestResponseShareDto ,  EventRequestRequestBuildDto ,  EventRequestResponseBuildDto > ,  //
     IEventRequestShareRepository //
-    { 
-    /// <summary>
-    /// BuilderRepository 
-    /// </summary>
-     private  readonly  EventRequestBuilderRepository  _builder ;  
+    { // Declare the builder repository.
+    //
+    private  readonly  EventRequestBuilderRepository  _builder ;  //
     /// <summary>
     /// Constructor for EventRequestShareRepository.
     /// </summary>
-     public  EventRequestShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) //
-    { // Initialize constructor.
-    _builder  =  new  EventRequestBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( EventRequestShareRepository ) . FullName ) ) ;  //
+     public  EventRequestShareRepository ( DataContext  dbContext ,  IMapper  mapper ,  ILoggerFactory  logger ) :  base ( mapper ,  logger ) // Pass parameters to the base class.
+    { // Initialize the builder repository.
     //
+    _builder  =  new  EventRequestBuilderRepository ( dbContext ,  mapper ,  logger . CreateLogger ( typeof ( EventRequestShareRepository ) . FullName ) ) ;  //
     } //
-    // Add additional methods or properties as needed.
+    // Additional methods can be added as needed.
+    //
+    /// <summary>
+    /// Method to count the number of entities.
+    /// </summary>
+     public  Task < int > CountAsync ( ) //
+    { // Throw an exception indicating the method is not implemented.
+    //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to create a new entity asynchronously.
+    /// </summary>
+     public  async  Task < EventRequestResponseShareDto > CreateAsync ( EventRequestRequestShareDto  entity ) //
+    { // Call the create method in the builder repository.
+    //
+    var  result  =  await  _builder . CreateAsync ( entity ) ;  // Convert the result to ResponseShareDto type.
+    //
+    var  output  =  ( EventRequestResponseShareDto ) result ;  // Return the final result.
+    //
+    return  output ;  //
+    } //
+    /// <summary>
+    /// Method to create a range of entities asynchronously.
+    /// </summary>
+     public  Task < IEnumerable < EventRequestResponseShareDto > > CreateRangeAsync ( IEnumerable < EventRequestRequestShareDto > entities ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a specific entity.
+    /// </summary>
+     public  Task  DeleteAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to delete a range of entities based on a condition.
+    /// </summary>
+     public  Task  DeleteRangeAsync ( Expression < Func < EventRequestResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to check if an entity exists based on a condition.
+    /// </summary>
+     public  Task < bool > ExistsAsync ( Expression < Func < EventRequestResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to find an entity based on a condition.
+    /// </summary>
+     public  Task < EventRequestResponseShareDto ? > FindAsync ( Expression < Func < EventRequestResponseShareDto ,  bool > > predicate ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve all entities.
+    /// </summary>
+     public  Task < IEnumerable < EventRequestResponseShareDto > > GetAllAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get an entity by its unique ID.
+    /// </summary>
+     public  Task < EventRequestResponseShareDto ? > GetByIdAsync ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to get data using a specific ID.
+    /// </summary>
+     public  Task < EventRequestResponseShareDto > getData ( int  id ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to retrieve data as an IQueryable object.
+    /// </summary>
+     public  IQueryable < EventRequestResponseShareDto > GetQueryable ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to save changes to the database.
+    /// </summary>
+     public  Task  SaveChangesAsync ( ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
+    /// <summary>
+    /// Method to update a specific entity.
+    /// </summary>
+     public  Task < EventRequestResponseShareDto > UpdateAsync ( EventRequestRequestShareDto  entity ) { //
+    throw  new  NotImplementedException ( ) ;  //
+    } //
     }
 
 }

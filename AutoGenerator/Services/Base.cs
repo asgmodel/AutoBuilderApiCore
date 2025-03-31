@@ -6,8 +6,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AutoGenerator.Services.Base
 {
-
-    public class BaseService :ITBaseService
+    public interface IBaseService: ITBaseService
+    {
+    }
+    public class BaseService : IBaseService
     {
         protected readonly   IMapper _mapper;
 

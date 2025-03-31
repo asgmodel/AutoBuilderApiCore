@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using Services.Services;
 using Microsoft.AspNetCore.Mvc;
+using VM.CategoryTab;
+using System.Linq.Expressions;
+using Dso.Requests;
 using System;
 
 namespace Controllers.Api
@@ -21,11 +24,112 @@ namespace Controllers.Api
             _logger = logger.CreateLogger(typeof(CategoryTabController).FullName);
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateInvoice()
+        // Get all CategoryTabs.
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<CategoryTabOutputVM>>> GetAll()
         {
-            return Ok();
+            var result = await _categorytabService.GetAllAsync();
+            var items = _mapper.Map<List<CategoryTabOutputVM>>(result);
+            return Ok(items);
         }
-    // You can add more actions like PUT, DELETE, etc., depending on the methods in your service interface.
+
+        // Get a CategoryTab by ID.
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoryTabInfoVM>> GetById(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid CategoryTab ID.");
+            var categorytab = await _categorytabService.GetByIdAsync(id);
+            if (categorytab == null)
+                return NotFound();
+            var item = _mapper.Map<CategoryTabInfoVM>(categorytab);
+            return Ok(item);
+        }
+
+        //// Find a CategoryTab by a specific predicate.
+        //[HttpGet("find")]
+        //public async Task<ActionResult<CategoryTabInfoVM>> Find([FromQuery] Expression<Func<CategoryTabOutputVM, bool>> predicate)
+        //{
+        //     return NotFound();
+        //    //var categorytab = await _categorytabService.FindAsync(predicate);
+        //   // if (categorytab == null) return NotFound();
+        //   // var item = _mapper.Map<CategoryTabInfoVM>(categorytab);
+        //   // return Ok(item);
+        //}
+        // Create a new CategoryTab.
+        [HttpPost]
+        public async Task<ActionResult<CategoryTabCreateVM>> Create([FromBody] CategoryTabCreateVM model)
+        {
+            if (model == null)
+                return BadRequest("CategoryTab data is required.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var item = _mapper.Map<CategoryTabRequestDso>(model);
+            var createdCategoryTab = await _categorytabService.CreateAsync(item);
+            var createdItem = _mapper.Map<CategoryTabCreateVM>(createdCategoryTab);
+            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+        }
+
+        // Create multiple CategoryTabs.
+        [HttpPost("createRange")]
+        public async Task<ActionResult<IEnumerable<CategoryTabCreateVM>>> CreateRange([FromBody] IEnumerable<CategoryTabCreateVM> models)
+        {
+            if (models == null)
+                return BadRequest("Data is required.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var items = _mapper.Map<List<CategoryTabRequestDso>>(models);
+            var createdCategoryTabs = await _categorytabService.CreateRangeAsync(items);
+            var createdItems = _mapper.Map<List<CategoryTabCreateVM>>(createdCategoryTabs);
+            return CreatedAtAction(nameof(GetAll), createdItems);
+        }
+
+        // Update an existing CategoryTab.
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CategoryTabUpdateVM model)
+        {
+            if (id <= 0 || model == null)
+                return BadRequest("Invalid data.");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+            var item = _mapper.Map<CategoryTabRequestDso>(model);
+            var updatedCategoryTab = await _categorytabService.UpdateAsync(item);
+            if (updatedCategoryTab == null)
+                return NotFound();
+            var updatedItem = _mapper.Map<CategoryTabUpdateVM>(updatedCategoryTab);
+            return Ok(updatedItem);
+        }
+
+        // Delete a CategoryTab.
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (id <= 0)
+                return BadRequest("Invalid CategoryTab ID.");
+            await _categorytabService.DeleteAsync(id);
+            return NoContent();
+        }
+
+        //// Delete multiple CategoryTabs.
+        //[HttpDelete("deleteRange")]
+        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<CategoryTabOutputVM, bool>> predicate)
+        //{
+        //    //await _categorytabService.DeleteRangeAsync(predicate);
+        //    return NoContent();
+        //}
+        //// Check if a CategoryTab exists based on a predicate.
+        //[HttpGet("exists")]
+        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<CategoryTabOutputVM, bool>> predicate)
+        //{
+        //    //var exists = await _categorytabService.ExistsAsync(predicate);
+        //    return Ok();
+        //}
+        // Get count of CategoryTabs.
+        [HttpGet("count")]
+        public async Task<ActionResult<int>> Count()
+        {
+            var count = await _categorytabService.CountAsync();
+            return Ok(count);
+        }
     }
 }

@@ -39,8 +39,10 @@ namespace AutoGenerator
             else
             {
                 if (option.IsMapper)
+                {
+                    MappingConfig.AssemblyShare = option.Assembly;
                     serviceCollection.AddAutoMapper(typeof(MappingConfig));
-
+                }
                 if (option.Assembly != null)
                 {
                     serviceCollection.AddAutoScope(option.Assembly);

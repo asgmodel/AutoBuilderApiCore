@@ -89,12 +89,12 @@ namespace AutoGenerator.Config
             // Return true if the attribute exists and IgnoreMapping is true, otherwise false
             return attribute != null && attribute.IgnoreMapping;
         }
-
+        public  static Assembly? AssemblyShare { get; set; }
         public MappingConfig()
         {
 
 
-            var assembly = Assembly.GetExecutingAssembly();
+            var assembly = AssemblyShare;
 
             var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
             var dtos = assembly.GetTypes().Where(t => typeof(ITBuildDto).IsAssignableFrom(t) && t.IsClass).ToList();
@@ -153,12 +153,15 @@ namespace AutoGenerator.Config
             {
                 if (!CheckIgnoreAutomateMapper(dso))
                 {
-                    var vmMatches = vms.Where(v => v.Name.Contains(dso.Name.Replace("RequestDso", "").Replace("ResponseDso", ""), StringComparison.OrdinalIgnoreCase)).ToList();
+                    var vmMatches = vms;//.Where(v => v.Name.Contains(dso.Name.Replace("RequestDso", "").Replace("ResponseDso", ""), StringComparison.OrdinalIgnoreCase)).ToList();
                     foreach (var vm in vmMatches)
                     {
                         if (!CheckIgnoreAutomateMapper(vm))
                         {
-                            CreateMap(dso, vm).ReverseMap();
+                            CreateMap(dso, vm).ReverseMap();//.ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                            //{
+                            //    return HelperTranslation.MapToTranslationData(src, dest, destMember);
+                            //})); ;
                         }
                     }
                 }

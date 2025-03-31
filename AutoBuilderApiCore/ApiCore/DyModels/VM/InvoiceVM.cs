@@ -9,12 +9,8 @@ namespace VM.Invoice
     public class InvoiceCreateVM : ITVM
     ///
     {
-        ///
-        /// 
-        public required string Id { get; set; }
-        public required string CustomerId { get; set; }
-        public required string Status { get; set; }
-        ////
+    ///
+     ////
     } //
     /// <summary>
     /// Invoice  property for VM Output.

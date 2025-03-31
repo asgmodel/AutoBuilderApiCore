@@ -4,8 +4,7 @@ using AutoGenerator.Config;
 using AutoGenerator.Data;
 using Microsoft.EntityFrameworkCore;
 using Models;
-using Repositorys.Share;
-using Services.Services;
+
 using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
 

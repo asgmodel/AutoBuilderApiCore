@@ -157,11 +157,24 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             // إذا كانت الخاصية من نوع Collection
             else if (prop.PropertyType.IsCollection())
             {
-                var genericArguments = prop.PropertyType.GenericTypeArguments;
-                var typeNames = genericArguments.Select(t => models.Any(m => m.Name == t.Name) ? $"{t.Name}{end}" : t.Name);
+                if (prop.PropertyType.IsArray)
+                {
+                    var elementType = prop.PropertyType.GetElementType();
+                    var typeName = models.Any(m => m.Name == elementType.Name) ? $"{elementType.Name}{end}" : elementType.Name;
 
-                propertyDeclarations.AppendLine($@"
+                    propertyDeclarations.AppendLine($@"
+        public {typeName}[]? {prop.Name} {{ get; set; }}");
+                }
+                else
+                {
+
+                    var genericArguments = prop.PropertyType.GenericTypeArguments;
+                    var typeNames = genericArguments.Select(t => models.Any(m => m.Name == t.Name) ? $"{t.Name}{end}" : t.Name);
+
+                    propertyDeclarations.AppendLine($@"
         public ICollection<{string.Join(", ", typeNames)}>? {prop.Name} {{ get; set; }}");
+                }
+
             }
             // إذا كان لديها `ToTranslationAttribute`
             else if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())

@@ -1,46 +1,55 @@
+using AutoGenerator.Code;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-
-namespace AutoGenerator.Code;
-
 public class GenericClassGenerator : ITGenerator
 {
-    private string generatedCode; //
+    private string generatedCode = string.Empty; // «· √ﬂœ „‰ ⁄œ„ ÊÃÊœ ﬁÌ„… €Ì— „ÂÌ√…
     public event EventHandler<string>? OnCodeGenerated;
     public event EventHandler<string>? OnCodeSaved;
+
     public string Generate(GenerationOptions options)
     {
+        if (options == null)
+            throw new ArgumentNullException(nameof(options), "Generation options cannot be null.");
+        if (string.IsNullOrWhiteSpace(options.ClassName))
+            throw new ArgumentException("Class name cannot be null or empty.");
+       
+        if (options.Template == null)
+            throw new ArgumentException("Template cannot be null.");
+
         var propertyDeclarations = new List<string>();
         if (options.Properties != null)
         {
-            var properties = options.Properties;
-
-
-            foreach (var prop in properties)
+            foreach (var prop in options.Properties)
             {
+                if (prop == null || prop.PropertyType == null)
+                    continue; //  ŒÿÌ «·Œ«’Ì… ≈–« ﬂ«‰  €Ì— ’«·Õ…
+
                 propertyDeclarations.Add($@"
-                public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "" : "")} {prop.Name} {{ get; set; }}
-            ");
+                public {CodeGeneratorUtils.GetPropertyTypeName(prop.PropertyType)}{(prop.PropertyType.IsNullableType() ? "" : "")} {prop.Name} {{ get; set; }}");
             }
         }
-        var baseClass = options.BaseClass != null ? $": {options.BaseClass}" : "";
-        if (options.BaseClass != null && options.Interfaces.Any())
+
+        var baseClass = string.Empty;
+        if (options.BaseClass != null)
         {
-            baseClass += ", ";
+            baseClass = $": {options.BaseClass}";
+            if (options.Interfaces.Any())
+                baseClass += ", ";
         }
-        else if (options.BaseClass == null && options.Interfaces.Any())
+        else if (options.Interfaces.Any())
         {
             baseClass = ": ";
         }
-        var interfaces = options.Interfaces.Any() ? $" {string.Join(", ", options.Interfaces.Select(i => i.Name))}" : "";
 
+        var interfaces = options.Interfaces.Any() ? $"{string.Join(", ", options.Interfaces.Select(i => i.Name))}" : "";
         var replacements = new Dictionary<string, string>
         {
             { "ClassName", options.ClassName },
             { "Properties", string.Join("//", propertyDeclarations) },
-            { "AdditionalCode", options.AdditionalCode },
+            { "AdditionalCode", options.AdditionalCode ?? "" },
             { "Interfaces", interfaces },
             { "BaseClass", baseClass }
         };
@@ -50,37 +59,52 @@ public class GenericClassGenerator : ITGenerator
         var namespaceDeclaration = SyntaxFactory.NamespaceDeclaration(SyntaxFactory.ParseName(options.NamespaceName))
             .AddMembers(SyntaxFactory.ParseMemberDeclaration(generatedCode));
 
-        options.Usings.Add("System");
-        List<UsingDirectiveSyntax> usingDirectives = new List<UsingDirectiveSyntax>();
+        if (!options.Usings.Contains("System"))
+            options.Usings.Add("System");
 
-        foreach (var ns in options.Usings)
-        {
-
-            usingDirectives.Add(SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns)));
-        }
+        List<UsingDirectiveSyntax> usingDirectives = options.Usings
+            .Where(ns => !string.IsNullOrWhiteSpace(ns))
+            .Select(ns => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns)))
+            .ToList();
 
         var compilationUnit = SyntaxFactory.CompilationUnit()
-            .AddUsings(usingDirectives.ToArray())
-            .AddMembers(namespaceDeclaration)
-            .NormalizeWhitespace();
+          .AddUsings(usingDirectives.ToArray())
+          .AddMembers(namespaceDeclaration)
+          .NormalizeWhitespace();
 
         generatedCode = compilationUnit.ToFullString(); //  ÕœÌÀ «·ﬂÊœ «·„ Ê·œ
 
+        OnCodeGenerated?.Invoke(this, generatedCode);
         return generatedCode;
     }
 
-
-
     public void SaveToFile(string filePath)
     {
-        if (!string.IsNullOrEmpty(generatedCode))
-        {
-            File.WriteAllText(filePath, generatedCode);
-            Console.WriteLine($"Generated code saved to {filePath}");
-        }
-        else
+        if (string.IsNullOrWhiteSpace(filePath))
+            throw new ArgumentException("File path cannot be null or empty.", nameof(filePath));
+
+        if (string.IsNullOrEmpty(generatedCode))
         {
             Console.WriteLine("No generated code to save.");
+            return;
+        }
+
+        try
+        {
+            var directory = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            File.WriteAllText(filePath, generatedCode);
+            Console.WriteLine($"Generated code saved to {filePath}");
+            OnCodeSaved?.Invoke(this, filePath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving file: {ex.Message}");
+            throw;
         }
     }
 }

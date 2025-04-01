@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseEventRequestService :  IEventRequestBuilderRepository < EventRequestRequestDso ,  EventRequestResponseDso > ,  IEventRequestService < EventRequestRequestDso ,  EventRequestResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  EventRequestService :  BaseService ,  IUseEventRequestService 
+    } public  class  EventRequestService :  BaseService < EventRequestRequestDso ,  EventRequestResponseDso > ,  IUseEventRequestService 
     ///
      { 
     ///

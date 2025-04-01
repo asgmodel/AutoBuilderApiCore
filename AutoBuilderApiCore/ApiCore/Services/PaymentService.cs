@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUsePaymentService :  IPaymentBuilderRepository < PaymentRequestDso ,  PaymentResponseDso > ,  IPaymentService < PaymentRequestDso ,  PaymentResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  PaymentService :  BaseService ,  IUsePaymentService 
+    } public  class  PaymentService :  BaseService < PaymentRequestDso ,  PaymentResponseDso > ,  IUsePaymentService 
     ///
      { 
     ///

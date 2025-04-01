@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseCategoryModelService :  ICategoryModelBuilderRepository < CategoryModelRequestDso ,  CategoryModelResponseDso > ,  ICategoryModelService < CategoryModelRequestDso ,  CategoryModelResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  CategoryModelService :  BaseService ,  IUseCategoryModelService 
+    } public  class  CategoryModelService :  BaseService < CategoryModelRequestDso ,  CategoryModelResponseDso > ,  IUseCategoryModelService 
     ///
      { 
     ///

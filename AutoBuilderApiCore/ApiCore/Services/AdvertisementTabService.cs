@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseAdvertisementTabService :  IAdvertisementTabBuilderRepository < AdvertisementTabRequestDso ,  AdvertisementTabResponseDso > ,  IAdvertisementTabService < AdvertisementTabRequestDso ,  AdvertisementTabResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  AdvertisementTabService :  BaseService ,  IUseAdvertisementTabService 
+    } public  class  AdvertisementTabService :  BaseService < AdvertisementTabRequestDso ,  AdvertisementTabResponseDso > ,  IUseAdvertisementTabService 
     ///
      { 
     ///

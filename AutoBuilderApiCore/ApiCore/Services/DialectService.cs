@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseDialectService :  IDialectBuilderRepository < DialectRequestDso ,  DialectResponseDso > ,  IDialectService < DialectRequestDso ,  DialectResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  DialectService :  BaseService ,  IUseDialectService 
+    } public  class  DialectService :  BaseService < DialectRequestDso ,  DialectResponseDso > ,  IUseDialectService 
     ///
      { 
     ///

@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseUserModelAiService :  IUserModelAiBuilderRepository < UserModelAiRequestDso ,  UserModelAiResponseDso > ,  IUserModelAiService < UserModelAiRequestDso ,  UserModelAiResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  UserModelAiService :  BaseService ,  IUseUserModelAiService 
+    } public  class  UserModelAiService :  BaseService < UserModelAiRequestDso ,  UserModelAiResponseDso > ,  IUseUserModelAiService 
     ///
      { 
     ///

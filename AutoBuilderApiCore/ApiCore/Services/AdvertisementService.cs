@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseAdvertisementService :  IAdvertisementBuilderRepository < AdvertisementRequestDso ,  AdvertisementResponseDso > ,  IAdvertisementService < AdvertisementRequestDso ,  AdvertisementResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  AdvertisementService :  BaseService ,  IUseAdvertisementService 
+    } public  class  AdvertisementService :  BaseService < AdvertisementRequestDso ,  AdvertisementResponseDso > ,  IUseAdvertisementService 
     ///
      { 
     ///

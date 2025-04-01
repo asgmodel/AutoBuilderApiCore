@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseModelGatewayService :  IModelGatewayBuilderRepository < ModelGatewayRequestDso ,  ModelGatewayResponseDso > ,  IModelGatewayService < ModelGatewayRequestDso ,  ModelGatewayResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  ModelGatewayService :  BaseService ,  IUseModelGatewayService 
+    } public  class  ModelGatewayService :  BaseService < ModelGatewayRequestDso ,  ModelGatewayResponseDso > ,  IUseModelGatewayService 
     ///
      { 
     ///

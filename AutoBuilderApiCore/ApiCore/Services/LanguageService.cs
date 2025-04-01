@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseLanguageService :  ILanguageBuilderRepository < LanguageRequestDso ,  LanguageResponseDso > ,  ILanguageService < LanguageRequestDso ,  LanguageResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  LanguageService :  BaseService ,  IUseLanguageService 
+    } public  class  LanguageService :  BaseService < LanguageRequestDso ,  LanguageResponseDso > ,  IUseLanguageService 
     ///
      { 
     ///

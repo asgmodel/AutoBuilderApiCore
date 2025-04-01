@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseSubscriptionService :  ISubscriptionBuilderRepository < SubscriptionRequestDso ,  SubscriptionResponseDso > ,  ISubscriptionService < SubscriptionRequestDso ,  SubscriptionResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  SubscriptionService :  BaseService ,  IUseSubscriptionService 
+    } public  class  SubscriptionService :  BaseService < SubscriptionRequestDso ,  SubscriptionResponseDso > ,  IUseSubscriptionService 
     ///
      { 
     ///

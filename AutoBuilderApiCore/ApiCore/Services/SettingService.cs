@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseSettingService :  ISettingBuilderRepository < SettingRequestDso ,  SettingResponseDso > ,  ISettingService < SettingRequestDso ,  SettingResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  SettingService :  BaseService ,  IUseSettingService 
+    } public  class  SettingService :  BaseService < SettingRequestDso ,  SettingResponseDso > ,  IUseSettingService 
     ///
      { 
     ///

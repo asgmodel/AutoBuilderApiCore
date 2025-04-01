@@ -8,8 +8,11 @@ public class GenericClassGenerator : ITGenerator
     private string generatedCode = string.Empty; // ÇáÊÃßÏ ãä ÚÏã æÌæÏ ŞíãÉ ÛíÑ ãåíÃÉ
     public event EventHandler<string>? OnCodeGenerated;
     public event EventHandler<string>? OnCodeSaved;
+
+    private static  readonly HashSet<ITGenerator>  tGenerators= new HashSet<ITGenerator>();
     public bool IsEditFile { get; private set; } = false;
 
+    public static  HashSet<ITGenerator> TGenerators { get { return tGenerators; } }
     public string Generate(GenerationOptions options)
     {
         if (options == null)
@@ -76,6 +79,7 @@ public class GenericClassGenerator : ITGenerator
         generatedCode = compilationUnit.ToFullString(); // ÊÍÏíË ÇáßæÏ ÇáãÊæáÏ
 
         OnCodeGenerated?.Invoke(this, generatedCode);
+        tGenerators.Add(this);
         return generatedCode;
     }
 

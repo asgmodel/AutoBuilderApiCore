@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseAuthorizationSessionService :  IAuthorizationSessionBuilderRepository < AuthorizationSessionRequestDso ,  AuthorizationSessionResponseDso > ,  IAuthorizationSessionService < AuthorizationSessionRequestDso ,  AuthorizationSessionResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  AuthorizationSessionService :  BaseService ,  IUseAuthorizationSessionService 
+    } public  class  AuthorizationSessionService :  BaseService < AuthorizationSessionRequestDso ,  AuthorizationSessionResponseDso > ,  IUseAuthorizationSessionService 
     ///
      { 
     ///

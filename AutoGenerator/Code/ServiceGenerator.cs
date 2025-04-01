@@ -140,7 +140,7 @@ public interface I{className}Service<TServiceRequestDso, TServiceResponseDso>
 
     }}
 
-public class {className}Service : BaseService,IUse{className}Service  ///
+public class {className}Service : BaseService<{className}RequestDso, {className}ResponseDso>,IUse{className}Service  ///
 {{
 ///
     private readonly I{className}ShareRepository _builder;

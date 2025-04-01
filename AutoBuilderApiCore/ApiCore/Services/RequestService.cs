@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseRequestService :  IRequestBuilderRepository < RequestRequestDso ,  RequestResponseDso > ,  IRequestService < RequestRequestDso ,  RequestResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  RequestService :  BaseService ,  IUseRequestService 
+    } public  class  RequestService :  BaseService < RequestRequestDso ,  RequestResponseDso > ,  IUseRequestService 
     ///
      { 
     ///

@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseSpaceService :  ISpaceBuilderRepository < SpaceRequestDso ,  SpaceResponseDso > ,  ISpaceService < SpaceRequestDso ,  SpaceResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  SpaceService :  BaseService ,  IUseSpaceService 
+    } public  class  SpaceService :  BaseService < SpaceRequestDso ,  SpaceResponseDso > ,  IUseSpaceService 
     ///
      { 
     ///

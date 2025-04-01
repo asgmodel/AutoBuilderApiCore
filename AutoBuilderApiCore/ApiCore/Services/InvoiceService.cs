@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseInvoiceService :  IInvoiceBuilderRepository < InvoiceRequestDso ,  InvoiceResponseDso > ,  IInvoiceService < InvoiceRequestDso ,  InvoiceResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  InvoiceService :  BaseService ,  IUseInvoiceService 
+    } public  class  InvoiceService :  BaseService < InvoiceRequestDso ,  InvoiceResponseDso > ,  IUseInvoiceService 
     ///
      { 
     ///

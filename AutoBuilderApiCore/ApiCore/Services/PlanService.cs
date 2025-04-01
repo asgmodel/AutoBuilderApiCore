@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUsePlanService :  IPlanBuilderRepository < PlanRequestDso ,  PlanResponseDso > ,  IPlanService < PlanRequestDso ,  PlanResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  PlanService :  BaseService ,  IUsePlanService 
+    } public  class  PlanService :  BaseService < PlanRequestDso ,  PlanResponseDso > ,  IUsePlanService 
     ///
      { 
     ///

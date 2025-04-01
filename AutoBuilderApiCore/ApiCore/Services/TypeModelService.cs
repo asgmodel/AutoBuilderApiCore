@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseTypeModelService :  ITypeModelBuilderRepository < TypeModelRequestDso ,  TypeModelResponseDso > ,  ITypeModelService < TypeModelRequestDso ,  TypeModelResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  TypeModelService :  BaseService ,  IUseTypeModelService 
+    } public  class  TypeModelService :  BaseService < TypeModelRequestDso ,  TypeModelResponseDso > ,  IUseTypeModelService 
     ///
      { 
     ///

@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseUserServiceService :  IUserServiceBuilderRepository < UserServiceRequestDso ,  UserServiceResponseDso > ,  IUserServiceService < UserServiceRequestDso ,  UserServiceResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  UserServiceService :  BaseService ,  IUseUserServiceService 
+    } public  class  UserServiceService :  BaseService < UserServiceRequestDso ,  UserServiceResponseDso > ,  IUseUserServiceService 
     ///
      { 
     ///

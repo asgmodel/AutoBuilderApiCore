@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseCategoryTabService :  ICategoryTabBuilderRepository < CategoryTabRequestDso ,  CategoryTabResponseDso > ,  ICategoryTabService < CategoryTabRequestDso ,  CategoryTabResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  CategoryTabService :  BaseService ,  IUseCategoryTabService 
+    } public  class  CategoryTabService :  BaseService < CategoryTabRequestDso ,  CategoryTabResponseDso > ,  IUseCategoryTabService 
     ///
      { 
     ///

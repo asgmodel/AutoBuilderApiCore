@@ -25,7 +25,7 @@ namespace ApiCore.Services.Services
     public  interface  IUseFAQItemService :  IFAQItemBuilderRepository < FAQItemRequestDso ,  FAQItemResponseDso > ,  IFAQItemService < FAQItemRequestDso ,  FAQItemResponseDso > ,  IBaseService { 
     ///
      /////
-    } public  class  FAQItemService :  BaseService ,  IUseFAQItemService 
+    } public  class  FAQItemService :  BaseService < FAQItemRequestDso ,  FAQItemResponseDso > ,  IUseFAQItemService 
     ///
      { 
     ///

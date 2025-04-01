@@ -16,7 +16,7 @@ namespace AutoGenerator.Config
        
         public static void AddAutoScope(this IServiceCollection serviceCollection, Assembly? assembly)
         {
-          
+
             var scopes = assembly.GetTypes().Where(t => typeof(ITScope).IsAssignableFrom(t) ).AsParallel().ToList();
             var Iscopeshare = scopes.Where(t => typeof(ITBaseShareRepository).IsAssignableFrom(t) && t.IsInterface).AsParallel().ToList();
             var cscopeshare = scopes.Where(t => typeof(ITBaseShareRepository).IsAssignableFrom(t) && t.IsClass).AsParallel().ToList();
@@ -96,7 +96,10 @@ namespace AutoGenerator.Config
 
             var assembly = AssemblyShare;
 
-            var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
+            var assemblymodel = Assembly.GetExecutingAssembly();
+
+            var models = assemblymodel.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
+
             var dtos = assembly.GetTypes().Where(t => typeof(ITBuildDto).IsAssignableFrom(t) && t.IsClass).ToList();
             var dtosshare = assembly.GetTypes().Where(t => typeof(ITShareDto).IsAssignableFrom(t) && t.IsClass).ToList();
 

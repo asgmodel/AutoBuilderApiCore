@@ -60,7 +60,7 @@ else
         IsMapper = true,
         Assembly = Assembly.GetExecutingAssembly()
     });
-    builder.Services.AddAutoMapper(typeof(MappingConfig));
+    //builder.Services.AddAutoMapper(typeof(MappingConfig));
     //builder.Services.AddScoped<IInvoiceShareRepository, InvoiceShareRepository>();
 
     //builder.Services.AddScoped<IUseInvoiceService, InvoiceService>();

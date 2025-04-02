@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a UserModelAi by Lg.
-        [HttpGet(Name = "GetUserModelAiByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserModelAiInfoVM>> GetByLg(UserModelAiFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid UserModelAi ID received.");
-                return BadRequest("Invalid UserModelAi ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching UserModelAi with ID: {id}", id);
-                var entity = await _usermodelaiService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("UserModelAi not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<UserModelAiInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching UserModelAi with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a UserModelAi by Lg.
+        //[HttpGet( Name = "GetUserModelAiByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<UserModelAiInfoVM>> GetByLg(UserModelAiFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid UserModelAi ID received.");
+        //        return BadRequest("Invalid UserModelAi ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching UserModelAi with ID: {id}", id);
+        //        var entity = await _usermodelaiService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("UserModelAi not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<UserModelAiInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching UserModelAi with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new UserModelAi.
         [HttpPost(Name = "CreateUserModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

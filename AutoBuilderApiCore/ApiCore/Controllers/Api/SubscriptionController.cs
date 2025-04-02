@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a Subscription by Lg.
-        [HttpGet(Name = "GetSubscriptionByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SubscriptionInfoVM>> GetByLg(SubscriptionFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid Subscription ID received.");
-                return BadRequest("Invalid Subscription ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching Subscription with ID: {id}", id);
-                var entity = await _subscriptionService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Subscription not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<SubscriptionInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching Subscription with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a Subscription by Lg.
+        //[HttpGet( Name = "GetSubscriptionByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<SubscriptionInfoVM>> GetByLg(SubscriptionFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid Subscription ID received.");
+        //        return BadRequest("Invalid Subscription ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching Subscription with ID: {id}", id);
+        //        var entity = await _subscriptionService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("Subscription not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<SubscriptionInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching Subscription with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new Subscription.
         [HttpPost(Name = "CreateSubscription")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

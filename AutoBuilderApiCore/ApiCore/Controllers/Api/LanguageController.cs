@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a Language by Lg.
-        [HttpGet(Name = "GetLanguageByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LanguageInfoVM>> GetByLg(LanguageFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid Language ID received.");
-                return BadRequest("Invalid Language ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching Language with ID: {id}", id);
-                var entity = await _languageService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Language not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<LanguageInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching Language with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a Language by Lg.
+        //[HttpGet( Name = "GetLanguageByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<LanguageInfoVM>> GetByLg(LanguageFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid Language ID received.");
+        //        return BadRequest("Invalid Language ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching Language with ID: {id}", id);
+        //        var entity = await _languageService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("Language not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<LanguageInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching Language with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new Language.
         [HttpPost(Name = "CreateLanguage")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a Request by Lg.
-        [HttpGet(Name = "GetRequestByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<RequestInfoVM>> GetByLg(RequestFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid Request ID received.");
-                return BadRequest("Invalid Request ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching Request with ID: {id}", id);
-                var entity = await _requestService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("Request not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<RequestInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching Request with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a Request by Lg.
+        //[HttpGet( Name = "GetRequestByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<RequestInfoVM>> GetByLg(RequestFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid Request ID received.");
+        //        return BadRequest("Invalid Request ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching Request with ID: {id}", id);
+        //        var entity = await _requestService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("Request not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<RequestInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching Request with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new Request.
         [HttpPost(Name = "CreateRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

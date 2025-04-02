@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a CategoryTab by Lg.
-        [HttpGet(Name = "GetCategoryTabByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CategoryTabInfoVM>> GetByLg(CategoryTabFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid CategoryTab ID received.");
-                return BadRequest("Invalid CategoryTab ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching CategoryTab with ID: {id}", id);
-                var entity = await _categorytabService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("CategoryTab not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<CategoryTabInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching CategoryTab with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a CategoryTab by Lg.
+        //[HttpGet( Name = "GetCategoryTabByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<CategoryTabInfoVM>> GetByLg(CategoryTabFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid CategoryTab ID received.");
+        //        return BadRequest("Invalid CategoryTab ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching CategoryTab with ID: {id}", id);
+        //        var entity = await _categorytabService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("CategoryTab not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<CategoryTabInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching CategoryTab with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new CategoryTab.
         [HttpPost(Name = "CreateCategoryTab")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

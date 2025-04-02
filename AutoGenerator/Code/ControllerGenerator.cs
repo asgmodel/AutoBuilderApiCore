@@ -184,38 +184,38 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
                 return StatusCode(500, ""Internal Server Error"");
             }}
         }}
-         // Get a {className} by Lg.
-        [HttpGet( Name = ""Get{className}ByLg"")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<{className}InfoVM>> GetByLg({className}FilterVM model)
-        {{
-             var id=model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {{
-                _logger.LogWarning(""Invalid {className} ID received."");
-                return BadRequest(""Invalid {className} ID."");
-            }}
+        // // Get a {className} by Lg.
+        //[HttpGet( Name = ""Get{className}ByLg"")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<{className}InfoVM>> GetByLg({className}FilterVM model)
+        //{{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {{
+        //        _logger.LogWarning(""Invalid {className} ID received."");
+        //        return BadRequest(""Invalid {className} ID."");
+        //    }}
 
-            try
-            {{
-                _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
-                var entity = await _{className.ToLower()}Service.GetByIdAsync(id);
-                if (entity == null)
-                {{
-                    _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
-                    return NotFound();
-                }}
-                var item = _mapper.Map<{className}InfoVM>(entity);
-                return Ok(item);
-            }}
-            catch (Exception ex)
-            {{
-                _logger.LogError(ex, ""Error while fetching {className} with ID: {{id}}"", id);
-                return StatusCode(500, ""Internal Server Error"");
-            }}
-        }}
+        //    try
+        //    {{
+        //        _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
+        //        var entity = await _{className.ToLower()}Service.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {{
+        //            _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
+        //            return NotFound();
+        //        }}
+        //        var item = _mapper.Map<{className}InfoVM>(entity);
+        //        return Ok(item);
+        //    }}
+        //    catch (Exception ex)
+        //    {{
+        //        _logger.LogError(ex, ""Error while fetching {className} with ID: {{id}}"", id);
+        //        return StatusCode(500, ""Internal Server Error"");
+        //    }}
+        //}}
 
         // Create a new {className}.
         [HttpPost(Name = ""Create{className}"")]

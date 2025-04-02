@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a ModelAi by Lg.
-        [HttpGet(Name = "GetModelAiByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ModelAiInfoVM>> GetByLg(ModelAiFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid ModelAi ID received.");
-                return BadRequest("Invalid ModelAi ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching ModelAi with ID: {id}", id);
-                var entity = await _modelaiService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("ModelAi not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<ModelAiInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching ModelAi with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a ModelAi by Lg.
+        //[HttpGet( Name = "GetModelAiByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<ModelAiInfoVM>> GetByLg(ModelAiFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid ModelAi ID received.");
+        //        return BadRequest("Invalid ModelAi ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching ModelAi with ID: {id}", id);
+        //        var entity = await _modelaiService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("ModelAi not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<ModelAiInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching ModelAi with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new ModelAi.
         [HttpPost(Name = "CreateModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

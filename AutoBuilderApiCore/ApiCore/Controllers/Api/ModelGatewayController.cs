@@ -79,40 +79,37 @@ namespace ApiCore.Controllers.Api
             }
         }
 
-        // Get a ModelGateway by Lg.
-        [HttpGet(Name = "GetModelGatewayByLg")]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ModelGatewayInfoVM>> GetByLg(ModelGatewayFilterVM model)
-        {
-            var id = model.Id;
-            if (string.IsNullOrWhiteSpace(id))
-            {
-                _logger.LogWarning("Invalid ModelGateway ID received.");
-                return BadRequest("Invalid ModelGateway ID.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Fetching ModelGateway with ID: {id}", id);
-                var entity = await _modelgatewayService.GetByIdAsync(id);
-                if (entity == null)
-                {
-                    _logger.LogWarning("ModelGateway not found with ID: {id}", id);
-                    return NotFound();
-                }
-
-                var item = _mapper.Map<ModelGatewayInfoVM>(entity);
-                return Ok(item);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while fetching ModelGateway with ID: {id}", id);
-                return StatusCode(500, "Internal Server Error");
-            }
-        }
-
+        // // Get a ModelGateway by Lg.
+        //[HttpGet( Name = "GetModelGatewayByLg")]
+        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        //public async Task<ActionResult<ModelGatewayInfoVM>> GetByLg(ModelGatewayFilterVM model)
+        //{
+        //     var id=model.Id;
+        //    if (string.IsNullOrWhiteSpace(id))
+        //    {
+        //        _logger.LogWarning("Invalid ModelGateway ID received.");
+        //        return BadRequest("Invalid ModelGateway ID.");
+        //    }
+        //    try
+        //    {
+        //        _logger.LogInformation("Fetching ModelGateway with ID: {id}", id);
+        //        var entity = await _modelgatewayService.GetByIdAsync(id);
+        //        if (entity == null)
+        //        {
+        //            _logger.LogWarning("ModelGateway not found with ID: {id}", id);
+        //            return NotFound();
+        //        }
+        //        var item = _mapper.Map<ModelGatewayInfoVM>(entity);
+        //        return Ok(item);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error while fetching ModelGateway with ID: {id}", id);
+        //        return StatusCode(500, "Internal Server Error");
+        //    }
+        //}
         // Create a new ModelGateway.
         [HttpPost(Name = "CreateModelGateway")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

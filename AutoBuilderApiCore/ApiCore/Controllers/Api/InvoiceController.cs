@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<InvoiceOutputVM>>> GetAll()
         {
-            var result = await _invoiceService.GetAllAsync();
-            var items = _mapper.Map<List<InvoiceOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Invoices...");
+                var result = await _invoiceService.GetAllAsync();
+                var items = _mapper.Map<List<InvoiceOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Invoices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Invoice by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<InvoiceInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Invoice ID received.");
                 return BadRequest("Invalid Invoice ID.");
-            var invoice = await _invoiceService.GetByIdAsync(id);
-            if (invoice == null)
-                return NotFound();
-            var item = _mapper.Map<InvoiceInfoVM>(invoice);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Invoice with ID: {id}", id);
+                var entity = await _invoiceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Invoice not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<InvoiceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Invoice with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Invoice by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<InvoiceInfoVM>> Find([FromQuery] Expression<Func<InvoiceOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var invoice = await _invoiceService.FindAsync(predicate);
-        //   // if (invoice == null) return NotFound();
-        //   // var item = _mapper.Map<InvoiceInfoVM>(invoice);
-        //   // return Ok(item);
-        //}
         // Create a new Invoice.
         [HttpPost(Name = "CreateInvoice")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<InvoiceCreateVM>> Create([FromBody] InvoiceCreateVM model)
+        public async Task<ActionResult<InvoiceOutputVM>> Create([FromBody] InvoiceCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Invoice data is null in Create.");
                 return BadRequest("Invoice data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<InvoiceRequestDso>(model);
-            var createdInvoice = await _invoiceService.CreateAsync(item);
-            var createdItem = _mapper.Map<InvoiceCreateVM>(createdInvoice);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Invoice with data: {@model}", model);
+                var item = _mapper.Map<InvoiceRequestDso>(model);
+                var createdEntity = await _invoiceService.CreateAsync(item);
+                var createdItem = _mapper.Map<InvoiceOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Invoice");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Invoices.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<InvoiceCreateVM>>> CreateRange([FromBody] IEnumerable<InvoiceCreateVM> models)
+        public async Task<ActionResult<IEnumerable<InvoiceOutputVM>>> CreateRange([FromBody] IEnumerable<InvoiceCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<InvoiceRequestDso>>(models);
-            var createdInvoices = await _invoiceService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<InvoiceCreateVM>>(createdInvoices);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Invoices.");
+                var items = _mapper.Map<List<InvoiceRequestDso>>(models);
+                var createdEntities = await _invoiceService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<InvoiceOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Invoices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Invoice.
-        [HttpPut("{id}", Name = "UpdateInvoice")]
+        [HttpPut(Name = "UpdateInvoice")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] InvoiceUpdateVM model)
+        public async Task<ActionResult<InvoiceOutputVM>> Update([FromBody] InvoiceUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<InvoiceRequestDso>(model);
-            var updatedInvoice = await _invoiceService.UpdateAsync(item);
-            if (updatedInvoice == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<InvoiceUpdateVM>(updatedInvoice);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Invoice with ID: {id}", model?.Id);
+                var item = _mapper.Map<InvoiceRequestDso>(model);
+                var updatedEntity = await _invoiceService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Invoice not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<InvoiceOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Invoice with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Invoice.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Invoice ID received in Delete.");
                 return BadRequest("Invalid Invoice ID.");
-            await _invoiceService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Invoice with ID: {id}", id);
+                await _invoiceService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Invoice with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Invoices.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<InvoiceOutputVM, bool>> predicate)
-        //{
-        //    //await _invoiceService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Invoice exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<InvoiceOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _invoiceService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Invoices.
         [HttpGet("CountInvoice")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _invoiceService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Invoices...");
+                var count = await _invoiceService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Invoices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

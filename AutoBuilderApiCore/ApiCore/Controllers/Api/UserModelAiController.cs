@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<UserModelAiOutputVM>>> GetAll()
         {
-            var result = await _usermodelaiService.GetAllAsync();
-            var items = _mapper.Map<List<UserModelAiOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all UserModelAis...");
+                var result = await _usermodelaiService.GetAllAsync();
+                var items = _mapper.Map<List<UserModelAiOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all UserModelAis");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a UserModelAi by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserModelAiInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserModelAi ID received.");
                 return BadRequest("Invalid UserModelAi ID.");
-            var usermodelai = await _usermodelaiService.GetByIdAsync(id);
-            if (usermodelai == null)
-                return NotFound();
-            var item = _mapper.Map<UserModelAiInfoVM>(usermodelai);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching UserModelAi with ID: {id}", id);
+                var entity = await _usermodelaiService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("UserModelAi not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<UserModelAiInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserModelAi with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a UserModelAi by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<UserModelAiInfoVM>> Find([FromQuery] Expression<Func<UserModelAiOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var usermodelai = await _usermodelaiService.FindAsync(predicate);
-        //   // if (usermodelai == null) return NotFound();
-        //   // var item = _mapper.Map<UserModelAiInfoVM>(usermodelai);
-        //   // return Ok(item);
-        //}
         // Create a new UserModelAi.
         [HttpPost(Name = "CreateUserModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserModelAiCreateVM>> Create([FromBody] UserModelAiCreateVM model)
+        public async Task<ActionResult<UserModelAiOutputVM>> Create([FromBody] UserModelAiCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("UserModelAi data is null in Create.");
                 return BadRequest("UserModelAi data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<UserModelAiRequestDso>(model);
-            var createdUserModelAi = await _usermodelaiService.CreateAsync(item);
-            var createdItem = _mapper.Map<UserModelAiCreateVM>(createdUserModelAi);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new UserModelAi with data: {@model}", model);
+                var item = _mapper.Map<UserModelAiRequestDso>(model);
+                var createdEntity = await _usermodelaiService.CreateAsync(item);
+                var createdItem = _mapper.Map<UserModelAiOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new UserModelAi");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple UserModelAis.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<UserModelAiCreateVM>>> CreateRange([FromBody] IEnumerable<UserModelAiCreateVM> models)
+        public async Task<ActionResult<IEnumerable<UserModelAiOutputVM>>> CreateRange([FromBody] IEnumerable<UserModelAiCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<UserModelAiRequestDso>>(models);
-            var createdUserModelAis = await _usermodelaiService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<UserModelAiCreateVM>>(createdUserModelAis);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple UserModelAis.");
+                var items = _mapper.Map<List<UserModelAiRequestDso>>(models);
+                var createdEntities = await _usermodelaiService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<UserModelAiOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple UserModelAis");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing UserModelAi.
-        [HttpPut("{id}", Name = "UpdateUserModelAi")]
+        [HttpPut(Name = "UpdateUserModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] UserModelAiUpdateVM model)
+        public async Task<ActionResult<UserModelAiOutputVM>> Update([FromBody] UserModelAiUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<UserModelAiRequestDso>(model);
-            var updatedUserModelAi = await _usermodelaiService.UpdateAsync(item);
-            if (updatedUserModelAi == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<UserModelAiUpdateVM>(updatedUserModelAi);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating UserModelAi with ID: {id}", model?.Id);
+                var item = _mapper.Map<UserModelAiRequestDso>(model);
+                var updatedEntity = await _usermodelaiService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("UserModelAi not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<UserModelAiOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating UserModelAi with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a UserModelAi.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserModelAi ID received in Delete.");
                 return BadRequest("Invalid UserModelAi ID.");
-            await _usermodelaiService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting UserModelAi with ID: {id}", id);
+                await _usermodelaiService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting UserModelAi with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple UserModelAis.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<UserModelAiOutputVM, bool>> predicate)
-        //{
-        //    //await _usermodelaiService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a UserModelAi exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<UserModelAiOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _usermodelaiService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of UserModelAis.
         [HttpGet("CountUserModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _usermodelaiService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting UserModelAis...");
+                var count = await _usermodelaiService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting UserModelAis");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

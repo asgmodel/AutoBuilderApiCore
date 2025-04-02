@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<AuthorizationSessionOutputVM>>> GetAll()
         {
-            var result = await _authorizationsessionService.GetAllAsync();
-            var items = _mapper.Map<List<AuthorizationSessionOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all AuthorizationSessions...");
+                var result = await _authorizationsessionService.GetAllAsync();
+                var items = _mapper.Map<List<AuthorizationSessionOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all AuthorizationSessions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a AuthorizationSession by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AuthorizationSessionInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid AuthorizationSession ID received.");
                 return BadRequest("Invalid AuthorizationSession ID.");
-            var authorizationsession = await _authorizationsessionService.GetByIdAsync(id);
-            if (authorizationsession == null)
-                return NotFound();
-            var item = _mapper.Map<AuthorizationSessionInfoVM>(authorizationsession);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching AuthorizationSession with ID: {id}", id);
+                var entity = await _authorizationsessionService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("AuthorizationSession not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<AuthorizationSessionInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching AuthorizationSession with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a AuthorizationSession by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<AuthorizationSessionInfoVM>> Find([FromQuery] Expression<Func<AuthorizationSessionOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var authorizationsession = await _authorizationsessionService.FindAsync(predicate);
-        //   // if (authorizationsession == null) return NotFound();
-        //   // var item = _mapper.Map<AuthorizationSessionInfoVM>(authorizationsession);
-        //   // return Ok(item);
-        //}
         // Create a new AuthorizationSession.
         [HttpPost(Name = "CreateAuthorizationSession")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AuthorizationSessionCreateVM>> Create([FromBody] AuthorizationSessionCreateVM model)
+        public async Task<ActionResult<AuthorizationSessionOutputVM>> Create([FromBody] AuthorizationSessionCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("AuthorizationSession data is null in Create.");
                 return BadRequest("AuthorizationSession data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AuthorizationSessionRequestDso>(model);
-            var createdAuthorizationSession = await _authorizationsessionService.CreateAsync(item);
-            var createdItem = _mapper.Map<AuthorizationSessionCreateVM>(createdAuthorizationSession);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new AuthorizationSession with data: {@model}", model);
+                var item = _mapper.Map<AuthorizationSessionRequestDso>(model);
+                var createdEntity = await _authorizationsessionService.CreateAsync(item);
+                var createdItem = _mapper.Map<AuthorizationSessionOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new AuthorizationSession");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple AuthorizationSessions.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<AuthorizationSessionCreateVM>>> CreateRange([FromBody] IEnumerable<AuthorizationSessionCreateVM> models)
+        public async Task<ActionResult<IEnumerable<AuthorizationSessionOutputVM>>> CreateRange([FromBody] IEnumerable<AuthorizationSessionCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<AuthorizationSessionRequestDso>>(models);
-            var createdAuthorizationSessions = await _authorizationsessionService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<AuthorizationSessionCreateVM>>(createdAuthorizationSessions);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple AuthorizationSessions.");
+                var items = _mapper.Map<List<AuthorizationSessionRequestDso>>(models);
+                var createdEntities = await _authorizationsessionService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<AuthorizationSessionOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple AuthorizationSessions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing AuthorizationSession.
-        [HttpPut("{id}", Name = "UpdateAuthorizationSession")]
+        [HttpPut(Name = "UpdateAuthorizationSession")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] AuthorizationSessionUpdateVM model)
+        public async Task<ActionResult<AuthorizationSessionOutputVM>> Update([FromBody] AuthorizationSessionUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AuthorizationSessionRequestDso>(model);
-            var updatedAuthorizationSession = await _authorizationsessionService.UpdateAsync(item);
-            if (updatedAuthorizationSession == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<AuthorizationSessionUpdateVM>(updatedAuthorizationSession);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating AuthorizationSession with ID: {id}", model?.Id);
+                var item = _mapper.Map<AuthorizationSessionRequestDso>(model);
+                var updatedEntity = await _authorizationsessionService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("AuthorizationSession not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<AuthorizationSessionOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating AuthorizationSession with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a AuthorizationSession.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid AuthorizationSession ID received in Delete.");
                 return BadRequest("Invalid AuthorizationSession ID.");
-            await _authorizationsessionService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting AuthorizationSession with ID: {id}", id);
+                await _authorizationsessionService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting AuthorizationSession with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple AuthorizationSessions.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<AuthorizationSessionOutputVM, bool>> predicate)
-        //{
-        //    //await _authorizationsessionService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a AuthorizationSession exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<AuthorizationSessionOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _authorizationsessionService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of AuthorizationSessions.
         [HttpGet("CountAuthorizationSession")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _authorizationsessionService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting AuthorizationSessions...");
+                var count = await _authorizationsessionService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting AuthorizationSessions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.ServiceMethod
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ServiceMethod  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.ServiceMethod
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ServiceMethod  property for VM Info.

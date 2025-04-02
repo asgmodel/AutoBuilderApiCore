@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Space
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Space  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Space
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Space  property for VM Info.

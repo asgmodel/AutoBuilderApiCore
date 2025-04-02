@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Plan
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Plan  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Plan
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Plan  property for VM Info.

@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<SettingOutputVM>>> GetAll()
         {
-            var result = await _settingService.GetAllAsync();
-            var items = _mapper.Map<List<SettingOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Settings...");
+                var result = await _settingService.GetAllAsync();
+                var items = _mapper.Map<List<SettingOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Settings");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Setting by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SettingInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Setting ID received.");
                 return BadRequest("Invalid Setting ID.");
-            var setting = await _settingService.GetByIdAsync(id);
-            if (setting == null)
-                return NotFound();
-            var item = _mapper.Map<SettingInfoVM>(setting);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Setting with ID: {id}", id);
+                var entity = await _settingService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Setting not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SettingInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Setting with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Setting by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<SettingInfoVM>> Find([FromQuery] Expression<Func<SettingOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var setting = await _settingService.FindAsync(predicate);
-        //   // if (setting == null) return NotFound();
-        //   // var item = _mapper.Map<SettingInfoVM>(setting);
-        //   // return Ok(item);
-        //}
         // Create a new Setting.
         [HttpPost(Name = "CreateSetting")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SettingCreateVM>> Create([FromBody] SettingCreateVM model)
+        public async Task<ActionResult<SettingOutputVM>> Create([FromBody] SettingCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Setting data is null in Create.");
                 return BadRequest("Setting data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<SettingRequestDso>(model);
-            var createdSetting = await _settingService.CreateAsync(item);
-            var createdItem = _mapper.Map<SettingCreateVM>(createdSetting);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Setting with data: {@model}", model);
+                var item = _mapper.Map<SettingRequestDso>(model);
+                var createdEntity = await _settingService.CreateAsync(item);
+                var createdItem = _mapper.Map<SettingOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Setting");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Settings.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<SettingCreateVM>>> CreateRange([FromBody] IEnumerable<SettingCreateVM> models)
+        public async Task<ActionResult<IEnumerable<SettingOutputVM>>> CreateRange([FromBody] IEnumerable<SettingCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<SettingRequestDso>>(models);
-            var createdSettings = await _settingService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<SettingCreateVM>>(createdSettings);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Settings.");
+                var items = _mapper.Map<List<SettingRequestDso>>(models);
+                var createdEntities = await _settingService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<SettingOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Settings");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Setting.
-        [HttpPut("{id}", Name = "UpdateSetting")]
+        [HttpPut(Name = "UpdateSetting")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] SettingUpdateVM model)
+        public async Task<ActionResult<SettingOutputVM>> Update([FromBody] SettingUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<SettingRequestDso>(model);
-            var updatedSetting = await _settingService.UpdateAsync(item);
-            if (updatedSetting == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<SettingUpdateVM>(updatedSetting);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Setting with ID: {id}", model?.Id);
+                var item = _mapper.Map<SettingRequestDso>(model);
+                var updatedEntity = await _settingService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Setting not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<SettingOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Setting with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Setting.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Setting ID received in Delete.");
                 return BadRequest("Invalid Setting ID.");
-            await _settingService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Setting with ID: {id}", id);
+                await _settingService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Setting with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Settings.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<SettingOutputVM, bool>> predicate)
-        //{
-        //    //await _settingService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Setting exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<SettingOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _settingService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Settings.
         [HttpGet("CountSetting")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _settingService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Settings...");
+                var count = await _settingService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Settings");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

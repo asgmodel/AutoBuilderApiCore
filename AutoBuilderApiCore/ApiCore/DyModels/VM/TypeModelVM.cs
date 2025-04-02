@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// TypeModel  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// TypeModel  property for VM Info.

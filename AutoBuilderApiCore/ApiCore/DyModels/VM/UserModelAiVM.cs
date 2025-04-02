@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.UserModelAi
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// UserModelAi  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.UserModelAi
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// UserModelAi  property for VM Info.

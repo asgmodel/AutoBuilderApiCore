@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<PlanFeatureOutputVM>>> GetAll()
         {
-            var result = await _planfeatureService.GetAllAsync();
-            var items = _mapper.Map<List<PlanFeatureOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all PlanFeatures...");
+                var result = await _planfeatureService.GetAllAsync();
+                var items = _mapper.Map<List<PlanFeatureOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all PlanFeatures");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a PlanFeature by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PlanFeatureInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid PlanFeature ID received.");
                 return BadRequest("Invalid PlanFeature ID.");
-            var planfeature = await _planfeatureService.GetByIdAsync(id);
-            if (planfeature == null)
-                return NotFound();
-            var item = _mapper.Map<PlanFeatureInfoVM>(planfeature);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching PlanFeature with ID: {id}", id);
+                var entity = await _planfeatureService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("PlanFeature not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<PlanFeatureInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching PlanFeature with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a PlanFeature by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PlanFeatureInfoVM>> Find([FromQuery] Expression<Func<PlanFeatureOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var planfeature = await _planfeatureService.FindAsync(predicate);
-        //   // if (planfeature == null) return NotFound();
-        //   // var item = _mapper.Map<PlanFeatureInfoVM>(planfeature);
-        //   // return Ok(item);
-        //}
         // Create a new PlanFeature.
         [HttpPost(Name = "CreatePlanFeature")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PlanFeatureCreateVM>> Create([FromBody] PlanFeatureCreateVM model)
+        public async Task<ActionResult<PlanFeatureOutputVM>> Create([FromBody] PlanFeatureCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("PlanFeature data is null in Create.");
                 return BadRequest("PlanFeature data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<PlanFeatureRequestDso>(model);
-            var createdPlanFeature = await _planfeatureService.CreateAsync(item);
-            var createdItem = _mapper.Map<PlanFeatureCreateVM>(createdPlanFeature);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new PlanFeature with data: {@model}", model);
+                var item = _mapper.Map<PlanFeatureRequestDso>(model);
+                var createdEntity = await _planfeatureService.CreateAsync(item);
+                var createdItem = _mapper.Map<PlanFeatureOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new PlanFeature");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple PlanFeatures.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<PlanFeatureCreateVM>>> CreateRange([FromBody] IEnumerable<PlanFeatureCreateVM> models)
+        public async Task<ActionResult<IEnumerable<PlanFeatureOutputVM>>> CreateRange([FromBody] IEnumerable<PlanFeatureCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<PlanFeatureRequestDso>>(models);
-            var createdPlanFeatures = await _planfeatureService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<PlanFeatureCreateVM>>(createdPlanFeatures);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple PlanFeatures.");
+                var items = _mapper.Map<List<PlanFeatureRequestDso>>(models);
+                var createdEntities = await _planfeatureService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<PlanFeatureOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple PlanFeatures");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing PlanFeature.
-        [HttpPut("{id}", Name = "UpdatePlanFeature")]
+        [HttpPut(Name = "UpdatePlanFeature")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] PlanFeatureUpdateVM model)
+        public async Task<ActionResult<PlanFeatureOutputVM>> Update([FromBody] PlanFeatureUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<PlanFeatureRequestDso>(model);
-            var updatedPlanFeature = await _planfeatureService.UpdateAsync(item);
-            if (updatedPlanFeature == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<PlanFeatureUpdateVM>(updatedPlanFeature);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating PlanFeature with ID: {id}", model?.Id);
+                var item = _mapper.Map<PlanFeatureRequestDso>(model);
+                var updatedEntity = await _planfeatureService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("PlanFeature not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<PlanFeatureOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating PlanFeature with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a PlanFeature.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid PlanFeature ID received in Delete.");
                 return BadRequest("Invalid PlanFeature ID.");
-            await _planfeatureService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting PlanFeature with ID: {id}", id);
+                await _planfeatureService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting PlanFeature with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple PlanFeatures.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<PlanFeatureOutputVM, bool>> predicate)
-        //{
-        //    //await _planfeatureService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a PlanFeature exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<PlanFeatureOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _planfeatureService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of PlanFeatures.
         [HttpGet("CountPlanFeature")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _planfeatureService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting PlanFeatures...");
+                var count = await _planfeatureService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting PlanFeatures");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<UserServiceOutputVM>>> GetAll()
         {
-            var result = await _userserviceService.GetAllAsync();
-            var items = _mapper.Map<List<UserServiceOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all UserServices...");
+                var result = await _userserviceService.GetAllAsync();
+                var items = _mapper.Map<List<UserServiceOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all UserServices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a UserService by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserServiceInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserService ID received.");
                 return BadRequest("Invalid UserService ID.");
-            var userservice = await _userserviceService.GetByIdAsync(id);
-            if (userservice == null)
-                return NotFound();
-            var item = _mapper.Map<UserServiceInfoVM>(userservice);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching UserService with ID: {id}", id);
+                var entity = await _userserviceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("UserService not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<UserServiceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserService with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a UserService by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<UserServiceInfoVM>> Find([FromQuery] Expression<Func<UserServiceOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var userservice = await _userserviceService.FindAsync(predicate);
-        //   // if (userservice == null) return NotFound();
-        //   // var item = _mapper.Map<UserServiceInfoVM>(userservice);
-        //   // return Ok(item);
-        //}
         // Create a new UserService.
         [HttpPost(Name = "CreateUserService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserServiceCreateVM>> Create([FromBody] UserServiceCreateVM model)
+        public async Task<ActionResult<UserServiceOutputVM>> Create([FromBody] UserServiceCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("UserService data is null in Create.");
                 return BadRequest("UserService data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<UserServiceRequestDso>(model);
-            var createdUserService = await _userserviceService.CreateAsync(item);
-            var createdItem = _mapper.Map<UserServiceCreateVM>(createdUserService);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new UserService with data: {@model}", model);
+                var item = _mapper.Map<UserServiceRequestDso>(model);
+                var createdEntity = await _userserviceService.CreateAsync(item);
+                var createdItem = _mapper.Map<UserServiceOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new UserService");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple UserServices.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<UserServiceCreateVM>>> CreateRange([FromBody] IEnumerable<UserServiceCreateVM> models)
+        public async Task<ActionResult<IEnumerable<UserServiceOutputVM>>> CreateRange([FromBody] IEnumerable<UserServiceCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<UserServiceRequestDso>>(models);
-            var createdUserServices = await _userserviceService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<UserServiceCreateVM>>(createdUserServices);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple UserServices.");
+                var items = _mapper.Map<List<UserServiceRequestDso>>(models);
+                var createdEntities = await _userserviceService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<UserServiceOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple UserServices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing UserService.
-        [HttpPut("{id}", Name = "UpdateUserService")]
+        [HttpPut(Name = "UpdateUserService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] UserServiceUpdateVM model)
+        public async Task<ActionResult<UserServiceOutputVM>> Update([FromBody] UserServiceUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<UserServiceRequestDso>(model);
-            var updatedUserService = await _userserviceService.UpdateAsync(item);
-            if (updatedUserService == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<UserServiceUpdateVM>(updatedUserService);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating UserService with ID: {id}", model?.Id);
+                var item = _mapper.Map<UserServiceRequestDso>(model);
+                var updatedEntity = await _userserviceService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("UserService not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<UserServiceOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating UserService with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a UserService.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserService ID received in Delete.");
                 return BadRequest("Invalid UserService ID.");
-            await _userserviceService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting UserService with ID: {id}", id);
+                await _userserviceService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting UserService with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple UserServices.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<UserServiceOutputVM, bool>> predicate)
-        //{
-        //    //await _userserviceService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a UserService exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<UserServiceOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _userserviceService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of UserServices.
         [HttpGet("CountUserService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _userserviceService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting UserServices...");
+                var count = await _userserviceService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting UserServices");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.UserService
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// UserService  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.UserService
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// UserService  property for VM Info.

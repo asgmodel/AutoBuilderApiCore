@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<AdvertisementOutputVM>>> GetAll()
         {
-            var result = await _advertisementService.GetAllAsync();
-            var items = _mapper.Map<List<AdvertisementOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Advertisements...");
+                var result = await _advertisementService.GetAllAsync();
+                var items = _mapper.Map<List<AdvertisementOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Advertisements");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Advertisement by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AdvertisementInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Advertisement ID received.");
                 return BadRequest("Invalid Advertisement ID.");
-            var advertisement = await _advertisementService.GetByIdAsync(id);
-            if (advertisement == null)
-                return NotFound();
-            var item = _mapper.Map<AdvertisementInfoVM>(advertisement);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Advertisement with ID: {id}", id);
+                var entity = await _advertisementService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Advertisement not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<AdvertisementInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Advertisement with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Advertisement by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<AdvertisementInfoVM>> Find([FromQuery] Expression<Func<AdvertisementOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var advertisement = await _advertisementService.FindAsync(predicate);
-        //   // if (advertisement == null) return NotFound();
-        //   // var item = _mapper.Map<AdvertisementInfoVM>(advertisement);
-        //   // return Ok(item);
-        //}
         // Create a new Advertisement.
         [HttpPost(Name = "CreateAdvertisement")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AdvertisementCreateVM>> Create([FromBody] AdvertisementCreateVM model)
+        public async Task<ActionResult<AdvertisementOutputVM>> Create([FromBody] AdvertisementCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Advertisement data is null in Create.");
                 return BadRequest("Advertisement data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AdvertisementRequestDso>(model);
-            var createdAdvertisement = await _advertisementService.CreateAsync(item);
-            var createdItem = _mapper.Map<AdvertisementCreateVM>(createdAdvertisement);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Advertisement with data: {@model}", model);
+                var item = _mapper.Map<AdvertisementRequestDso>(model);
+                var createdEntity = await _advertisementService.CreateAsync(item);
+                var createdItem = _mapper.Map<AdvertisementOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Advertisement");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Advertisements.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<AdvertisementCreateVM>>> CreateRange([FromBody] IEnumerable<AdvertisementCreateVM> models)
+        public async Task<ActionResult<IEnumerable<AdvertisementOutputVM>>> CreateRange([FromBody] IEnumerable<AdvertisementCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<AdvertisementRequestDso>>(models);
-            var createdAdvertisements = await _advertisementService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<AdvertisementCreateVM>>(createdAdvertisements);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Advertisements.");
+                var items = _mapper.Map<List<AdvertisementRequestDso>>(models);
+                var createdEntities = await _advertisementService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<AdvertisementOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Advertisements");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Advertisement.
-        [HttpPut("{id}", Name = "UpdateAdvertisement")]
+        [HttpPut(Name = "UpdateAdvertisement")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] AdvertisementUpdateVM model)
+        public async Task<ActionResult<AdvertisementOutputVM>> Update([FromBody] AdvertisementUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AdvertisementRequestDso>(model);
-            var updatedAdvertisement = await _advertisementService.UpdateAsync(item);
-            if (updatedAdvertisement == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<AdvertisementUpdateVM>(updatedAdvertisement);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Advertisement with ID: {id}", model?.Id);
+                var item = _mapper.Map<AdvertisementRequestDso>(model);
+                var updatedEntity = await _advertisementService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Advertisement not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<AdvertisementOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Advertisement with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Advertisement.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Advertisement ID received in Delete.");
                 return BadRequest("Invalid Advertisement ID.");
-            await _advertisementService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Advertisement with ID: {id}", id);
+                await _advertisementService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Advertisement with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Advertisements.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<AdvertisementOutputVM, bool>> predicate)
-        //{
-        //    //await _advertisementService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Advertisement exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<AdvertisementOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _advertisementService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Advertisements.
         [HttpGet("CountAdvertisement")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _advertisementService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Advertisements...");
+                var count = await _advertisementService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Advertisements");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

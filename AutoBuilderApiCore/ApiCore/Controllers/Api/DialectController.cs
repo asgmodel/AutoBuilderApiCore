@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<DialectOutputVM>>> GetAll()
         {
-            var result = await _dialectService.GetAllAsync();
-            var items = _mapper.Map<List<DialectOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Dialects...");
+                var result = await _dialectService.GetAllAsync();
+                var items = _mapper.Map<List<DialectOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Dialects");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Dialect by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<DialectInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Dialect ID received.");
                 return BadRequest("Invalid Dialect ID.");
-            var dialect = await _dialectService.GetByIdAsync(id);
-            if (dialect == null)
-                return NotFound();
-            var item = _mapper.Map<DialectInfoVM>(dialect);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Dialect with ID: {id}", id);
+                var entity = await _dialectService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Dialect not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<DialectInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Dialect with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Dialect by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<DialectInfoVM>> Find([FromQuery] Expression<Func<DialectOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var dialect = await _dialectService.FindAsync(predicate);
-        //   // if (dialect == null) return NotFound();
-        //   // var item = _mapper.Map<DialectInfoVM>(dialect);
-        //   // return Ok(item);
-        //}
         // Create a new Dialect.
         [HttpPost(Name = "CreateDialect")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<DialectCreateVM>> Create([FromBody] DialectCreateVM model)
+        public async Task<ActionResult<DialectOutputVM>> Create([FromBody] DialectCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Dialect data is null in Create.");
                 return BadRequest("Dialect data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<DialectRequestDso>(model);
-            var createdDialect = await _dialectService.CreateAsync(item);
-            var createdItem = _mapper.Map<DialectCreateVM>(createdDialect);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Dialect with data: {@model}", model);
+                var item = _mapper.Map<DialectRequestDso>(model);
+                var createdEntity = await _dialectService.CreateAsync(item);
+                var createdItem = _mapper.Map<DialectOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Dialect");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Dialects.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<DialectCreateVM>>> CreateRange([FromBody] IEnumerable<DialectCreateVM> models)
+        public async Task<ActionResult<IEnumerable<DialectOutputVM>>> CreateRange([FromBody] IEnumerable<DialectCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<DialectRequestDso>>(models);
-            var createdDialects = await _dialectService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<DialectCreateVM>>(createdDialects);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Dialects.");
+                var items = _mapper.Map<List<DialectRequestDso>>(models);
+                var createdEntities = await _dialectService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<DialectOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Dialects");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Dialect.
-        [HttpPut("{id}", Name = "UpdateDialect")]
+        [HttpPut(Name = "UpdateDialect")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] DialectUpdateVM model)
+        public async Task<ActionResult<DialectOutputVM>> Update([FromBody] DialectUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<DialectRequestDso>(model);
-            var updatedDialect = await _dialectService.UpdateAsync(item);
-            if (updatedDialect == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<DialectUpdateVM>(updatedDialect);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Dialect with ID: {id}", model?.Id);
+                var item = _mapper.Map<DialectRequestDso>(model);
+                var updatedEntity = await _dialectService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Dialect not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<DialectOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Dialect with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Dialect.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Dialect ID received in Delete.");
                 return BadRequest("Invalid Dialect ID.");
-            await _dialectService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Dialect with ID: {id}", id);
+                await _dialectService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Dialect with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Dialects.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<DialectOutputVM, bool>> predicate)
-        //{
-        //    //await _dialectService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Dialect exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<DialectOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _dialectService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Dialects.
         [HttpGet("CountDialect")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _dialectService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Dialects...");
+                var count = await _dialectService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Dialects");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

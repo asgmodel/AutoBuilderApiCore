@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.ApplicationUser
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ApplicationUser  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.ApplicationUser
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ApplicationUser  property for VM Info.

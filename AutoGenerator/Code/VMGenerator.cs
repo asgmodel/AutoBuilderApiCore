@@ -113,6 +113,10 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
         if (nameSpace == "Filter")
             pros.AppendLine(" public string?  Lg { get; set; }");
 
+        else if(nameSpace =="Update"|| nameSpace=="Delete")
+            pros.AppendLine(" public string?  Id { get; set; }");
+
+
         return $@"
 {usingStatements.ToString()}
 

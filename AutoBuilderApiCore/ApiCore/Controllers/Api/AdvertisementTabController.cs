@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<AdvertisementTabOutputVM>>> GetAll()
         {
-            var result = await _advertisementtabService.GetAllAsync();
-            var items = _mapper.Map<List<AdvertisementTabOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all AdvertisementTabs...");
+                var result = await _advertisementtabService.GetAllAsync();
+                var items = _mapper.Map<List<AdvertisementTabOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all AdvertisementTabs");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a AdvertisementTab by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<AdvertisementTabInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid AdvertisementTab ID received.");
                 return BadRequest("Invalid AdvertisementTab ID.");
-            var advertisementtab = await _advertisementtabService.GetByIdAsync(id);
-            if (advertisementtab == null)
-                return NotFound();
-            var item = _mapper.Map<AdvertisementTabInfoVM>(advertisementtab);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching AdvertisementTab with ID: {id}", id);
+                var entity = await _advertisementtabService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("AdvertisementTab not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<AdvertisementTabInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching AdvertisementTab with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a AdvertisementTab by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<AdvertisementTabInfoVM>> Find([FromQuery] Expression<Func<AdvertisementTabOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var advertisementtab = await _advertisementtabService.FindAsync(predicate);
-        //   // if (advertisementtab == null) return NotFound();
-        //   // var item = _mapper.Map<AdvertisementTabInfoVM>(advertisementtab);
-        //   // return Ok(item);
-        //}
         // Create a new AdvertisementTab.
         [HttpPost(Name = "CreateAdvertisementTab")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AdvertisementTabCreateVM>> Create([FromBody] AdvertisementTabCreateVM model)
+        public async Task<ActionResult<AdvertisementTabOutputVM>> Create([FromBody] AdvertisementTabCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("AdvertisementTab data is null in Create.");
                 return BadRequest("AdvertisementTab data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AdvertisementTabRequestDso>(model);
-            var createdAdvertisementTab = await _advertisementtabService.CreateAsync(item);
-            var createdItem = _mapper.Map<AdvertisementTabCreateVM>(createdAdvertisementTab);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new AdvertisementTab with data: {@model}", model);
+                var item = _mapper.Map<AdvertisementTabRequestDso>(model);
+                var createdEntity = await _advertisementtabService.CreateAsync(item);
+                var createdItem = _mapper.Map<AdvertisementTabOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new AdvertisementTab");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple AdvertisementTabs.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<AdvertisementTabCreateVM>>> CreateRange([FromBody] IEnumerable<AdvertisementTabCreateVM> models)
+        public async Task<ActionResult<IEnumerable<AdvertisementTabOutputVM>>> CreateRange([FromBody] IEnumerable<AdvertisementTabCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<AdvertisementTabRequestDso>>(models);
-            var createdAdvertisementTabs = await _advertisementtabService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<AdvertisementTabCreateVM>>(createdAdvertisementTabs);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple AdvertisementTabs.");
+                var items = _mapper.Map<List<AdvertisementTabRequestDso>>(models);
+                var createdEntities = await _advertisementtabService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<AdvertisementTabOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple AdvertisementTabs");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing AdvertisementTab.
-        [HttpPut("{id}", Name = "UpdateAdvertisementTab")]
+        [HttpPut(Name = "UpdateAdvertisementTab")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] AdvertisementTabUpdateVM model)
+        public async Task<ActionResult<AdvertisementTabOutputVM>> Update([FromBody] AdvertisementTabUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<AdvertisementTabRequestDso>(model);
-            var updatedAdvertisementTab = await _advertisementtabService.UpdateAsync(item);
-            if (updatedAdvertisementTab == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<AdvertisementTabUpdateVM>(updatedAdvertisementTab);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating AdvertisementTab with ID: {id}", model?.Id);
+                var item = _mapper.Map<AdvertisementTabRequestDso>(model);
+                var updatedEntity = await _advertisementtabService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("AdvertisementTab not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<AdvertisementTabOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating AdvertisementTab with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a AdvertisementTab.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid AdvertisementTab ID received in Delete.");
                 return BadRequest("Invalid AdvertisementTab ID.");
-            await _advertisementtabService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting AdvertisementTab with ID: {id}", id);
+                await _advertisementtabService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting AdvertisementTab with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple AdvertisementTabs.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<AdvertisementTabOutputVM, bool>> predicate)
-        //{
-        //    //await _advertisementtabService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a AdvertisementTab exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<AdvertisementTabOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _advertisementtabService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of AdvertisementTabs.
         [HttpGet("CountAdvertisementTab")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _advertisementtabService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting AdvertisementTabs...");
+                var count = await _advertisementtabService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting AdvertisementTabs");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

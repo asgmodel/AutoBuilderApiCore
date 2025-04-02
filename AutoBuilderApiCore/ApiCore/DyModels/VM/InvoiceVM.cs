@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Invoice
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Invoice  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Invoice
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Invoice  property for VM Info.

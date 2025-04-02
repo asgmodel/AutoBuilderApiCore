@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<ServiceOutputVM>>> GetAll()
         {
-            var result = await _serviceService.GetAllAsync();
-            var items = _mapper.Map<List<ServiceOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Services...");
+                var result = await _serviceService.GetAllAsync();
+                var items = _mapper.Map<List<ServiceOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Services");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Service by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ServiceInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Service ID received.");
                 return BadRequest("Invalid Service ID.");
-            var service = await _serviceService.GetByIdAsync(id);
-            if (service == null)
-                return NotFound();
-            var item = _mapper.Map<ServiceInfoVM>(service);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Service with ID: {id}", id);
+                var entity = await _serviceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Service not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Service with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Service by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ServiceInfoVM>> Find([FromQuery] Expression<Func<ServiceOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var service = await _serviceService.FindAsync(predicate);
-        //   // if (service == null) return NotFound();
-        //   // var item = _mapper.Map<ServiceInfoVM>(service);
-        //   // return Ok(item);
-        //}
         // Create a new Service.
         [HttpPost(Name = "CreateService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ServiceCreateVM>> Create([FromBody] ServiceCreateVM model)
+        public async Task<ActionResult<ServiceOutputVM>> Create([FromBody] ServiceCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Service data is null in Create.");
                 return BadRequest("Service data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ServiceRequestDso>(model);
-            var createdService = await _serviceService.CreateAsync(item);
-            var createdItem = _mapper.Map<ServiceCreateVM>(createdService);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Service with data: {@model}", model);
+                var item = _mapper.Map<ServiceRequestDso>(model);
+                var createdEntity = await _serviceService.CreateAsync(item);
+                var createdItem = _mapper.Map<ServiceOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Service");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Services.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<ServiceCreateVM>>> CreateRange([FromBody] IEnumerable<ServiceCreateVM> models)
+        public async Task<ActionResult<IEnumerable<ServiceOutputVM>>> CreateRange([FromBody] IEnumerable<ServiceCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<ServiceRequestDso>>(models);
-            var createdServices = await _serviceService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<ServiceCreateVM>>(createdServices);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Services.");
+                var items = _mapper.Map<List<ServiceRequestDso>>(models);
+                var createdEntities = await _serviceService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<ServiceOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Services");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Service.
-        [HttpPut("{id}", Name = "UpdateService")]
+        [HttpPut(Name = "UpdateService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] ServiceUpdateVM model)
+        public async Task<ActionResult<ServiceOutputVM>> Update([FromBody] ServiceUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ServiceRequestDso>(model);
-            var updatedService = await _serviceService.UpdateAsync(item);
-            if (updatedService == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<ServiceUpdateVM>(updatedService);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Service with ID: {id}", model?.Id);
+                var item = _mapper.Map<ServiceRequestDso>(model);
+                var updatedEntity = await _serviceService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Service not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<ServiceOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Service with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Service.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Service ID received in Delete.");
                 return BadRequest("Invalid Service ID.");
-            await _serviceService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Service with ID: {id}", id);
+                await _serviceService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Service with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Services.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<ServiceOutputVM, bool>> predicate)
-        //{
-        //    //await _serviceService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Service exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<ServiceOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _serviceService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Services.
         [HttpGet("CountService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _serviceService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Services...");
+                var count = await _serviceService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Services");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

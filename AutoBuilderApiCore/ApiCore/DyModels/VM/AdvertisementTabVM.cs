@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.AdvertisementTab
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// AdvertisementTab  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.AdvertisementTab
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// AdvertisementTab  property for VM Info.

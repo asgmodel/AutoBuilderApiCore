@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<TypeModelOutputVM>>> GetAll()
         {
-            var result = await _typemodelService.GetAllAsync();
-            var items = _mapper.Map<List<TypeModelOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all TypeModels...");
+                var result = await _typemodelService.GetAllAsync();
+                var items = _mapper.Map<List<TypeModelOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all TypeModels");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a TypeModel by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<TypeModelInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid TypeModel ID received.");
                 return BadRequest("Invalid TypeModel ID.");
-            var typemodel = await _typemodelService.GetByIdAsync(id);
-            if (typemodel == null)
-                return NotFound();
-            var item = _mapper.Map<TypeModelInfoVM>(typemodel);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching TypeModel with ID: {id}", id);
+                var entity = await _typemodelService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("TypeModel not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<TypeModelInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching TypeModel with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a TypeModel by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<TypeModelInfoVM>> Find([FromQuery] Expression<Func<TypeModelOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var typemodel = await _typemodelService.FindAsync(predicate);
-        //   // if (typemodel == null) return NotFound();
-        //   // var item = _mapper.Map<TypeModelInfoVM>(typemodel);
-        //   // return Ok(item);
-        //}
         // Create a new TypeModel.
         [HttpPost(Name = "CreateTypeModel")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<TypeModelCreateVM>> Create([FromBody] TypeModelCreateVM model)
+        public async Task<ActionResult<TypeModelOutputVM>> Create([FromBody] TypeModelCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("TypeModel data is null in Create.");
                 return BadRequest("TypeModel data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<TypeModelRequestDso>(model);
-            var createdTypeModel = await _typemodelService.CreateAsync(item);
-            var createdItem = _mapper.Map<TypeModelCreateVM>(createdTypeModel);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new TypeModel with data: {@model}", model);
+                var item = _mapper.Map<TypeModelRequestDso>(model);
+                var createdEntity = await _typemodelService.CreateAsync(item);
+                var createdItem = _mapper.Map<TypeModelOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new TypeModel");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple TypeModels.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<TypeModelCreateVM>>> CreateRange([FromBody] IEnumerable<TypeModelCreateVM> models)
+        public async Task<ActionResult<IEnumerable<TypeModelOutputVM>>> CreateRange([FromBody] IEnumerable<TypeModelCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<TypeModelRequestDso>>(models);
-            var createdTypeModels = await _typemodelService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<TypeModelCreateVM>>(createdTypeModels);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple TypeModels.");
+                var items = _mapper.Map<List<TypeModelRequestDso>>(models);
+                var createdEntities = await _typemodelService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<TypeModelOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple TypeModels");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing TypeModel.
-        [HttpPut("{id}", Name = "UpdateTypeModel")]
+        [HttpPut(Name = "UpdateTypeModel")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] TypeModelUpdateVM model)
+        public async Task<ActionResult<TypeModelOutputVM>> Update([FromBody] TypeModelUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<TypeModelRequestDso>(model);
-            var updatedTypeModel = await _typemodelService.UpdateAsync(item);
-            if (updatedTypeModel == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<TypeModelUpdateVM>(updatedTypeModel);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating TypeModel with ID: {id}", model?.Id);
+                var item = _mapper.Map<TypeModelRequestDso>(model);
+                var updatedEntity = await _typemodelService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("TypeModel not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<TypeModelOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating TypeModel with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a TypeModel.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid TypeModel ID received in Delete.");
                 return BadRequest("Invalid TypeModel ID.");
-            await _typemodelService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting TypeModel with ID: {id}", id);
+                await _typemodelService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting TypeModel with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple TypeModels.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<TypeModelOutputVM, bool>> predicate)
-        //{
-        //    //await _typemodelService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a TypeModel exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<TypeModelOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _typemodelService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of TypeModels.
         [HttpGet("CountTypeModel")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _typemodelService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting TypeModels...");
+                var count = await _typemodelService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting TypeModels");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

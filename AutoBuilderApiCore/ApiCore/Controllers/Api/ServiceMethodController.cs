@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<ServiceMethodOutputVM>>> GetAll()
         {
-            var result = await _servicemethodService.GetAllAsync();
-            var items = _mapper.Map<List<ServiceMethodOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all ServiceMethods...");
+                var result = await _servicemethodService.GetAllAsync();
+                var items = _mapper.Map<List<ServiceMethodOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all ServiceMethods");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a ServiceMethod by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ServiceMethodInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ServiceMethod ID received.");
                 return BadRequest("Invalid ServiceMethod ID.");
-            var servicemethod = await _servicemethodService.GetByIdAsync(id);
-            if (servicemethod == null)
-                return NotFound();
-            var item = _mapper.Map<ServiceMethodInfoVM>(servicemethod);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ServiceMethod with ID: {id}", id);
+                var entity = await _servicemethodService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ServiceMethod not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceMethodInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ServiceMethod with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a ServiceMethod by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ServiceMethodInfoVM>> Find([FromQuery] Expression<Func<ServiceMethodOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var servicemethod = await _servicemethodService.FindAsync(predicate);
-        //   // if (servicemethod == null) return NotFound();
-        //   // var item = _mapper.Map<ServiceMethodInfoVM>(servicemethod);
-        //   // return Ok(item);
-        //}
         // Create a new ServiceMethod.
         [HttpPost(Name = "CreateServiceMethod")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ServiceMethodCreateVM>> Create([FromBody] ServiceMethodCreateVM model)
+        public async Task<ActionResult<ServiceMethodOutputVM>> Create([FromBody] ServiceMethodCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("ServiceMethod data is null in Create.");
                 return BadRequest("ServiceMethod data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ServiceMethodRequestDso>(model);
-            var createdServiceMethod = await _servicemethodService.CreateAsync(item);
-            var createdItem = _mapper.Map<ServiceMethodCreateVM>(createdServiceMethod);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new ServiceMethod with data: {@model}", model);
+                var item = _mapper.Map<ServiceMethodRequestDso>(model);
+                var createdEntity = await _servicemethodService.CreateAsync(item);
+                var createdItem = _mapper.Map<ServiceMethodOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new ServiceMethod");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple ServiceMethods.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<ServiceMethodCreateVM>>> CreateRange([FromBody] IEnumerable<ServiceMethodCreateVM> models)
+        public async Task<ActionResult<IEnumerable<ServiceMethodOutputVM>>> CreateRange([FromBody] IEnumerable<ServiceMethodCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<ServiceMethodRequestDso>>(models);
-            var createdServiceMethods = await _servicemethodService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<ServiceMethodCreateVM>>(createdServiceMethods);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple ServiceMethods.");
+                var items = _mapper.Map<List<ServiceMethodRequestDso>>(models);
+                var createdEntities = await _servicemethodService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<ServiceMethodOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple ServiceMethods");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing ServiceMethod.
-        [HttpPut("{id}", Name = "UpdateServiceMethod")]
+        [HttpPut(Name = "UpdateServiceMethod")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] ServiceMethodUpdateVM model)
+        public async Task<ActionResult<ServiceMethodOutputVM>> Update([FromBody] ServiceMethodUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ServiceMethodRequestDso>(model);
-            var updatedServiceMethod = await _servicemethodService.UpdateAsync(item);
-            if (updatedServiceMethod == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<ServiceMethodUpdateVM>(updatedServiceMethod);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating ServiceMethod with ID: {id}", model?.Id);
+                var item = _mapper.Map<ServiceMethodRequestDso>(model);
+                var updatedEntity = await _servicemethodService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("ServiceMethod not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<ServiceMethodOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating ServiceMethod with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a ServiceMethod.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ServiceMethod ID received in Delete.");
                 return BadRequest("Invalid ServiceMethod ID.");
-            await _servicemethodService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting ServiceMethod with ID: {id}", id);
+                await _servicemethodService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting ServiceMethod with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple ServiceMethods.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<ServiceMethodOutputVM, bool>> predicate)
-        //{
-        //    //await _servicemethodService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a ServiceMethod exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<ServiceMethodOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _servicemethodService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of ServiceMethods.
         [HttpGet("CountServiceMethod")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _servicemethodService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting ServiceMethods...");
+                var count = await _servicemethodService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting ServiceMethods");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

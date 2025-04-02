@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Subscription
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Subscription  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Subscription
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Subscription  property for VM Info.

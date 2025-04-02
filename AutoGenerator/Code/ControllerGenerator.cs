@@ -50,14 +50,14 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         {
             var options = new GenerationOptions($"{model.Name}{type}", model)
             {
-                NamespaceName= NamespaceName,
+                NamespaceName = NamespaceName,
                 Template = GetTemplateController(null, subtype, model.Name)
                             ,
                 Usings = new List<string>
                         {
-                           
+
                             "AutoMapper",
-                         
+
                             "Microsoft.Extensions.Logging",
                             "System.Collections.Generic",
 
@@ -80,9 +80,9 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
 
             };
 
-           
 
-           
+
+
 
 
 
@@ -97,11 +97,8 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }
 
 
-
-
     }
 
-    // This method generates a controller template based on provided usings, namespace, and className.
     public static string GetTemplateController(List<string> usings, string namespaceName, string className)
     {
         // Initialize StringBuilder to accumulate the using statements dynamically.
@@ -136,16 +133,24 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         }}
 
         // Get all {className}s.
-       
         [HttpGet(Name = ""Get{className}s"")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<{className}OutputVM>>> GetAll()
         {{
-            var result = await _{className.ToLower()}Service.GetAllAsync();
-            var items = _mapper.Map<List<{className}OutputVM>>(result);
-            return Ok(items);
+            try
+            {{
+                _logger.LogInformation(""Fetching all {className}s..."");
+                var result = await _{className.ToLower()}Service.GetAllAsync();
+                var items = _mapper.Map<List<{className}OutputVM>>(result);
+                return Ok(items);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while fetching all {className}s"");
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
 
         // Get a {className} by ID.
@@ -155,42 +160,62 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<{className}InfoVM>> GetById(string? id)
         {{
-            if (id=="""") return BadRequest(""Invalid {className} ID."");
+            if (string.IsNullOrWhiteSpace(id))
+            {{
+                _logger.LogWarning(""Invalid {className} ID received."");
+                return BadRequest(""Invalid {className} ID."");
+            }}
 
-            var {className.ToLower()} = await _{className.ToLower()}Service.GetByIdAsync(id);
-            if ({className.ToLower()} == null) return NotFound();
-            var item = _mapper.Map<{className}InfoVM>({className.ToLower()});
-            return Ok(item);
+            try
+            {{
+                _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
+                var entity = await _{className.ToLower()}Service.GetByIdAsync(id);
+                if (entity == null)
+                {{
+                    _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
+                    return NotFound();
+                }}
+                var item = _mapper.Map<{className}InfoVM>(entity);
+                return Ok(item);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while fetching {className} with ID: {{id}}"", id);
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
-
-        //// Find a {className} by a specific predicate.
-        //[HttpGet(""find"")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<{className}InfoVM>> Find([FromQuery] Expression<Func<{className}OutputVM, bool>> predicate)
-        //{{
-        //     return NotFound();
-        //    //var {className.ToLower()} = await _{className.ToLower()}Service.FindAsync(predicate);
-        //   // if ({className.ToLower()} == null) return NotFound();
-        //   // var item = _mapper.Map<{className}InfoVM>({className.ToLower()});
-        //   // return Ok(item);
-        //}}
 
         // Create a new {className}.
         [HttpPost(Name = ""Create{className}"")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<{className}CreateVM>> Create([FromBody] {className}CreateVM model)
+        public async Task<ActionResult<{className}OutputVM>> Create([FromBody] {className}CreateVM model)
         {{
-            if (model == null) return BadRequest(""{className} data is required."");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (model == null)
+            {{
+                _logger.LogWarning(""{className} data is null in Create."");
+                return BadRequest(""{className} data is required."");
+            }}
+            if (!ModelState.IsValid)
+            {{
+                _logger.LogWarning(""Invalid model state in Create: {{ModelState}}"", ModelState);
+                return BadRequest(ModelState);
+            }}
 
-            var item = _mapper.Map<{className}RequestDso>(model);
-            var created{className} = await _{className.ToLower()}Service.CreateAsync(item);
-            var createdItem = _mapper.Map<{className}CreateVM>(created{className});
-            return CreatedAtAction(nameof(GetById), new {{ id = 0 }}, createdItem);
+            try
+            {{
+                _logger.LogInformation(""Creating new {className} with data: {{@model}}"", model);
+                var item = _mapper.Map<{className}RequestDso>(model);
+                var createdEntity = await _{className.ToLower()}Service.CreateAsync(item);
+                var createdItem = _mapper.Map<{className}OutputVM>(createdEntity);
+                return Ok(createdItem);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while creating a new {className}"");
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
 
         // Create multiple {className}s.
@@ -198,32 +223,70 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<{className}CreateVM>>> CreateRange([FromBody] IEnumerable<{className}CreateVM> models)
+        public async Task<ActionResult<IEnumerable<{className}OutputVM>>> CreateRange([FromBody] IEnumerable<{className}CreateVM> models)
         {{
-            if (models == null) return BadRequest(""Data is required."");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (models == null)
+            {{
+                _logger.LogWarning(""Data is null in CreateRange."");
+                return BadRequest(""Data is required."");
+            }}
+            if (!ModelState.IsValid)
+            {{
+                _logger.LogWarning(""Invalid model state in CreateRange: {{ModelState}}"", ModelState);
+                return BadRequest(ModelState);
+            }}
 
-            var items = _mapper.Map<List<{className}RequestDso>>(models);
-            var created{className}s = await _{className.ToLower()}Service.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<{className}CreateVM>>(created{className}s);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            try
+            {{
+                _logger.LogInformation(""Creating multiple {className}s."");
+                var items = _mapper.Map<List<{className}RequestDso>>(models);
+                var createdEntities = await _{className.ToLower()}Service.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<{className}OutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while creating multiple {className}s"");
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
 
         // Update an existing {className}.
-        [HttpPut(""{{id}}"", Name = ""Update{className}"")]
+        [HttpPut(Name = ""Update{className}"")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] {className}UpdateVM model)
+        public async Task<ActionResult<{className}OutputVM>> Update([FromBody] {className}UpdateVM model)
         {{
-            if (id <= 0 || model == null) return BadRequest(""Invalid data."");
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            if (model == null)
+            {{
+                _logger.LogWarning(""Invalid data in Update."");
+                return BadRequest(""Invalid data."");
+            }}
+            if (!ModelState.IsValid)
+            {{
+                _logger.LogWarning(""Invalid model state in Update: {{ModelState}}"", ModelState);
+                return BadRequest(ModelState);
+            }}
 
-            var item = _mapper.Map<{className}RequestDso>(model);
-            var updated{className} = await _{className.ToLower()}Service.UpdateAsync(item);
-            if (updated{className} == null) return NotFound();
-            var updatedItem = _mapper.Map<{className}UpdateVM>(updated{className});
-            return Ok(updatedItem);
+            try
+            {{
+                _logger.LogInformation(""Updating {className} with ID: {{id}}"", model?.Id);
+                var item = _mapper.Map<{className}RequestDso>(model);
+                var updatedEntity = await _{className.ToLower()}Service.UpdateAsync(item);
+                if (updatedEntity == null)
+                {{
+                    _logger.LogWarning(""{className} not found for update with ID: {{id}}"", model?.Id);
+                    return NotFound();
+                }}
+                var updatedItem = _mapper.Map<{className}OutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while updating {className} with ID: {{id}}"", model?.Id);
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
 
         // Delete a {className}.
@@ -233,27 +296,24 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {{
-            if (id=="""") return BadRequest(""Invalid {className} ID."");
+            if (string.IsNullOrWhiteSpace(id))
+            {{
+                _logger.LogWarning(""Invalid {className} ID received in Delete."");
+                return BadRequest(""Invalid {className} ID."");
+            }}
 
-            await _{className.ToLower()}Service.DeleteAsync(id);
-            return NoContent();
+            try
+            {{
+                _logger.LogInformation(""Deleting {className} with ID: {{id}}"", id);
+                await _{className.ToLower()}Service.DeleteAsync(id);
+                return NoContent();
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while deleting {className} with ID: {{id}}"", id);
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
-
-        //// Delete multiple {className}s.
-        //[HttpDelete(""deleteRange"")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<{className}OutputVM, bool>> predicate)
-        //{{
-        //    //await _{className.ToLower()}Service.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}}
-
-        //// Check if a {className} exists based on a predicate.
-        //[HttpGet(""exists"")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<{className}OutputVM, bool>> predicate)
-        //{{
-        //    //var exists = await _{className.ToLower()}Service.ExistsAsync(predicate);
-        //    return Ok();
-        //}}
 
         // Get count of {className}s.
         [HttpGet(""Count{className}"")]
@@ -262,8 +322,17 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {{
-            var count = await _{className.ToLower()}Service.CountAsync();
-            return Ok(count);
+            try
+            {{
+                _logger.LogInformation(""Counting {className}s..."");
+                var count = await _{className.ToLower()}Service.CountAsync();
+                return Ok(count);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while counting {className}s"");
+                return StatusCode(500, ""Internal Server Error"");
+            }}
         }}
     }}
 ";

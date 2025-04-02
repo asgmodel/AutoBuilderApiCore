@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.EventRequest
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// EventRequest  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.EventRequest
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// EventRequest  property for VM Info.

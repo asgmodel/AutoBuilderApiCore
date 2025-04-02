@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<EventRequestOutputVM>>> GetAll()
         {
-            var result = await _eventrequestService.GetAllAsync();
-            var items = _mapper.Map<List<EventRequestOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all EventRequests...");
+                var result = await _eventrequestService.GetAllAsync();
+                var items = _mapper.Map<List<EventRequestOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all EventRequests");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a EventRequest by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<EventRequestInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid EventRequest ID received.");
                 return BadRequest("Invalid EventRequest ID.");
-            var eventrequest = await _eventrequestService.GetByIdAsync(id);
-            if (eventrequest == null)
-                return NotFound();
-            var item = _mapper.Map<EventRequestInfoVM>(eventrequest);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching EventRequest with ID: {id}", id);
+                var entity = await _eventrequestService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("EventRequest not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<EventRequestInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching EventRequest with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a EventRequest by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<EventRequestInfoVM>> Find([FromQuery] Expression<Func<EventRequestOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var eventrequest = await _eventrequestService.FindAsync(predicate);
-        //   // if (eventrequest == null) return NotFound();
-        //   // var item = _mapper.Map<EventRequestInfoVM>(eventrequest);
-        //   // return Ok(item);
-        //}
         // Create a new EventRequest.
         [HttpPost(Name = "CreateEventRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<EventRequestCreateVM>> Create([FromBody] EventRequestCreateVM model)
+        public async Task<ActionResult<EventRequestOutputVM>> Create([FromBody] EventRequestCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("EventRequest data is null in Create.");
                 return BadRequest("EventRequest data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<EventRequestRequestDso>(model);
-            var createdEventRequest = await _eventrequestService.CreateAsync(item);
-            var createdItem = _mapper.Map<EventRequestCreateVM>(createdEventRequest);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new EventRequest with data: {@model}", model);
+                var item = _mapper.Map<EventRequestRequestDso>(model);
+                var createdEntity = await _eventrequestService.CreateAsync(item);
+                var createdItem = _mapper.Map<EventRequestOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new EventRequest");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple EventRequests.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<EventRequestCreateVM>>> CreateRange([FromBody] IEnumerable<EventRequestCreateVM> models)
+        public async Task<ActionResult<IEnumerable<EventRequestOutputVM>>> CreateRange([FromBody] IEnumerable<EventRequestCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<EventRequestRequestDso>>(models);
-            var createdEventRequests = await _eventrequestService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<EventRequestCreateVM>>(createdEventRequests);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple EventRequests.");
+                var items = _mapper.Map<List<EventRequestRequestDso>>(models);
+                var createdEntities = await _eventrequestService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<EventRequestOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple EventRequests");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing EventRequest.
-        [HttpPut("{id}", Name = "UpdateEventRequest")]
+        [HttpPut(Name = "UpdateEventRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] EventRequestUpdateVM model)
+        public async Task<ActionResult<EventRequestOutputVM>> Update([FromBody] EventRequestUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<EventRequestRequestDso>(model);
-            var updatedEventRequest = await _eventrequestService.UpdateAsync(item);
-            if (updatedEventRequest == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<EventRequestUpdateVM>(updatedEventRequest);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating EventRequest with ID: {id}", model?.Id);
+                var item = _mapper.Map<EventRequestRequestDso>(model);
+                var updatedEntity = await _eventrequestService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("EventRequest not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<EventRequestOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating EventRequest with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a EventRequest.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid EventRequest ID received in Delete.");
                 return BadRequest("Invalid EventRequest ID.");
-            await _eventrequestService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting EventRequest with ID: {id}", id);
+                await _eventrequestService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting EventRequest with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple EventRequests.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<EventRequestOutputVM, bool>> predicate)
-        //{
-        //    //await _eventrequestService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a EventRequest exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<EventRequestOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _eventrequestService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of EventRequests.
         [HttpGet("CountEventRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _eventrequestService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting EventRequests...");
+                var count = await _eventrequestService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting EventRequests");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

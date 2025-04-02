@@ -176,31 +176,23 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
 
 
-
     private static string GetTemplatShare(List<string> usings, string nameSpace, string className)
+{
+    // Create a StringBuilder to store the using statements.
+    StringBuilder usingStatements = new StringBuilder();
+
+    // Check if the usings list is not null.
+    if (usings != null)
     {
-        // Create a StringBuilder to store the using statements.
-        //
-        StringBuilder usingStatements = new StringBuilder();
-        //
-
-        // Check if the usings list is not null.
-        //
-        if (usings != null)
+        // Loop through each using statement and add it to StringBuilder.
+        foreach (var u in usings)
         {
-            // Loop through each using statement and add it to StringBuilder.
-            //
-            foreach (var u in usings)
-            {
-                usingStatements.AppendLine($"using {u};"); // Append using statement with a new line.
-            }
-            //
+            usingStatements.AppendLine($"using {u};");
         }
-        //
+    }
 
-        // Generate and return the final template as a formatted string.
-        //
-        return $@"
+    // Generate and return the final template as a formatted string.
+    return $@"
 {usingStatements.ToString()}
 
 /// <summary>
@@ -208,195 +200,264 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 /// </summary>
 public interface I{className}ShareRepository  
     : IBaseShareRepository<{className}RequestShareDto, {className}ResponseShareDto> 
-     , I{className}BuilderRepository<{className}RequestShareDto, {className}ResponseShareDto> 
-     //  You can add all IBuilder functions here to use them in the generated class.
+     , I{className}BuilderRepository<{className}RequestShareDto, {className}ResponseShareDto>
 {{
     // Define methods or properties specific to the share repository interface.
-    //
 }}
-//
 
 /// <summary>
 /// {className} class for ShareRepository.
 /// </summary>
-public class {className}ShareRepository   //
-    : BaseShareRepository<{className}RequestShareDto, {className}ResponseShareDto, {className}RequestBuildDto, {className}ResponseBuildDto>,  //
-      I{className}ShareRepository //
+public class {className}ShareRepository  
+    : BaseShareRepository<{className}RequestShareDto, {className}ResponseShareDto, {className}RequestBuildDto, {className}ResponseBuildDto>,  
+      I{className}ShareRepository 
 {{
     // Declare the builder repository.
-    //
     private readonly {className}BuilderRepository _builder;
-    //
+    // Declare a logger for the repository.
+    private readonly ILogger _logger;
 
     /// <summary>
     /// Constructor for {className}ShareRepository.
     /// </summary>
     public {className}ShareRepository(DataContext dbContext, IMapper mapper, ILoggerFactory logger) 
-        : base(mapper, logger) // Pass parameters to the base class.
+        : base(mapper, logger)
     {{
         // Initialize the builder repository.
-        //
         _builder = new {className}BuilderRepository(dbContext, mapper, logger.CreateLogger(typeof({className}ShareRepository).FullName));
-        //
+        // Initialize the logger.
+        _logger = logger.CreateLogger(typeof({className}ShareRepository).FullName);
     }}
-    //
-
-    // Additional methods can be added as needed.
-    //
 
     /// <summary>
     /// Method to count the number of entities.
     /// </summary>
-    public Task<int> CountAsync() //
+    public Task<int> CountAsync()
     {{
-        // Throw an exception indicating the method is not implemented.
-        //
-        throw new NotImplementedException(); 
-        //
+        try
+        {{
+            _logger.LogInformation(""Counting {className} entities..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in CountAsync for {className} entities."");
+            return Task.FromResult(0);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to create a new entity asynchronously.
     /// </summary>
-    public async Task<{className}ResponseShareDto> CreateAsync({className}RequestShareDto entity) //
+    public async Task<{className}ResponseShareDto> CreateAsync({className}RequestShareDto entity)
     {{
-        // Call the create method in the builder repository.
-        //
-        var result = await _builder.CreateAsync(entity);
-        // Convert the result to ResponseShareDto type.
-        //
-        var output = ({className}ResponseShareDto)result;
-        // Return the final result.
-        //
-        return output; 
-        //
+        try
+        {{
+            _logger.LogInformation(""Creating new {className} entity..."");
+            // Call the create method in the builder repository.
+            var result = await _builder.CreateAsync(entity);
+            // Convert the result to ResponseShareDto type.
+            var output = ({className}ResponseShareDto)result;
+            _logger.LogInformation(""Created {className} entity successfully."");
+            // Return the final result.
+            return output;
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error while creating {className} entity."");
+            return null;
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to create a range of entities asynchronously.
     /// </summary>
     public Task<IEnumerable<{className}ResponseShareDto>> CreateRangeAsync(IEnumerable<{className}RequestShareDto> entities)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Creating a range of {className} entities..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in CreateRangeAsync for {className} entities."");
+            return Task.FromResult<IEnumerable<{className}ResponseShareDto>>(null);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to delete a specific entity.
     /// </summary>
     public Task DeleteAsync(string id)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation($""Deleting {className} entity with ID: {{id}}..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, $""Error while deleting {className} entity with ID: {{id}}."");
+            return Task.CompletedTask;
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to delete a range of entities based on a condition.
     /// </summary>
     public Task DeleteRangeAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Deleting a range of {className} entities based on condition..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in DeleteRangeAsync for {className} entities."");
+            return Task.CompletedTask;
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to check if an entity exists based on a condition.
     /// </summary>
     public Task<bool> ExistsAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Checking existence of {className} entity based on condition..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in ExistsAsync for {className} entity."");
+            return Task.FromResult(false);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to find an entity based on a condition.
     /// </summary>
     public Task<{className}ResponseShareDto?> FindAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Finding {className} entity based on condition..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in FindAsync for {className} entity."");
+            return Task.FromResult<{className}ResponseShareDto>(null);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to retrieve all entities.
     /// </summary>
     public Task<IEnumerable<{className}ResponseShareDto>> GetAllAsync()
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Retrieving all {className} entities..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in GetAllAsync for {className} entities."");
+            return Task.FromResult<IEnumerable<{className}ResponseShareDto>>(null);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to get an entity by its unique ID.
     /// </summary>
     public Task<{className}ResponseShareDto?> GetByIdAsync(string id)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation($""Retrieving {className} entity with ID: {{id}}..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, $""Error in GetByIdAsync for {className} entity with ID: {{id}}."");
+            return Task.FromResult<{className}ResponseShareDto>(null);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to get data using a specific ID.
     /// </summary>
     public Task<{className}ResponseShareDto> getData(int id)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation($""Getting data for {className} entity with numeric ID: {{id}}..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, $""Error in getData for {className} entity with numeric ID: {{id}}."");
+            return Task.FromResult<{className}ResponseShareDto>(null);
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to retrieve data as an IQueryable object.
     /// </summary>
     public IQueryable<{className}ResponseShareDto> GetQueryable()
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Retrieving IQueryable<{className}ResponseShareDto> for {className} entities..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in GetQueryable for {className} entities."");
+            return null;
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to save changes to the database.
     /// </summary>
     public Task SaveChangesAsync()
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Saving changes to the database for {className} entities..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in SaveChangesAsync for {className} entities."");
+            return Task.CompletedTask;
+        }}
     }}
-    //
 
     /// <summary>
     /// Method to update a specific entity.
     /// </summary>
     public Task<{className}ResponseShareDto> UpdateAsync({className}RequestShareDto entity)
     {{
-        //
-        throw new NotImplementedException();
-        //
+        try
+        {{
+            _logger.LogInformation(""Updating {className} entity..."");
+            throw new NotImplementedException();
+        }}
+        catch(Exception ex)
+        {{
+            _logger.LogError(ex, ""Error in UpdateAsync for {className} entity."");
+            return Task.FromResult<{className}ResponseShareDto>(null);
+        }}
     }}
-    //
 }}
 ";
-    }
+}
 
 
     private static string[] UseRepositorys = new string[] { "Builder", "Share" };

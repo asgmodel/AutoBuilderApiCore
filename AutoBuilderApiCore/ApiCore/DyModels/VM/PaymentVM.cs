@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Payment
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Payment  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Payment
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Payment  property for VM Info.

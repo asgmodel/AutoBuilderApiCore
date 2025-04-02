@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.Dialect
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Dialect  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.Dialect
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// Dialect  property for VM Info.

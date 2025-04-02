@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<LanguageOutputVM>>> GetAll()
         {
-            var result = await _languageService.GetAllAsync();
-            var items = _mapper.Map<List<LanguageOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Languages...");
+                var result = await _languageService.GetAllAsync();
+                var items = _mapper.Map<List<LanguageOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Languages");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Language by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<LanguageInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Language ID received.");
                 return BadRequest("Invalid Language ID.");
-            var language = await _languageService.GetByIdAsync(id);
-            if (language == null)
-                return NotFound();
-            var item = _mapper.Map<LanguageInfoVM>(language);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Language with ID: {id}", id);
+                var entity = await _languageService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Language not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<LanguageInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Language with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Language by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<LanguageInfoVM>> Find([FromQuery] Expression<Func<LanguageOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var language = await _languageService.FindAsync(predicate);
-        //   // if (language == null) return NotFound();
-        //   // var item = _mapper.Map<LanguageInfoVM>(language);
-        //   // return Ok(item);
-        //}
         // Create a new Language.
         [HttpPost(Name = "CreateLanguage")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<LanguageCreateVM>> Create([FromBody] LanguageCreateVM model)
+        public async Task<ActionResult<LanguageOutputVM>> Create([FromBody] LanguageCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Language data is null in Create.");
                 return BadRequest("Language data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<LanguageRequestDso>(model);
-            var createdLanguage = await _languageService.CreateAsync(item);
-            var createdItem = _mapper.Map<LanguageCreateVM>(createdLanguage);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Language with data: {@model}", model);
+                var item = _mapper.Map<LanguageRequestDso>(model);
+                var createdEntity = await _languageService.CreateAsync(item);
+                var createdItem = _mapper.Map<LanguageOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Language");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Languages.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<LanguageCreateVM>>> CreateRange([FromBody] IEnumerable<LanguageCreateVM> models)
+        public async Task<ActionResult<IEnumerable<LanguageOutputVM>>> CreateRange([FromBody] IEnumerable<LanguageCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<LanguageRequestDso>>(models);
-            var createdLanguages = await _languageService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<LanguageCreateVM>>(createdLanguages);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Languages.");
+                var items = _mapper.Map<List<LanguageRequestDso>>(models);
+                var createdEntities = await _languageService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<LanguageOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Languages");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Language.
-        [HttpPut("{id}", Name = "UpdateLanguage")]
+        [HttpPut(Name = "UpdateLanguage")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] LanguageUpdateVM model)
+        public async Task<ActionResult<LanguageOutputVM>> Update([FromBody] LanguageUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<LanguageRequestDso>(model);
-            var updatedLanguage = await _languageService.UpdateAsync(item);
-            if (updatedLanguage == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<LanguageUpdateVM>(updatedLanguage);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Language with ID: {id}", model?.Id);
+                var item = _mapper.Map<LanguageRequestDso>(model);
+                var updatedEntity = await _languageService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Language not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<LanguageOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Language with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Language.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Language ID received in Delete.");
                 return BadRequest("Invalid Language ID.");
-            await _languageService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Language with ID: {id}", id);
+                await _languageService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Language with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Languages.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<LanguageOutputVM, bool>> predicate)
-        //{
-        //    //await _languageService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Language exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<LanguageOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _languageService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Languages.
         [HttpGet("CountLanguage")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _languageService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Languages...");
+                var count = await _languageService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Languages");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

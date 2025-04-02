@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.AuthorizationSession
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// AuthorizationSession  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.AuthorizationSession
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// AuthorizationSession  property for VM Info.

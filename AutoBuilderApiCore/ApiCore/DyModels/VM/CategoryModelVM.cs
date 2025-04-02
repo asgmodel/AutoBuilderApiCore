@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.CategoryModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// CategoryModel  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.CategoryModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// CategoryModel  property for VM Info.

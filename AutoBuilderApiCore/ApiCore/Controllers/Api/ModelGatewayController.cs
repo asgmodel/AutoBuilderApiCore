@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<ModelGatewayOutputVM>>> GetAll()
         {
-            var result = await _modelgatewayService.GetAllAsync();
-            var items = _mapper.Map<List<ModelGatewayOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all ModelGateways...");
+                var result = await _modelgatewayService.GetAllAsync();
+                var items = _mapper.Map<List<ModelGatewayOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all ModelGateways");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a ModelGateway by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ModelGatewayInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ModelGateway ID received.");
                 return BadRequest("Invalid ModelGateway ID.");
-            var modelgateway = await _modelgatewayService.GetByIdAsync(id);
-            if (modelgateway == null)
-                return NotFound();
-            var item = _mapper.Map<ModelGatewayInfoVM>(modelgateway);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ModelGateway with ID: {id}", id);
+                var entity = await _modelgatewayService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ModelGateway not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ModelGatewayInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ModelGateway with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a ModelGateway by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ModelGatewayInfoVM>> Find([FromQuery] Expression<Func<ModelGatewayOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var modelgateway = await _modelgatewayService.FindAsync(predicate);
-        //   // if (modelgateway == null) return NotFound();
-        //   // var item = _mapper.Map<ModelGatewayInfoVM>(modelgateway);
-        //   // return Ok(item);
-        //}
         // Create a new ModelGateway.
         [HttpPost(Name = "CreateModelGateway")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ModelGatewayCreateVM>> Create([FromBody] ModelGatewayCreateVM model)
+        public async Task<ActionResult<ModelGatewayOutputVM>> Create([FromBody] ModelGatewayCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("ModelGateway data is null in Create.");
                 return BadRequest("ModelGateway data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ModelGatewayRequestDso>(model);
-            var createdModelGateway = await _modelgatewayService.CreateAsync(item);
-            var createdItem = _mapper.Map<ModelGatewayCreateVM>(createdModelGateway);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new ModelGateway with data: {@model}", model);
+                var item = _mapper.Map<ModelGatewayRequestDso>(model);
+                var createdEntity = await _modelgatewayService.CreateAsync(item);
+                var createdItem = _mapper.Map<ModelGatewayOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new ModelGateway");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple ModelGateways.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<ModelGatewayCreateVM>>> CreateRange([FromBody] IEnumerable<ModelGatewayCreateVM> models)
+        public async Task<ActionResult<IEnumerable<ModelGatewayOutputVM>>> CreateRange([FromBody] IEnumerable<ModelGatewayCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<ModelGatewayRequestDso>>(models);
-            var createdModelGateways = await _modelgatewayService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<ModelGatewayCreateVM>>(createdModelGateways);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple ModelGateways.");
+                var items = _mapper.Map<List<ModelGatewayRequestDso>>(models);
+                var createdEntities = await _modelgatewayService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<ModelGatewayOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple ModelGateways");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing ModelGateway.
-        [HttpPut("{id}", Name = "UpdateModelGateway")]
+        [HttpPut(Name = "UpdateModelGateway")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] ModelGatewayUpdateVM model)
+        public async Task<ActionResult<ModelGatewayOutputVM>> Update([FromBody] ModelGatewayUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<ModelGatewayRequestDso>(model);
-            var updatedModelGateway = await _modelgatewayService.UpdateAsync(item);
-            if (updatedModelGateway == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<ModelGatewayUpdateVM>(updatedModelGateway);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating ModelGateway with ID: {id}", model?.Id);
+                var item = _mapper.Map<ModelGatewayRequestDso>(model);
+                var updatedEntity = await _modelgatewayService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("ModelGateway not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<ModelGatewayOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating ModelGateway with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a ModelGateway.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ModelGateway ID received in Delete.");
                 return BadRequest("Invalid ModelGateway ID.");
-            await _modelgatewayService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting ModelGateway with ID: {id}", id);
+                await _modelgatewayService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting ModelGateway with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple ModelGateways.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<ModelGatewayOutputVM, bool>> predicate)
-        //{
-        //    //await _modelgatewayService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a ModelGateway exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<ModelGatewayOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _modelgatewayService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of ModelGateways.
         [HttpGet("CountModelGateway")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _modelgatewayService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting ModelGateways...");
+                var count = await _modelgatewayService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting ModelGateways");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

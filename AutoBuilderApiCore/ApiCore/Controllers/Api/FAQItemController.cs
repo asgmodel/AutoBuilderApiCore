@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<FAQItemOutputVM>>> GetAll()
         {
-            var result = await _faqitemService.GetAllAsync();
-            var items = _mapper.Map<List<FAQItemOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all FAQItems...");
+                var result = await _faqitemService.GetAllAsync();
+                var items = _mapper.Map<List<FAQItemOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all FAQItems");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a FAQItem by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<FAQItemInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid FAQItem ID received.");
                 return BadRequest("Invalid FAQItem ID.");
-            var faqitem = await _faqitemService.GetByIdAsync(id);
-            if (faqitem == null)
-                return NotFound();
-            var item = _mapper.Map<FAQItemInfoVM>(faqitem);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching FAQItem with ID: {id}", id);
+                var entity = await _faqitemService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("FAQItem not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<FAQItemInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching FAQItem with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a FAQItem by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<FAQItemInfoVM>> Find([FromQuery] Expression<Func<FAQItemOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var faqitem = await _faqitemService.FindAsync(predicate);
-        //   // if (faqitem == null) return NotFound();
-        //   // var item = _mapper.Map<FAQItemInfoVM>(faqitem);
-        //   // return Ok(item);
-        //}
         // Create a new FAQItem.
         [HttpPost(Name = "CreateFAQItem")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<FAQItemCreateVM>> Create([FromBody] FAQItemCreateVM model)
+        public async Task<ActionResult<FAQItemOutputVM>> Create([FromBody] FAQItemCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("FAQItem data is null in Create.");
                 return BadRequest("FAQItem data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<FAQItemRequestDso>(model);
-            var createdFAQItem = await _faqitemService.CreateAsync(item);
-            var createdItem = _mapper.Map<FAQItemCreateVM>(createdFAQItem);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new FAQItem with data: {@model}", model);
+                var item = _mapper.Map<FAQItemRequestDso>(model);
+                var createdEntity = await _faqitemService.CreateAsync(item);
+                var createdItem = _mapper.Map<FAQItemOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new FAQItem");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple FAQItems.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<FAQItemCreateVM>>> CreateRange([FromBody] IEnumerable<FAQItemCreateVM> models)
+        public async Task<ActionResult<IEnumerable<FAQItemOutputVM>>> CreateRange([FromBody] IEnumerable<FAQItemCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<FAQItemRequestDso>>(models);
-            var createdFAQItems = await _faqitemService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<FAQItemCreateVM>>(createdFAQItems);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple FAQItems.");
+                var items = _mapper.Map<List<FAQItemRequestDso>>(models);
+                var createdEntities = await _faqitemService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<FAQItemOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple FAQItems");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing FAQItem.
-        [HttpPut("{id}", Name = "UpdateFAQItem")]
+        [HttpPut(Name = "UpdateFAQItem")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] FAQItemUpdateVM model)
+        public async Task<ActionResult<FAQItemOutputVM>> Update([FromBody] FAQItemUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<FAQItemRequestDso>(model);
-            var updatedFAQItem = await _faqitemService.UpdateAsync(item);
-            if (updatedFAQItem == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<FAQItemUpdateVM>(updatedFAQItem);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating FAQItem with ID: {id}", model?.Id);
+                var item = _mapper.Map<FAQItemRequestDso>(model);
+                var updatedEntity = await _faqitemService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("FAQItem not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<FAQItemOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating FAQItem with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a FAQItem.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid FAQItem ID received in Delete.");
                 return BadRequest("Invalid FAQItem ID.");
-            await _faqitemService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting FAQItem with ID: {id}", id);
+                await _faqitemService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting FAQItem with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple FAQItems.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<FAQItemOutputVM, bool>> predicate)
-        //{
-        //    //await _faqitemService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a FAQItem exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<FAQItemOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _faqitemService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of FAQItems.
         [HttpGet("CountFAQItem")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _faqitemService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting FAQItems...");
+                var count = await _faqitemService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting FAQItems");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

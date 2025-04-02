@@ -28,7 +28,7 @@ namespace ApiCore.DyModels.VM.ModelGateway
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ModelGateway  property for VM Delete.
@@ -37,7 +37,7 @@ namespace ApiCore.DyModels.VM.ModelGateway
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// ModelGateway  property for VM Info.

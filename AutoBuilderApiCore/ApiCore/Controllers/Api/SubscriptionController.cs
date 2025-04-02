@@ -32,9 +32,18 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<SubscriptionOutputVM>>> GetAll()
         {
-            var result = await _subscriptionService.GetAllAsync();
-            var items = _mapper.Map<List<SubscriptionOutputVM>>(result);
-            return Ok(items);
+            try
+            {
+                _logger.LogInformation("Fetching all Subscriptions...");
+                var result = await _subscriptionService.GetAllAsync();
+                var items = _mapper.Map<List<SubscriptionOutputVM>>(result);
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Subscriptions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Get a Subscription by ID.
@@ -44,43 +53,64 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<SubscriptionInfoVM>> GetById(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Subscription ID received.");
                 return BadRequest("Invalid Subscription ID.");
-            var subscription = await _subscriptionService.GetByIdAsync(id);
-            if (subscription == null)
-                return NotFound();
-            var item = _mapper.Map<SubscriptionInfoVM>(subscription);
-            return Ok(item);
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Subscription with ID: {id}", id);
+                var entity = await _subscriptionService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Subscription not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SubscriptionInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Subscription with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Find a Subscription by a specific predicate.
-        //[HttpGet("find")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<SubscriptionInfoVM>> Find([FromQuery] Expression<Func<SubscriptionOutputVM, bool>> predicate)
-        //{
-        //     return NotFound();
-        //    //var subscription = await _subscriptionService.FindAsync(predicate);
-        //   // if (subscription == null) return NotFound();
-        //   // var item = _mapper.Map<SubscriptionInfoVM>(subscription);
-        //   // return Ok(item);
-        //}
         // Create a new Subscription.
         [HttpPost(Name = "CreateSubscription")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SubscriptionCreateVM>> Create([FromBody] SubscriptionCreateVM model)
+        public async Task<ActionResult<SubscriptionOutputVM>> Create([FromBody] SubscriptionCreateVM model)
         {
             if (model == null)
+            {
+                _logger.LogWarning("Subscription data is null in Create.");
                 return BadRequest("Subscription data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Create: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<SubscriptionRequestDso>(model);
-            var createdSubscription = await _subscriptionService.CreateAsync(item);
-            var createdItem = _mapper.Map<SubscriptionCreateVM>(createdSubscription);
-            return CreatedAtAction(nameof(GetById), new { id = 0 }, createdItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating new Subscription with data: {@model}", model);
+                var item = _mapper.Map<SubscriptionRequestDso>(model);
+                var createdEntity = await _subscriptionService.CreateAsync(item);
+                var createdItem = _mapper.Map<SubscriptionOutputVM>(createdEntity);
+                return Ok(createdItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating a new Subscription");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Create multiple Subscriptions.
@@ -88,35 +118,73 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<SubscriptionCreateVM>>> CreateRange([FromBody] IEnumerable<SubscriptionCreateVM> models)
+        public async Task<ActionResult<IEnumerable<SubscriptionOutputVM>>> CreateRange([FromBody] IEnumerable<SubscriptionCreateVM> models)
         {
             if (models == null)
+            {
+                _logger.LogWarning("Data is null in CreateRange.");
                 return BadRequest("Data is required.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in CreateRange: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var items = _mapper.Map<List<SubscriptionRequestDso>>(models);
-            var createdSubscriptions = await _subscriptionService.CreateRangeAsync(items);
-            var createdItems = _mapper.Map<List<SubscriptionCreateVM>>(createdSubscriptions);
-            return CreatedAtAction(nameof(GetAll), createdItems);
+            }
+
+            try
+            {
+                _logger.LogInformation("Creating multiple Subscriptions.");
+                var items = _mapper.Map<List<SubscriptionRequestDso>>(models);
+                var createdEntities = await _subscriptionService.CreateRangeAsync(items);
+                var createdItems = _mapper.Map<List<SubscriptionOutputVM>>(createdEntities);
+                return Ok(createdItems);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while creating multiple Subscriptions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Update an existing Subscription.
-        [HttpPut("{id}", Name = "UpdateSubscription")]
+        [HttpPut(Name = "UpdateSubscription")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, [FromBody] SubscriptionUpdateVM model)
+        public async Task<ActionResult<SubscriptionOutputVM>> Update([FromBody] SubscriptionUpdateVM model)
         {
-            if (id <= 0 || model == null)
+            if (model == null)
+            {
+                _logger.LogWarning("Invalid data in Update.");
                 return BadRequest("Invalid data.");
+            }
+
             if (!ModelState.IsValid)
+            {
+                _logger.LogWarning("Invalid model state in Update: {ModelState}", ModelState);
                 return BadRequest(ModelState);
-            var item = _mapper.Map<SubscriptionRequestDso>(model);
-            var updatedSubscription = await _subscriptionService.UpdateAsync(item);
-            if (updatedSubscription == null)
-                return NotFound();
-            var updatedItem = _mapper.Map<SubscriptionUpdateVM>(updatedSubscription);
-            return Ok(updatedItem);
+            }
+
+            try
+            {
+                _logger.LogInformation("Updating Subscription with ID: {id}", model?.Id);
+                var item = _mapper.Map<SubscriptionRequestDso>(model);
+                var updatedEntity = await _subscriptionService.UpdateAsync(item);
+                if (updatedEntity == null)
+                {
+                    _logger.LogWarning("Subscription not found for update with ID: {id}", model?.Id);
+                    return NotFound();
+                }
+
+                var updatedItem = _mapper.Map<SubscriptionOutputVM>(updatedEntity);
+                return Ok(updatedItem);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while updating Subscription with ID: {id}", model?.Id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
         // Delete a Subscription.
@@ -126,26 +194,25 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(string? id)
         {
-            if (id == "")
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Subscription ID received in Delete.");
                 return BadRequest("Invalid Subscription ID.");
-            await _subscriptionService.DeleteAsync(id);
-            return NoContent();
+            }
+
+            try
+            {
+                _logger.LogInformation("Deleting Subscription with ID: {id}", id);
+                await _subscriptionService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Subscription with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
         }
 
-        //// Delete multiple Subscriptions.
-        //[HttpDelete("deleteRange")]
-        //public async Task<IActionResult> DeleteRange([FromQuery] Expression<Func<SubscriptionOutputVM, bool>> predicate)
-        //{
-        //    //await _subscriptionService.DeleteRangeAsync(predicate);
-        //    return NoContent();
-        //}
-        //// Check if a Subscription exists based on a predicate.
-        //[HttpGet("exists")]
-        //public async Task<ActionResult<bool>> Exists([FromQuery] Expression<Func<SubscriptionOutputVM, bool>> predicate)
-        //{
-        //    //var exists = await _subscriptionService.ExistsAsync(predicate);
-        //    return Ok();
-        //}
         // Get count of Subscriptions.
         [HttpGet("CountSubscription")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -153,8 +220,17 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> Count()
         {
-            var count = await _subscriptionService.CountAsync();
-            return Ok(count);
+            try
+            {
+                _logger.LogInformation("Counting Subscriptions...");
+                var count = await _subscriptionService.CountAsync();
+                return Ok(count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while counting Subscriptions");
+                return StatusCode(500, "Internal Server Error");
+            }
         }
     }
 }

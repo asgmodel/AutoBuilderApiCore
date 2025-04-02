@@ -288,7 +288,7 @@ public class {className}ShareRepository   //
     /// <summary>
     /// Method to delete a specific entity.
     /// </summary>
-    public Task DeleteAsync(int id)
+    public Task DeleteAsync(string id)
     {{
         //
         throw new NotImplementedException();
@@ -343,7 +343,7 @@ public class {className}ShareRepository   //
     /// <summary>
     /// Method to get an entity by its unique ID.
     /// </summary>
-    public Task<{className}ResponseShareDto?> GetByIdAsync(int id)
+    public Task<{className}ResponseShareDto?> GetByIdAsync(string id)
     {{
         //
         throw new NotImplementedException();

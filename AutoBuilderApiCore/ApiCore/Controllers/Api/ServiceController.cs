@@ -42,9 +42,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ServiceInfoVM>> GetById(int id)
+        public async Task<ActionResult<ServiceInfoVM>> GetById(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid Service ID.");
             var service = await _serviceService.GetByIdAsync(id);
             if (service == null)
@@ -124,9 +124,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid Service ID.");
             await _serviceService.DeleteAsync(id);
             return NoContent();

@@ -42,9 +42,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<RequestInfoVM>> GetById(int id)
+        public async Task<ActionResult<RequestInfoVM>> GetById(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid Request ID.");
             var request = await _requestService.GetByIdAsync(id);
             if (request == null)
@@ -124,9 +124,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid Request ID.");
             await _requestService.DeleteAsync(id);
             return NoContent();

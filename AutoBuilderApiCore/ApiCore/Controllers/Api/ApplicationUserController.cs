@@ -42,9 +42,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ApplicationUserInfoVM>> GetById(int id)
+        public async Task<ActionResult<ApplicationUserInfoVM>> GetById(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid ApplicationUser ID.");
             var applicationuser = await _applicationuserService.GetByIdAsync(id);
             if (applicationuser == null)
@@ -124,9 +124,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid ApplicationUser ID.");
             await _applicationuserService.DeleteAsync(id);
             return NoContent();

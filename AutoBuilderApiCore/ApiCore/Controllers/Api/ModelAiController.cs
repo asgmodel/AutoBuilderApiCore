@@ -42,9 +42,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<ModelAiInfoVM>> GetById(int id)
+        public async Task<ActionResult<ModelAiInfoVM>> GetById(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid ModelAi ID.");
             var modelai = await _modelaiService.GetByIdAsync(id);
             if (modelai == null)
@@ -124,9 +124,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid ModelAi ID.");
             await _modelaiService.DeleteAsync(id);
             return NoContent();

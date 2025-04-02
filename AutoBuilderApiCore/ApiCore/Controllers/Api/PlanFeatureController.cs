@@ -42,9 +42,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PlanFeatureInfoVM>> GetById(int id)
+        public async Task<ActionResult<PlanFeatureInfoVM>> GetById(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid PlanFeature ID.");
             var planfeature = await _planfeatureService.GetByIdAsync(id);
             if (planfeature == null)
@@ -124,9 +124,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {
-            if (id <= 0)
+            if (id == "")
                 return BadRequest("Invalid PlanFeature ID.");
             await _planfeatureService.DeleteAsync(id);
             return NoContent();

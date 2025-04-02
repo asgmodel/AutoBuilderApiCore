@@ -72,7 +72,7 @@ namespace ApiCore.Repositorys.Share
     /// <summary>
     /// Method to delete a specific entity.
     /// </summary>
-     public  Task  DeleteAsync ( int  id ) { //
+     public  Task  DeleteAsync ( string  id ) { //
     throw  new  NotImplementedException ( ) ;  //
     } //
     /// <summary>
@@ -102,7 +102,7 @@ namespace ApiCore.Repositorys.Share
     /// <summary>
     /// Method to get an entity by its unique ID.
     /// </summary>
-     public  Task < AdvertisementTabResponseShareDto ? > GetByIdAsync ( int  id ) { //
+     public  Task < AdvertisementTabResponseShareDto ? > GetByIdAsync ( string  id ) { //
     throw  new  NotImplementedException ( ) ;  //
     } //
     /// <summary>

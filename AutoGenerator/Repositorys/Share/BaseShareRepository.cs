@@ -92,6 +92,18 @@ namespace AutoGenerator.Repositorys.Share
             return _mapper.Map<TShareRequestDto>(buildRequestDto);
         }
 
+
+        protected IEnumerable<TShareRequestDto> MapToIEnumerableShareRequestDto(IEnumerable<TBuildRequestDto> buildRequestDto)
+        {
+            if (buildRequestDto == null)
+            {
+                _logger.LogError("Mapping failed: TBuildRequestDto is null.");
+                throw new ArgumentNullException(nameof(buildRequestDto), "The build request DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TShareRequestDto>>(buildRequestDto);
+        }
+
         protected TBuildResponseDto MapToBuildResponseDto(TShareResponseDto shareResponseDto)
         {
             if (shareResponseDto == null)
@@ -102,5 +114,7 @@ namespace AutoGenerator.Repositorys.Share
 
             return _mapper.Map<TBuildResponseDto>(shareResponseDto);
         }
+
+       
     }
 }

@@ -153,9 +153,9 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<{className}InfoVM>> GetById(int id)
+        public async Task<ActionResult<{className}InfoVM>> GetById(string? id)
         {{
-            if (id <= 0) return BadRequest(""Invalid {className} ID."");
+            if (id=="""") return BadRequest(""Invalid {className} ID."");
 
             var {className.ToLower()} = await _{className.ToLower()}Service.GetByIdAsync(id);
             if ({className.ToLower()} == null) return NotFound();
@@ -231,9 +231,9 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(string? id)
         {{
-            if (id <= 0) return BadRequest(""Invalid {className} ID."");
+            if (id=="""") return BadRequest(""Invalid {className} ID."");
 
             await _{className.ToLower()}Service.DeleteAsync(id);
             return NoContent();

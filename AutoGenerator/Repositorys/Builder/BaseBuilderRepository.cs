@@ -14,7 +14,7 @@ namespace AutoGenerator.Repositorys.Builder
           where TBuildResponseDto : class
     {
         Task<IEnumerable<TBuildResponseDto>> GetAllAsync();
-        Task<TBuildResponseDto?> GetByIdAsync(int id);
+        Task<TBuildResponseDto?> GetByIdAsync(string id);
         Task<TBuildResponseDto?> FindAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
         IQueryable<TBuildResponseDto> GetQueryable();
 
@@ -23,7 +23,7 @@ namespace AutoGenerator.Repositorys.Builder
 
         Task<TBuildResponseDto> UpdateAsync(TBuildRequestDto entity);
 
-        Task DeleteAsync(int id);
+        Task DeleteAsync(string id);
         Task DeleteRangeAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
 
         Task<bool> ExistsAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
@@ -63,9 +63,9 @@ namespace AutoGenerator.Repositorys.Builder
             return entities.Select(entity => _mapper.Map<TBuildResponseDto>(entity));
         }
 
-        public async Task<TBuildResponseDto?> GetByIdAsync(int id)
+        public async Task<TBuildResponseDto?> GetByIdAsync(string id)
         {
-            var entity = await _repository.GetByAsync(e => EF.Property<int>(e, "Id") == id);
+            var entity = await _repository.GetByAsync(e => EF.Property<string>(e, "Id") == id);
             return entity != null ? _mapper.Map<TBuildResponseDto>(entity) : null;
         }
 
@@ -120,9 +120,9 @@ namespace AutoGenerator.Repositorys.Builder
 
         #region Delete Methods
 
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(string id)
         {
-            await _repository.RemoveAsync(e => EF.Property<int>(e, "Id") == id);
+            await _repository.RemoveAsync(e => EF.Property<string>(e, "Id") == id);
         }
 
         //public async Task DeleteRangeAsync(Expression<Func<TBuildResponseDto, bool>> predicate)
@@ -185,6 +185,17 @@ namespace AutoGenerator.Repositorys.Builder
             return _mapper.Map<TBuildResponseDto>(model);
         }
 
+        protected IEnumerable<TBuildResponseDto> MapToIEnumerableBuildResponseDto(IEnumerable<TModel> models)
+        {
+            if (models == null)
+            {
+                throw new ArgumentNullException(nameof(models), "The share response DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TBuildResponseDto>>(models);
+        }
+
+
 
         protected TModel MapToBuildRequestDto(TBuildRequestDto  requestDto)
         {
@@ -195,6 +206,19 @@ namespace AutoGenerator.Repositorys.Builder
 
             return _mapper.Map<TModel>(requestDto);
         }
+
+
+        protected IEnumerable<TModel> MapTIEnumerableBuildRequestDto(IEnumerable<TBuildRequestDto> requestDto)
+        {
+            if (requestDto == null)
+            {
+                throw new ArgumentNullException(nameof(requestDto), "The share request DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TModel>>(requestDto);
+        }
     }
+
+
 
 }

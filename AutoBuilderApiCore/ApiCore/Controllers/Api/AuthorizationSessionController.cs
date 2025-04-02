@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a AuthorizationSession by Lg.
+        [HttpGet(Name = "GetAuthorizationSessionByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AuthorizationSessionInfoVM>> GetByLg(AuthorizationSessionFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid AuthorizationSession ID received.");
+                return BadRequest("Invalid AuthorizationSession ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching AuthorizationSession with ID: {id}", id);
+                var entity = await _authorizationsessionService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("AuthorizationSession not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<AuthorizationSessionInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching AuthorizationSession with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new AuthorizationSession.
         [HttpPost(Name = "CreateAuthorizationSession")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

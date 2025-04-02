@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a Space by Lg.
+        [HttpGet(Name = "GetSpaceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SpaceInfoVM>> GetByLg(SpaceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Space ID received.");
+                return BadRequest("Invalid Space ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Space with ID: {id}", id);
+                var entity = await _spaceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Space not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SpaceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Space with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Space.
         [HttpPost(Name = "CreateSpace")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

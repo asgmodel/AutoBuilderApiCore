@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a Advertisement by Lg.
+        [HttpGet(Name = "GetAdvertisementByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AdvertisementInfoVM>> GetByLg(AdvertisementFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Advertisement ID received.");
+                return BadRequest("Invalid Advertisement ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Advertisement with ID: {id}", id);
+                var entity = await _advertisementService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Advertisement not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<AdvertisementInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Advertisement with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Advertisement.
         [HttpPost(Name = "CreateAdvertisement")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

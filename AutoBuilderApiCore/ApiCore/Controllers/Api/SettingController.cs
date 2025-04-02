@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a Setting by Lg.
+        [HttpGet(Name = "GetSettingByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SettingInfoVM>> GetByLg(SettingFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Setting ID received.");
+                return BadRequest("Invalid Setting ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Setting with ID: {id}", id);
+                var entity = await _settingService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Setting not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SettingInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Setting with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Setting.
         [HttpPost(Name = "CreateSetting")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

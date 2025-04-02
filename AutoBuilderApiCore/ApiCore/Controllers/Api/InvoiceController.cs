@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a Invoice by Lg.
+        [HttpGet(Name = "GetInvoiceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<InvoiceInfoVM>> GetByLg(InvoiceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Invoice ID received.");
+                return BadRequest("Invalid Invoice ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Invoice with ID: {id}", id);
+                var entity = await _invoiceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Invoice not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<InvoiceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Invoice with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Invoice.
         [HttpPost(Name = "CreateInvoice")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

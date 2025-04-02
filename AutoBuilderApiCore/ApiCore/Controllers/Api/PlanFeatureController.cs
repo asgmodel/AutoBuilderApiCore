@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a PlanFeature by Lg.
+        [HttpGet(Name = "GetPlanFeatureByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PlanFeatureInfoVM>> GetByLg(PlanFeatureFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid PlanFeature ID received.");
+                return BadRequest("Invalid PlanFeature ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching PlanFeature with ID: {id}", id);
+                var entity = await _planfeatureService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("PlanFeature not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<PlanFeatureInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching PlanFeature with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new PlanFeature.
         [HttpPost(Name = "CreatePlanFeature")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

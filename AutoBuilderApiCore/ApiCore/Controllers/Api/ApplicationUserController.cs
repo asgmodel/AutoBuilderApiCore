@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a ApplicationUser by Lg.
+        [HttpGet(Name = "GetApplicationUserByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ApplicationUserInfoVM>> GetByLg(ApplicationUserFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ApplicationUser ID received.");
+                return BadRequest("Invalid ApplicationUser ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ApplicationUser with ID: {id}", id);
+                var entity = await _applicationuserService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ApplicationUser not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ApplicationUserInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ApplicationUser with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new ApplicationUser.
         [HttpPost(Name = "CreateApplicationUser")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

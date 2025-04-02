@@ -19,7 +19,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// TypeModel  property for VM Update.
@@ -46,7 +46,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// TypeModel  property for VM Share.
@@ -55,7 +55,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     ////
+     public  string ? Id { get ;  set ;  } ////
     } //
     /// <summary>
     /// TypeModel  property for VM Filter.
@@ -64,7 +64,7 @@ namespace ApiCore.DyModels.VM.TypeModel
     ///
      { 
     ///
-     public  string ? Lg { get ;  set ;  } ////
+     public  string ? Lg { get ;  set ;  } public  string ? Id { get ;  set ;  } ////
     }
 
 }

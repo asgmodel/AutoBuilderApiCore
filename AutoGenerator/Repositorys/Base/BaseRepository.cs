@@ -45,7 +45,7 @@ namespace AutoGenerator.Repositorys.Base
         private readonly ILogger _logger;
         public long CounItems { get => _count; }
         private long _count = 0;
-        private IQueryable<T> query;
+        public IQueryable<T> query;
 
         public DbSet<T> DbSet => _dbSet;
 

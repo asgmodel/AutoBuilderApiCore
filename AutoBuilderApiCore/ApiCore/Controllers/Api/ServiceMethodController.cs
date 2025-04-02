@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a ServiceMethod by Lg.
+        [HttpGet(Name = "GetServiceMethodByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceMethodInfoVM>> GetByLg(ServiceMethodFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ServiceMethod ID received.");
+                return BadRequest("Invalid ServiceMethod ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ServiceMethod with ID: {id}", id);
+                var entity = await _servicemethodService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ServiceMethod not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceMethodInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ServiceMethod with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new ServiceMethod.
         [HttpPost(Name = "CreateServiceMethod")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

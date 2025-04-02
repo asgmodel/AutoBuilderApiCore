@@ -79,6 +79,40 @@ namespace ApiCore.Controllers.Api
             }
         }
 
+        // Get a Service by Lg.
+        [HttpGet(Name = "GetServiceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceInfoVM>> GetByLg(ServiceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Service ID received.");
+                return BadRequest("Invalid Service ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Service with ID: {id}", id);
+                var entity = await _serviceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Service not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceInfoVM>(entity);
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Service with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Service.
         [HttpPost(Name = "CreateService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

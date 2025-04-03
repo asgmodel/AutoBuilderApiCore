@@ -39,7 +39,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to count the number of entities.
         /// </summary>
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -56,7 +56,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to create a new entity asynchronously.
         /// </summary>
-        public async Task<CategoryTabResponseShareDto> CreateAsync(CategoryTabRequestShareDto entity)
+        public override async Task<CategoryTabResponseShareDto> CreateAsync(CategoryTabRequestShareDto entity)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to create a range of entities asynchronously.
         /// </summary>
-        public Task<IEnumerable<CategoryTabResponseShareDto>> CreateRangeAsync(IEnumerable<CategoryTabRequestShareDto> entities)
+        public override Task<IEnumerable<CategoryTabResponseShareDto>> CreateRangeAsync(IEnumerable<CategoryTabRequestShareDto> entities)
         {
             try
             {
@@ -96,7 +96,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to delete a specific entity.
         /// </summary>
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to delete a range of entities based on a condition.
         /// </summary>
-        public Task DeleteRangeAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
         {
             try
             {
@@ -130,7 +130,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to check if an entity exists based on a condition.
         /// </summary>
-        public Task<bool> ExistsAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to find an entity based on a condition.
         /// </summary>
-        public Task<CategoryTabResponseShareDto?> FindAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
+        public override Task<CategoryTabResponseShareDto?> FindAsync(Expression<Func<CategoryTabResponseShareDto, bool>> predicate)
         {
             try
             {
@@ -164,7 +164,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to retrieve all entities.
         /// </summary>
-        public Task<IEnumerable<CategoryTabResponseShareDto>> GetAllAsync()
+        public override Task<IEnumerable<CategoryTabResponseShareDto>> GetAllAsync()
         {
             try
             {
@@ -181,7 +181,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to get an entity by its unique ID.
         /// </summary>
-        public Task<CategoryTabResponseShareDto?> GetByIdAsync(string id)
+        public override Task<CategoryTabResponseShareDto?> GetByIdAsync(string id)
         {
             try
             {
@@ -215,7 +215,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to retrieve data as an IQueryable object.
         /// </summary>
-        public IQueryable<CategoryTabResponseShareDto> GetQueryable()
+        public override IQueryable<CategoryTabResponseShareDto> GetQueryable()
         {
             try
             {
@@ -249,7 +249,7 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to update a specific entity.
         /// </summary>
-        public Task<CategoryTabResponseShareDto> UpdateAsync(CategoryTabRequestShareDto entity)
+        public override Task<CategoryTabResponseShareDto> UpdateAsync(CategoryTabRequestShareDto entity)
         {
             try
             {

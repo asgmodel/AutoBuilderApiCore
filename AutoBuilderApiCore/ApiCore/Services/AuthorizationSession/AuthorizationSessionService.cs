@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(AuthorizationSessionService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<AuthorizationSessionResponseDso> CreateAsync(AuthorizationSessionRequestDso entity)
+        public override async Task<AuthorizationSessionResponseDso> CreateAsync(AuthorizationSessionRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<AuthorizationSessionResponseDso>> CreateRangeAsync(IEnumerable<AuthorizationSessionRequestDso> entities)
+        public override Task<IEnumerable<AuthorizationSessionResponseDso>> CreateRangeAsync(IEnumerable<AuthorizationSessionRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AuthorizationSessionResponseDso?> FindAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
+        public override Task<AuthorizationSessionResponseDso?> FindAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<AuthorizationSessionResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<AuthorizationSessionResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AuthorizationSessionResponseDso?> GetByIdAsync(string id)
+        public override Task<AuthorizationSessionResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<AuthorizationSessionResponseDso> GetQueryable()
+        public override IQueryable<AuthorizationSessionResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AuthorizationSessionResponseDso> UpdateAsync(AuthorizationSessionRequestDso entity)
+        public override Task<AuthorizationSessionResponseDso> UpdateAsync(AuthorizationSessionRequestDso entity)
         {
             try
             {

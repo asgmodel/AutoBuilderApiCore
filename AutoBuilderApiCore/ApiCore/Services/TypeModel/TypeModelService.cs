@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(TypeModelService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<TypeModelResponseDso> CreateAsync(TypeModelRequestDso entity)
+        public override async Task<TypeModelResponseDso> CreateAsync(TypeModelRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<TypeModelResponseDso>> CreateRangeAsync(IEnumerable<TypeModelRequestDso> entities)
+        public override Task<IEnumerable<TypeModelResponseDso>> CreateRangeAsync(IEnumerable<TypeModelRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<TypeModelResponseDso?> FindAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
+        public override Task<TypeModelResponseDso?> FindAsync(Expression<Func<TypeModelResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<TypeModelResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<TypeModelResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<TypeModelResponseDso?> GetByIdAsync(string id)
+        public override Task<TypeModelResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<TypeModelResponseDso> GetQueryable()
+        public override IQueryable<TypeModelResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<TypeModelResponseDso> UpdateAsync(TypeModelRequestDso entity)
+        public override Task<TypeModelResponseDso> UpdateAsync(TypeModelRequestDso entity)
         {
             try
             {

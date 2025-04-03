@@ -188,7 +188,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         _logger = logger.CreateLogger(typeof({className}Service).FullName);
     }}
 
-    public Task<int> CountAsync()
+    public override Task<int> CountAsync()
     {{
         try
         {{
@@ -202,7 +202,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public async Task<{className}ResponseDso> CreateAsync({className}RequestDso entity)
+    public override async Task<{className}ResponseDso> CreateAsync({className}RequestDso entity)
     {{
         try
         {{
@@ -219,7 +219,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<IEnumerable<{className}ResponseDso>> CreateRangeAsync(IEnumerable<{className}RequestDso> entities)
+    public override Task<IEnumerable<{className}ResponseDso>> CreateRangeAsync(IEnumerable<{className}RequestDso> entities)
     {{
         try
         {{
@@ -233,7 +233,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task DeleteAsync(string id)
+    public override Task DeleteAsync(string id)
     {{
         try
         {{
@@ -247,7 +247,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task DeleteRangeAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    public override  Task DeleteRangeAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
     {{
         try
         {{
@@ -261,7 +261,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<bool> ExistsAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    public override  Task<bool> ExistsAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
     {{
         try
         {{
@@ -275,7 +275,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<{className}ResponseDso?> FindAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
+    public override Task<{className}ResponseDso?> FindAsync(Expression<Func<{className}ResponseDso, bool>> predicate)
     {{
         try
         {{
@@ -289,7 +289,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<IEnumerable<{className}ResponseDso>> GetAllAsync()
+    public override Task<IEnumerable<{className}ResponseDso>> GetAllAsync()
     {{
         try
         {{
@@ -303,7 +303,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<{className}ResponseDso?> GetByIdAsync(string id)
+    public override Task<{className}ResponseDso?> GetByIdAsync(string id)
     {{
         try
         {{
@@ -317,7 +317,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<{className}ResponseDso> getData(int id)
+    public  Task<{className}ResponseDso> getData(int id)
     {{
         try
         {{
@@ -331,7 +331,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public IQueryable<{className}ResponseDso> GetQueryable()
+    public override IQueryable<{className}ResponseDso> GetQueryable()
     {{
         try
         {{
@@ -345,7 +345,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task SaveChangesAsync()
+    public  Task SaveChangesAsync()
     {{
         try
         {{
@@ -359,7 +359,7 @@ public class {className}Service : BaseService<{className}RequestDso,
         }}
     }}
 
-    public Task<{className}ResponseDso> UpdateAsync({className}RequestDso entity)
+    public override  Task<{className}ResponseDso> UpdateAsync({className}RequestDso entity)
     {{
         try
         {{

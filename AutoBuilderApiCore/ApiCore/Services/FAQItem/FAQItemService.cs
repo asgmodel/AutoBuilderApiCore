@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(FAQItemService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<FAQItemResponseDso> CreateAsync(FAQItemRequestDso entity)
+        public override async Task<FAQItemResponseDso> CreateAsync(FAQItemRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<FAQItemResponseDso>> CreateRangeAsync(IEnumerable<FAQItemRequestDso> entities)
+        public override Task<IEnumerable<FAQItemResponseDso>> CreateRangeAsync(IEnumerable<FAQItemRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<FAQItemResponseDso?> FindAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
+        public override Task<FAQItemResponseDso?> FindAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<FAQItemResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<FAQItemResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<FAQItemResponseDso?> GetByIdAsync(string id)
+        public override Task<FAQItemResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<FAQItemResponseDso> GetQueryable()
+        public override IQueryable<FAQItemResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<FAQItemResponseDso> UpdateAsync(FAQItemRequestDso entity)
+        public override Task<FAQItemResponseDso> UpdateAsync(FAQItemRequestDso entity)
         {
             try
             {

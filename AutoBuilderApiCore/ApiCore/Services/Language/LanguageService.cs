@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(LanguageService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<LanguageResponseDso> CreateAsync(LanguageRequestDso entity)
+        public override async Task<LanguageResponseDso> CreateAsync(LanguageRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<LanguageResponseDso>> CreateRangeAsync(IEnumerable<LanguageRequestDso> entities)
+        public override Task<IEnumerable<LanguageResponseDso>> CreateRangeAsync(IEnumerable<LanguageRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<LanguageResponseDso?> FindAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
+        public override Task<LanguageResponseDso?> FindAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<LanguageResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<LanguageResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<LanguageResponseDso?> GetByIdAsync(string id)
+        public override Task<LanguageResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<LanguageResponseDso> GetQueryable()
+        public override IQueryable<LanguageResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<LanguageResponseDso> UpdateAsync(LanguageRequestDso entity)
+        public override Task<LanguageResponseDso> UpdateAsync(LanguageRequestDso entity)
         {
             try
             {

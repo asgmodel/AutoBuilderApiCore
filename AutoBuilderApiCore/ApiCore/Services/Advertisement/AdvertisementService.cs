@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(AdvertisementService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<AdvertisementResponseDso> CreateAsync(AdvertisementRequestDso entity)
+        public override async Task<AdvertisementResponseDso> CreateAsync(AdvertisementRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<AdvertisementResponseDso>> CreateRangeAsync(IEnumerable<AdvertisementRequestDso> entities)
+        public override Task<IEnumerable<AdvertisementResponseDso>> CreateRangeAsync(IEnumerable<AdvertisementRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AdvertisementResponseDso?> FindAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
+        public override Task<AdvertisementResponseDso?> FindAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<AdvertisementResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<AdvertisementResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AdvertisementResponseDso?> GetByIdAsync(string id)
+        public override Task<AdvertisementResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<AdvertisementResponseDso> GetQueryable()
+        public override IQueryable<AdvertisementResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<AdvertisementResponseDso> UpdateAsync(AdvertisementRequestDso entity)
+        public override Task<AdvertisementResponseDso> UpdateAsync(AdvertisementRequestDso entity)
         {
             try
             {

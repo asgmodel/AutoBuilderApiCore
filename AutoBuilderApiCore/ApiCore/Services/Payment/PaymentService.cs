@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(PaymentService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<PaymentResponseDso> CreateAsync(PaymentRequestDso entity)
+        public override async Task<PaymentResponseDso> CreateAsync(PaymentRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<PaymentResponseDso>> CreateRangeAsync(IEnumerable<PaymentRequestDso> entities)
+        public override Task<IEnumerable<PaymentResponseDso>> CreateRangeAsync(IEnumerable<PaymentRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<PaymentResponseDso?> FindAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
+        public override Task<PaymentResponseDso?> FindAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<PaymentResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<PaymentResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<PaymentResponseDso?> GetByIdAsync(string id)
+        public override Task<PaymentResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<PaymentResponseDso> GetQueryable()
+        public override IQueryable<PaymentResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<PaymentResponseDso> UpdateAsync(PaymentRequestDso entity)
+        public override Task<PaymentResponseDso> UpdateAsync(PaymentRequestDso entity)
         {
             try
             {

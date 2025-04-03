@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(CategoryTabService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<CategoryTabResponseDso> CreateAsync(CategoryTabRequestDso entity)
+        public override async Task<CategoryTabResponseDso> CreateAsync(CategoryTabRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<CategoryTabResponseDso>> CreateRangeAsync(IEnumerable<CategoryTabRequestDso> entities)
+        public override Task<IEnumerable<CategoryTabResponseDso>> CreateRangeAsync(IEnumerable<CategoryTabRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<CategoryTabResponseDso?> FindAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
+        public override Task<CategoryTabResponseDso?> FindAsync(Expression<Func<CategoryTabResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<CategoryTabResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<CategoryTabResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<CategoryTabResponseDso?> GetByIdAsync(string id)
+        public override Task<CategoryTabResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<CategoryTabResponseDso> GetQueryable()
+        public override IQueryable<CategoryTabResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<CategoryTabResponseDso> UpdateAsync(CategoryTabRequestDso entity)
+        public override Task<CategoryTabResponseDso> UpdateAsync(CategoryTabRequestDso entity)
         {
             try
             {

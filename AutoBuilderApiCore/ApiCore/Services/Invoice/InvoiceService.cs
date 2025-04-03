@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(InvoiceService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<InvoiceResponseDso> CreateAsync(InvoiceRequestDso entity)
+        public override async Task<InvoiceResponseDso> CreateAsync(InvoiceRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<InvoiceResponseDso>> CreateRangeAsync(IEnumerable<InvoiceRequestDso> entities)
+        public override Task<IEnumerable<InvoiceResponseDso>> CreateRangeAsync(IEnumerable<InvoiceRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<InvoiceResponseDso?> FindAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
+        public override Task<InvoiceResponseDso?> FindAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<InvoiceResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<InvoiceResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<InvoiceResponseDso?> GetByIdAsync(string id)
+        public override Task<InvoiceResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<InvoiceResponseDso> GetQueryable()
+        public override IQueryable<InvoiceResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<InvoiceResponseDso> UpdateAsync(InvoiceRequestDso entity)
+        public override Task<InvoiceResponseDso> UpdateAsync(InvoiceRequestDso entity)
         {
             try
             {

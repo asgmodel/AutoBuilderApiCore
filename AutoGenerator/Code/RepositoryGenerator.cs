@@ -315,7 +315,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to count the number of entities.
                     /// </summary>
-                    public Task<int> CountAsync()
+                    public override Task<int> CountAsync()
                     {{
                         try
                         {{
@@ -332,7 +332,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to create a new entity asynchronously.
                     /// </summary>
-                    public async Task<{className}ResponseShareDto> CreateAsync({className}RequestShareDto entity)
+                    public override async Task<{className}ResponseShareDto> CreateAsync({className}RequestShareDto entity)
                     {{
                         try
                         {{
@@ -355,7 +355,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to create a range of entities asynchronously.
                     /// </summary>
-                    public Task<IEnumerable<{className}ResponseShareDto>> CreateRangeAsync(IEnumerable<{className}RequestShareDto> entities)
+                    public override Task<IEnumerable<{className}ResponseShareDto>> CreateRangeAsync(IEnumerable<{className}RequestShareDto> entities)
                     {{
                         try
                         {{
@@ -372,7 +372,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to delete a specific entity.
                     /// </summary>
-                    public Task DeleteAsync(string id)
+                    public override Task DeleteAsync(string id)
                     {{
                         try
                         {{
@@ -389,7 +389,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to delete a range of entities based on a condition.
                     /// </summary>
-                    public Task DeleteRangeAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
+                    public override Task DeleteRangeAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
                     {{
                         try
                         {{
@@ -406,7 +406,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to check if an entity exists based on a condition.
                     /// </summary>
-                    public Task<bool> ExistsAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
+                    public override Task<bool> ExistsAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
                     {{
                         try
                         {{
@@ -423,7 +423,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to find an entity based on a condition.
                     /// </summary>
-                    public Task<{className}ResponseShareDto?> FindAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
+                    public override Task<{className}ResponseShareDto?> FindAsync(Expression<Func<{className}ResponseShareDto, bool>> predicate)
                     {{
                         try
                         {{
@@ -440,7 +440,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to retrieve all entities.
                     /// </summary>
-                    public Task<IEnumerable<{className}ResponseShareDto>> GetAllAsync()
+                    public override Task<IEnumerable<{className}ResponseShareDto>> GetAllAsync()
                     {{
                         try
                         {{
@@ -457,7 +457,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to get an entity by its unique ID.
                     /// </summary>
-                    public Task<{className}ResponseShareDto?> GetByIdAsync(string id)
+                    public override Task<{className}ResponseShareDto?> GetByIdAsync(string id)
                     {{
                         try
                         {{
@@ -474,7 +474,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to get data using a specific ID.
                     /// </summary>
-                    public Task<{className}ResponseShareDto> getData(int id)
+                    public  Task<{className}ResponseShareDto> getData(int id)
                     {{
                         try
                         {{
@@ -491,7 +491,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to retrieve data as an IQueryable object.
                     /// </summary>
-                    public IQueryable<{className}ResponseShareDto> GetQueryable()
+                    public override IQueryable<{className}ResponseShareDto> GetQueryable()
                     {{
                         try
                         {{
@@ -525,7 +525,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     /// <summary>
                     /// Method to update a specific entity.
                     /// </summary>
-                    public Task<{className}ResponseShareDto> UpdateAsync({className}RequestShareDto entity)
+                    public override Task<{className}ResponseShareDto> UpdateAsync({className}RequestShareDto entity)
                     {{
                         try
                         {{

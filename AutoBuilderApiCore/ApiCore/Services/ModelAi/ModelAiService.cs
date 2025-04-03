@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(ModelAiService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<ModelAiResponseDso> CreateAsync(ModelAiRequestDso entity)
+        public override async Task<ModelAiResponseDso> CreateAsync(ModelAiRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<ModelAiResponseDso>> CreateRangeAsync(IEnumerable<ModelAiRequestDso> entities)
+        public override Task<IEnumerable<ModelAiResponseDso>> CreateRangeAsync(IEnumerable<ModelAiRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelAiResponseDso?> FindAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
+        public override Task<ModelAiResponseDso?> FindAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<ModelAiResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<ModelAiResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelAiResponseDso?> GetByIdAsync(string id)
+        public override Task<ModelAiResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<ModelAiResponseDso> GetQueryable()
+        public override IQueryable<ModelAiResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelAiResponseDso> UpdateAsync(ModelAiRequestDso entity)
+        public override Task<ModelAiResponseDso> UpdateAsync(ModelAiRequestDso entity)
         {
             try
             {

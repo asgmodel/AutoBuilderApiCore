@@ -26,7 +26,7 @@ namespace ApiCore.Services.Services
             _logger = logger.CreateLogger(typeof(ModelGatewayService).FullName);
         }
 
-        public Task<int> CountAsync()
+        public override Task<int> CountAsync()
         {
             try
             {
@@ -40,7 +40,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public async Task<ModelGatewayResponseDso> CreateAsync(ModelGatewayRequestDso entity)
+        public override async Task<ModelGatewayResponseDso> CreateAsync(ModelGatewayRequestDso entity)
         {
             try
             {
@@ -57,7 +57,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<ModelGatewayResponseDso>> CreateRangeAsync(IEnumerable<ModelGatewayRequestDso> entities)
+        public override Task<IEnumerable<ModelGatewayResponseDso>> CreateRangeAsync(IEnumerable<ModelGatewayRequestDso> entities)
         {
             try
             {
@@ -71,7 +71,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteAsync(string id)
+        public override Task DeleteAsync(string id)
         {
             try
             {
@@ -85,7 +85,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task DeleteRangeAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
+        public override Task DeleteRangeAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
         {
             try
             {
@@ -99,7 +99,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<bool> ExistsAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
+        public override Task<bool> ExistsAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
         {
             try
             {
@@ -113,7 +113,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelGatewayResponseDso?> FindAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
+        public override Task<ModelGatewayResponseDso?> FindAsync(Expression<Func<ModelGatewayResponseDso, bool>> predicate)
         {
             try
             {
@@ -127,7 +127,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<IEnumerable<ModelGatewayResponseDso>> GetAllAsync()
+        public override Task<IEnumerable<ModelGatewayResponseDso>> GetAllAsync()
         {
             try
             {
@@ -141,7 +141,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelGatewayResponseDso?> GetByIdAsync(string id)
+        public override Task<ModelGatewayResponseDso?> GetByIdAsync(string id)
         {
             try
             {
@@ -169,7 +169,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public IQueryable<ModelGatewayResponseDso> GetQueryable()
+        public override IQueryable<ModelGatewayResponseDso> GetQueryable()
         {
             try
             {
@@ -197,7 +197,7 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task<ModelGatewayResponseDso> UpdateAsync(ModelGatewayRequestDso entity)
+        public override Task<ModelGatewayResponseDso> UpdateAsync(ModelGatewayRequestDso entity)
         {
             try
             {

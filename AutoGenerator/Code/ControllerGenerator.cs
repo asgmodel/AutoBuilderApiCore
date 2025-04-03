@@ -63,9 +63,10 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
 
                             $"{root}.Services.Services",
                             "Microsoft.AspNetCore.Mvc",
-                            $"{root}.DyModels.VM.{model.Name}",
+                            $"{root}.DyModels.VMs",
                             "System.Linq.Expressions",
                             $"{root}.DyModels.Dso.Requests",
+                            "AutoGenerator.Helper.Translation"
 
 
 
@@ -112,6 +113,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
                 usingStatements.AppendLine($"using {u};");
             }
         }
+        var  nameObj=className.ToLower();
 
         // Generate and return the controller template by replacing the namespace and className variables.
         return $@"
@@ -121,13 +123,13 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
     [ApiController]
     public class {className}Controller : ControllerBase
     {{
-        private readonly IUse{className}Service _{className.ToLower()}Service;
+        private readonly IUse{className}Service _{nameObj}Service;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
 
-        public {className}Controller(IUse{className}Service {className.ToLower()}Service, IMapper mapper, ILoggerFactory logger)
+        public {className}Controller(IUse{className}Service {nameObj}Service, IMapper mapper, ILoggerFactory logger)
         {{
-            _{className.ToLower()}Service = {className.ToLower()}Service;
+            _{nameObj}Service = {nameObj}Service;
             _mapper = mapper;
             _logger = logger.CreateLogger(typeof({className}Controller).FullName);
         }}
@@ -142,7 +144,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             try
             {{
                 _logger.LogInformation(""Fetching all {className}s..."");
-                var result = await _{className.ToLower()}Service.GetAllAsync();
+                var result = await _{nameObj}Service.GetAllAsync();
                 var items = _mapper.Map<List<{className}OutputVM>>(result);
                 return Ok(items);
             }}
@@ -169,7 +171,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             try
             {{
                 _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
-                var entity = await _{className.ToLower()}Service.GetByIdAsync(id);
+                var entity = await _{nameObj}Service.GetByIdAsync(id);
                 if (entity == null)
                 {{
                     _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
@@ -185,38 +187,74 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             }}
         }}
         // // Get a {className} by Lg.
-        //[HttpGet( Name = ""Get{className}ByLg"")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<{className}InfoVM>> GetByLg({className}FilterVM model)
-        //{{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {{
-        //        _logger.LogWarning(""Invalid {className} ID received."");
-        //        return BadRequest(""Invalid {className} ID."");
-        //    }}
+        [HttpGet(""Get{className}ByLanguage"",Name = ""Get{className}ByLg"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<{className}OutputVM>> Get{className}ByLg({className}FilterVM model)
+        {{
+             var id=model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {{
+                _logger.LogWarning(""Invalid {className} ID received."");
+                return BadRequest(""Invalid {className} ID."");
+            }}
 
-        //    try
-        //    {{
-        //        _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
-        //        var entity = await _{className.ToLower()}Service.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {{
-        //            _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
-        //            return NotFound();
-        //        }}
-        //        var item = _mapper.Map<{className}InfoVM>(entity);
-        //        return Ok(item);
-        //    }}
-        //    catch (Exception ex)
-        //    {{
-        //        _logger.LogError(ex, ""Error while fetching {className} with ID: {{id}}"", id);
-        //        return StatusCode(500, ""Internal Server Error"");
-        //    }}
-        //}}
+            try
+            {{
+                _logger.LogInformation(""Fetching {className} with ID: {{id}}"", id);
+                var entity = await _{nameObj}Service.GetByIdAsync(id);
+                if (entity == null)
+                {{
+                    _logger.LogWarning(""{className} not found with ID: {{id}}"", id);
+                    return NotFound();
+                }}
+                var item = _mapper.Map<{className}OutputVM>(entity,opt=>opt.Items.Add(HelperTranslation.KEYLG,model.Lg));
+                return Ok(item);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while fetching {className} with ID: {{id}}"", id);
+                return StatusCode(500, ""Internal Server Error"");
+            }}
+        }}
 
+        
+         // // Get a {className}s by Lg.
+        [HttpGet(""Get{className}sByLanguage"",Name = ""Get{className}sByLg"")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<{className}OutputVM>> Get{className}sByLg(string? lg)
+        {{
+            
+            if (string.IsNullOrWhiteSpace(lg))
+            {{
+                _logger.LogWarning(""Invalid {className} lg received."");
+                return BadRequest(""Invalid {className} lg null "");
+            }}
+
+            try
+            {{
+               
+                var {nameObj}s = await _{nameObj}Service.GetAllAsync();
+                if ({nameObj}s == null)
+                {{
+                    _logger.LogWarning(""{className}s not found  by  "");
+                    return NotFound();
+                }}
+                var items = _mapper.Map<{className}OutputVM>({nameObj}s,opt=>opt.Items.Add(HelperTranslation.KEYLG,lg));
+                return Ok(items);
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error while fetching {className}s with Lg: {{lg}}"", lg);
+                return StatusCode(500, ""Internal Server Error"");
+            }}
+        }}
+
+
+          
         // Create a new {className}.
         [HttpPost(Name = ""Create{className}"")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -239,7 +277,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             {{
                 _logger.LogInformation(""Creating new {className} with data: {{@model}}"", model);
                 var item = _mapper.Map<{className}RequestDso>(model);
-                var createdEntity = await _{className.ToLower()}Service.CreateAsync(item);
+                var createdEntity = await _{nameObj}Service.CreateAsync(item);
                 var createdItem = _mapper.Map<{className}OutputVM>(createdEntity);
                 return Ok(createdItem);
             }}
@@ -272,7 +310,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             {{
                 _logger.LogInformation(""Creating multiple {className}s."");
                 var items = _mapper.Map<List<{className}RequestDso>>(models);
-                var createdEntities = await _{className.ToLower()}Service.CreateRangeAsync(items);
+                var createdEntities = await _{nameObj}Service.CreateRangeAsync(items);
                 var createdItems = _mapper.Map<List<{className}OutputVM>>(createdEntities);
                 return Ok(createdItems);
             }}
@@ -305,7 +343,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             {{
                 _logger.LogInformation(""Updating {className} with ID: {{id}}"", model?.Id);
                 var item = _mapper.Map<{className}RequestDso>(model);
-                var updatedEntity = await _{className.ToLower()}Service.UpdateAsync(item);
+                var updatedEntity = await _{nameObj}Service.UpdateAsync(item);
                 if (updatedEntity == null)
                 {{
                     _logger.LogWarning(""{className} not found for update with ID: {{id}}"", model?.Id);
@@ -337,7 +375,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             try
             {{
                 _logger.LogInformation(""Deleting {className} with ID: {{id}}"", id);
-                await _{className.ToLower()}Service.DeleteAsync(id);
+                await _{nameObj}Service.DeleteAsync(id);
                 return NoContent();
             }}
             catch (Exception ex)
@@ -357,7 +395,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
             try
             {{
                 _logger.LogInformation(""Counting {className}s..."");
-                var count = await _{className.ToLower()}Service.CountAsync();
+                var count = await _{nameObj}Service.CountAsync();
                 return Ok(count);
             }}
             catch (Exception ex)

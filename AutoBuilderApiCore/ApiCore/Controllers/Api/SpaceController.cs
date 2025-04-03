@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Space;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Space by Lg.
-        //[HttpGet( Name = "GetSpaceByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<SpaceInfoVM>> GetByLg(SpaceFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Space ID received.");
-        //        return BadRequest("Invalid Space ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Space with ID: {id}", id);
-        //        var entity = await _spaceService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Space not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<SpaceInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Space with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetSpaceByLanguage", Name = "GetSpaceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SpaceOutputVM>> GetSpaceByLg(SpaceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Space ID received.");
+                return BadRequest("Invalid Space ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Space with ID: {id}", id);
+                var entity = await _spaceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Space not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SpaceOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Space with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Spaces by Lg.
+        [HttpGet("GetSpacesByLanguage", Name = "GetSpacesByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SpaceOutputVM>> GetSpacesByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Space lg received.");
+                return BadRequest("Invalid Space lg null ");
+            }
+
+            try
+            {
+                var spaces = await _spaceService.GetAllAsync();
+                if (spaces == null)
+                {
+                    _logger.LogWarning("Spaces not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<SpaceOutputVM>(spaces, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Spaces with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Space.
         [HttpPost(Name = "CreateSpace")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

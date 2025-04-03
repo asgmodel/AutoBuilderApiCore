@@ -2,36 +2,21 @@
 using AutoGenerator.Data;
 using AutoGenerator.Repositorys.Base;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace AutoGenerator.Repositorys.Builder
 {
-
-    public interface IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto> :ITBuildRepository
-          where TBuildRequestDto : class
-          where TBuildResponseDto : class
+    public interface IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto> : IBasePublicRepository<TBuildRequestDto, TBuildResponseDto>, ITBuildRepository
+      where TBuildRequestDto : class
+      where TBuildResponseDto : class
     {
-        Task<IEnumerable<TBuildResponseDto>> GetAllAsync();
-        Task<TBuildResponseDto?> GetByIdAsync(string id);
-        Task<TBuildResponseDto?> FindAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
-        IQueryable<TBuildResponseDto> GetQueryable();
+        //   يمكن فقط اضافة الدوال العامه      المتعلقة بالطبقة   
+        Task<IEnumerable<TBuildResponseDto>> GetAllAsync(Expression<Func<TBuildResponseDto, bool>>? filter = null, Func<IQueryable<TBuildResponseDto>, IQueryable<TBuildResponseDto>>? include = null, Expression<Func<TBuildResponseDto, object>>? order = null);
 
-        Task<TBuildResponseDto> CreateAsync(TBuildRequestDto entity);
-        Task<IEnumerable<TBuildResponseDto>> CreateRangeAsync(IEnumerable<TBuildRequestDto> entities);
-
-        Task<TBuildResponseDto> UpdateAsync(TBuildRequestDto entity);
-
-        Task DeleteAsync(string id);
-        Task DeleteRangeAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
-
-        Task<bool> ExistsAsync(Expression<Func<TBuildResponseDto, bool>> predicate);
-        Task<int> CountAsync();
-
-        Task SaveChangesAsync();
     }
-
     public abstract  class BaseBuilderRepository<TModel, TBuildRequestDto, TBuildResponseDto> : IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto>,ITBuildRepository
       where TModel : class
       where TBuildRequestDto : class
@@ -166,6 +151,14 @@ namespace AutoGenerator.Repositorys.Builder
 
         #endregion
 
+        public async  Task<IEnumerable<TBuildResponseDto>> GetAllAsync(Expression<Func<TBuildResponseDto, bool>>? filter = null, Func<IQueryable<TBuildResponseDto>, IQueryable<TBuildResponseDto>>? include = null, Expression<Func<TBuildResponseDto, object>>? order = null)
+        {
+            var entities = await _repository.Get()
+                .ProjectTo<TBuildResponseDto>(_mapper.ConfigurationProvider)
+                .Where(filter)
+                .ToListAsync();
+            return entities;
+        }
 
         private static bool IsAllowCreate()
         {
@@ -217,6 +210,9 @@ namespace AutoGenerator.Repositorys.Builder
 
             return _mapper.Map<IEnumerable<TModel>>(requestDto);
         }
+
+
+
     }
 
 

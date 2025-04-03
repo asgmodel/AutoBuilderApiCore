@@ -1,6 +1,7 @@
 ﻿
 
 
+using AutoGenerator.Repositorys.Base;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -8,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace AutoGenerator.Repositorys.Share
 {
-    public interface IBaseShareRepository<TShareRequestDto, TShareResponseDto> : ITBaseShareRepository
+    public interface IBaseShareRepository<TShareRequestDto, TShareResponseDto> : IBasePublicRepository<TShareRequestDto, TShareResponseDto>, ITBaseShareRepository
         where TShareRequestDto : class
         where TShareResponseDto : class
   
@@ -115,6 +116,59 @@ namespace AutoGenerator.Repositorys.Share
             return _mapper.Map<TBuildResponseDto>(shareResponseDto);
         }
 
-       
+        public virtual Task<IEnumerable<TShareResponseDto>> GetAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<TShareResponseDto?> GetByIdAsync(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<TShareResponseDto?> FindAsync(Expression<Func<TShareResponseDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual IQueryable<TShareResponseDto> GetQueryable()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<TShareResponseDto> CreateAsync(TShareRequestDto entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<IEnumerable<TShareResponseDto>> CreateRangeAsync(IEnumerable<TShareRequestDto> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<TShareResponseDto> UpdateAsync(TShareRequestDto entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual  Task DeleteAsync(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual  Task DeleteRangeAsync(Expression<Func<TShareResponseDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<bool> ExistsAsync(Expression<Func<TShareResponseDto, bool>> predicate)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<int> CountAsync()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Setting;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Setting by Lg.
-        //[HttpGet( Name = "GetSettingByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<SettingInfoVM>> GetByLg(SettingFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Setting ID received.");
-        //        return BadRequest("Invalid Setting ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Setting with ID: {id}", id);
-        //        var entity = await _settingService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Setting not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<SettingInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Setting with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetSettingByLanguage", Name = "GetSettingByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SettingOutputVM>> GetSettingByLg(SettingFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Setting ID received.");
+                return BadRequest("Invalid Setting ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Setting with ID: {id}", id);
+                var entity = await _settingService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Setting not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SettingOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Setting with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Settings by Lg.
+        [HttpGet("GetSettingsByLanguage", Name = "GetSettingsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SettingOutputVM>> GetSettingsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Setting lg received.");
+                return BadRequest("Invalid Setting lg null ");
+            }
+
+            try
+            {
+                var settings = await _settingService.GetAllAsync();
+                if (settings == null)
+                {
+                    _logger.LogWarning("Settings not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<SettingOutputVM>(settings, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Settings with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Setting.
         [HttpPost(Name = "CreateSetting")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

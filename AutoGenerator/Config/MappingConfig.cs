@@ -121,7 +121,8 @@ namespace AutoGenerator.Config
 
                         CreateMap(model, dto).ReverseMap().ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                         {
-                            return HelperTranslation.MapToTranslationData(src, dest, destMember);
+                           
+                            return HelperTranslation.MapToTranslationData(src, dest, destMember, context.Items);
                         }));
 
                         if (!CheckIgnoreAutomateMapper(dto))
@@ -161,10 +162,10 @@ namespace AutoGenerator.Config
                     {
                         if (!CheckIgnoreAutomateMapper(vm))
                         {
-                            CreateMap(dso, vm).ReverseMap();//.ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
-                            //{
-                            //    return HelperTranslation.MapToTranslationData(src, dest, destMember);
-                            //})); ;
+                            CreateMap(dso, vm).ReverseMap().ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                            {
+                                return HelperTranslation.MapToTranslationData(src, dest, destMember,context.Items);
+                            })); ;
                         }
                     }
                 }

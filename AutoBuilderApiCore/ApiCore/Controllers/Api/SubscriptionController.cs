@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Subscription;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Subscription by Lg.
-        //[HttpGet( Name = "GetSubscriptionByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<SubscriptionInfoVM>> GetByLg(SubscriptionFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Subscription ID received.");
-        //        return BadRequest("Invalid Subscription ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Subscription with ID: {id}", id);
-        //        var entity = await _subscriptionService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Subscription not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<SubscriptionInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Subscription with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetSubscriptionByLanguage", Name = "GetSubscriptionByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SubscriptionOutputVM>> GetSubscriptionByLg(SubscriptionFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Subscription ID received.");
+                return BadRequest("Invalid Subscription ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Subscription with ID: {id}", id);
+                var entity = await _subscriptionService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Subscription not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<SubscriptionOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Subscription with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Subscriptions by Lg.
+        [HttpGet("GetSubscriptionsByLanguage", Name = "GetSubscriptionsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<SubscriptionOutputVM>> GetSubscriptionsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Subscription lg received.");
+                return BadRequest("Invalid Subscription lg null ");
+            }
+
+            try
+            {
+                var subscriptions = await _subscriptionService.GetAllAsync();
+                if (subscriptions == null)
+                {
+                    _logger.LogWarning("Subscriptions not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<SubscriptionOutputVM>(subscriptions, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Subscriptions with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Subscription.
         [HttpPost(Name = "CreateSubscription")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Plan;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Plan by Lg.
-        //[HttpGet( Name = "GetPlanByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PlanInfoVM>> GetByLg(PlanFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Plan ID received.");
-        //        return BadRequest("Invalid Plan ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Plan with ID: {id}", id);
-        //        var entity = await _planService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Plan not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<PlanInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Plan with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetPlanByLanguage", Name = "GetPlanByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PlanOutputVM>> GetPlanByLg(PlanFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Plan ID received.");
+                return BadRequest("Invalid Plan ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Plan with ID: {id}", id);
+                var entity = await _planService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Plan not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<PlanOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Plan with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Plans by Lg.
+        [HttpGet("GetPlansByLanguage", Name = "GetPlansByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PlanOutputVM>> GetPlansByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Plan lg received.");
+                return BadRequest("Invalid Plan lg null ");
+            }
+
+            try
+            {
+                var plans = await _planService.GetAllAsync();
+                if (plans == null)
+                {
+                    _logger.LogWarning("Plans not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<PlanOutputVM>(plans, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Plans with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Plan.
         [HttpPost(Name = "CreatePlan")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Service;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Service by Lg.
-        //[HttpGet( Name = "GetServiceByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ServiceInfoVM>> GetByLg(ServiceFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Service ID received.");
-        //        return BadRequest("Invalid Service ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Service with ID: {id}", id);
-        //        var entity = await _serviceService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Service not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<ServiceInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Service with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetServiceByLanguage", Name = "GetServiceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceOutputVM>> GetServiceByLg(ServiceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Service ID received.");
+                return BadRequest("Invalid Service ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Service with ID: {id}", id);
+                var entity = await _serviceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Service not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Service with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Services by Lg.
+        [HttpGet("GetServicesByLanguage", Name = "GetServicesByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceOutputVM>> GetServicesByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Service lg received.");
+                return BadRequest("Invalid Service lg null ");
+            }
+
+            try
+            {
+                var services = await _serviceService.GetAllAsync();
+                if (services == null)
+                {
+                    _logger.LogWarning("Services not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<ServiceOutputVM>(services, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Services with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Service.
         [HttpPost(Name = "CreateService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

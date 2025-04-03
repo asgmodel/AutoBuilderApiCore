@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.FAQItem;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a FAQItem by Lg.
-        //[HttpGet( Name = "GetFAQItemByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<FAQItemInfoVM>> GetByLg(FAQItemFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid FAQItem ID received.");
-        //        return BadRequest("Invalid FAQItem ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching FAQItem with ID: {id}", id);
-        //        var entity = await _faqitemService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("FAQItem not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<FAQItemInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching FAQItem with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetFAQItemByLanguage", Name = "GetFAQItemByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<FAQItemOutputVM>> GetFAQItemByLg(FAQItemFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid FAQItem ID received.");
+                return BadRequest("Invalid FAQItem ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching FAQItem with ID: {id}", id);
+                var entity = await _faqitemService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("FAQItem not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<FAQItemOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching FAQItem with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a FAQItems by Lg.
+        [HttpGet("GetFAQItemsByLanguage", Name = "GetFAQItemsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<FAQItemOutputVM>> GetFAQItemsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid FAQItem lg received.");
+                return BadRequest("Invalid FAQItem lg null ");
+            }
+
+            try
+            {
+                var faqitems = await _faqitemService.GetAllAsync();
+                if (faqitems == null)
+                {
+                    _logger.LogWarning("FAQItems not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<FAQItemOutputVM>(faqitems, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching FAQItems with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new FAQItem.
         [HttpPost(Name = "CreateFAQItem")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

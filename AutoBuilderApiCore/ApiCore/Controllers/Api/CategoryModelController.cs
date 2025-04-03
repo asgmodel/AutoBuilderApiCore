@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.CategoryModel;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a CategoryModel by Lg.
-        //[HttpGet( Name = "GetCategoryModelByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<CategoryModelInfoVM>> GetByLg(CategoryModelFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid CategoryModel ID received.");
-        //        return BadRequest("Invalid CategoryModel ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching CategoryModel with ID: {id}", id);
-        //        var entity = await _categorymodelService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("CategoryModel not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<CategoryModelInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching CategoryModel with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetCategoryModelByLanguage", Name = "GetCategoryModelByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CategoryModelOutputVM>> GetCategoryModelByLg(CategoryModelFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid CategoryModel ID received.");
+                return BadRequest("Invalid CategoryModel ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching CategoryModel with ID: {id}", id);
+                var entity = await _categorymodelService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("CategoryModel not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<CategoryModelOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching CategoryModel with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a CategoryModels by Lg.
+        [HttpGet("GetCategoryModelsByLanguage", Name = "GetCategoryModelsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CategoryModelOutputVM>> GetCategoryModelsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid CategoryModel lg received.");
+                return BadRequest("Invalid CategoryModel lg null ");
+            }
+
+            try
+            {
+                var categorymodels = await _categorymodelService.GetAllAsync();
+                if (categorymodels == null)
+                {
+                    _logger.LogWarning("CategoryModels not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<CategoryModelOutputVM>(categorymodels, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching CategoryModels with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new CategoryModel.
         [HttpPost(Name = "CreateCategoryModel")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

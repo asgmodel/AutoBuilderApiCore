@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.CategoryTab;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a CategoryTab by Lg.
-        //[HttpGet( Name = "GetCategoryTabByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<CategoryTabInfoVM>> GetByLg(CategoryTabFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid CategoryTab ID received.");
-        //        return BadRequest("Invalid CategoryTab ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching CategoryTab with ID: {id}", id);
-        //        var entity = await _categorytabService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("CategoryTab not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<CategoryTabInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching CategoryTab with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetCategoryTabByLanguage", Name = "GetCategoryTabByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CategoryTabOutputVM>> GetCategoryTabByLg(CategoryTabFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid CategoryTab ID received.");
+                return BadRequest("Invalid CategoryTab ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching CategoryTab with ID: {id}", id);
+                var entity = await _categorytabService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("CategoryTab not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<CategoryTabOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching CategoryTab with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a CategoryTabs by Lg.
+        [HttpGet("GetCategoryTabsByLanguage", Name = "GetCategoryTabsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CategoryTabOutputVM>> GetCategoryTabsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid CategoryTab lg received.");
+                return BadRequest("Invalid CategoryTab lg null ");
+            }
+
+            try
+            {
+                var categorytabs = await _categorytabService.GetAllAsync();
+                if (categorytabs == null)
+                {
+                    _logger.LogWarning("CategoryTabs not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<CategoryTabOutputVM>(categorytabs, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching CategoryTabs with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new CategoryTab.
         [HttpPost(Name = "CreateCategoryTab")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

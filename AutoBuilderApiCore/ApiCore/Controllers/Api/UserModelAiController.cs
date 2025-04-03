@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.UserModelAi;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a UserModelAi by Lg.
-        //[HttpGet( Name = "GetUserModelAiByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<UserModelAiInfoVM>> GetByLg(UserModelAiFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid UserModelAi ID received.");
-        //        return BadRequest("Invalid UserModelAi ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching UserModelAi with ID: {id}", id);
-        //        var entity = await _usermodelaiService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("UserModelAi not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<UserModelAiInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching UserModelAi with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetUserModelAiByLanguage", Name = "GetUserModelAiByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserModelAiOutputVM>> GetUserModelAiByLg(UserModelAiFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserModelAi ID received.");
+                return BadRequest("Invalid UserModelAi ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching UserModelAi with ID: {id}", id);
+                var entity = await _usermodelaiService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("UserModelAi not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<UserModelAiOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserModelAi with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a UserModelAis by Lg.
+        [HttpGet("GetUserModelAisByLanguage", Name = "GetUserModelAisByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserModelAiOutputVM>> GetUserModelAisByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid UserModelAi lg received.");
+                return BadRequest("Invalid UserModelAi lg null ");
+            }
+
+            try
+            {
+                var usermodelais = await _usermodelaiService.GetAllAsync();
+                if (usermodelais == null)
+                {
+                    _logger.LogWarning("UserModelAis not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<UserModelAiOutputVM>(usermodelais, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserModelAis with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new UserModelAi.
         [HttpPost(Name = "CreateUserModelAi")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.ServiceMethod;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a ServiceMethod by Lg.
-        //[HttpGet( Name = "GetServiceMethodByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ServiceMethodInfoVM>> GetByLg(ServiceMethodFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid ServiceMethod ID received.");
-        //        return BadRequest("Invalid ServiceMethod ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching ServiceMethod with ID: {id}", id);
-        //        var entity = await _servicemethodService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("ServiceMethod not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<ServiceMethodInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching ServiceMethod with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetServiceMethodByLanguage", Name = "GetServiceMethodByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceMethodOutputVM>> GetServiceMethodByLg(ServiceMethodFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ServiceMethod ID received.");
+                return BadRequest("Invalid ServiceMethod ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ServiceMethod with ID: {id}", id);
+                var entity = await _servicemethodService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ServiceMethod not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ServiceMethodOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ServiceMethod with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a ServiceMethods by Lg.
+        [HttpGet("GetServiceMethodsByLanguage", Name = "GetServiceMethodsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ServiceMethodOutputVM>> GetServiceMethodsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid ServiceMethod lg received.");
+                return BadRequest("Invalid ServiceMethod lg null ");
+            }
+
+            try
+            {
+                var servicemethods = await _servicemethodService.GetAllAsync();
+                if (servicemethods == null)
+                {
+                    _logger.LogWarning("ServiceMethods not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<ServiceMethodOutputVM>(servicemethods, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ServiceMethods with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new ServiceMethod.
         [HttpPost(Name = "CreateServiceMethod")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.PlanFeature;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a PlanFeature by Lg.
-        //[HttpGet( Name = "GetPlanFeatureByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PlanFeatureInfoVM>> GetByLg(PlanFeatureFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid PlanFeature ID received.");
-        //        return BadRequest("Invalid PlanFeature ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching PlanFeature with ID: {id}", id);
-        //        var entity = await _planfeatureService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("PlanFeature not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<PlanFeatureInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching PlanFeature with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetPlanFeatureByLanguage", Name = "GetPlanFeatureByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PlanFeatureOutputVM>> GetPlanFeatureByLg(PlanFeatureFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid PlanFeature ID received.");
+                return BadRequest("Invalid PlanFeature ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching PlanFeature with ID: {id}", id);
+                var entity = await _planfeatureService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("PlanFeature not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<PlanFeatureOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching PlanFeature with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a PlanFeatures by Lg.
+        [HttpGet("GetPlanFeaturesByLanguage", Name = "GetPlanFeaturesByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PlanFeatureOutputVM>> GetPlanFeaturesByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid PlanFeature lg received.");
+                return BadRequest("Invalid PlanFeature lg null ");
+            }
+
+            try
+            {
+                var planfeatures = await _planfeatureService.GetAllAsync();
+                if (planfeatures == null)
+                {
+                    _logger.LogWarning("PlanFeatures not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<PlanFeatureOutputVM>(planfeatures, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching PlanFeatures with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new PlanFeature.
         [HttpPost(Name = "CreatePlanFeature")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

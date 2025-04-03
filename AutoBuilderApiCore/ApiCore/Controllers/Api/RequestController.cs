@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Request;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Request by Lg.
-        //[HttpGet( Name = "GetRequestByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<RequestInfoVM>> GetByLg(RequestFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Request ID received.");
-        //        return BadRequest("Invalid Request ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Request with ID: {id}", id);
-        //        var entity = await _requestService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Request not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<RequestInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Request with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetRequestByLanguage", Name = "GetRequestByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<RequestOutputVM>> GetRequestByLg(RequestFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Request ID received.");
+                return BadRequest("Invalid Request ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Request with ID: {id}", id);
+                var entity = await _requestService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Request not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<RequestOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Request with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Requests by Lg.
+        [HttpGet("GetRequestsByLanguage", Name = "GetRequestsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<RequestOutputVM>> GetRequestsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Request lg received.");
+                return BadRequest("Invalid Request lg null ");
+            }
+
+            try
+            {
+                var requests = await _requestService.GetAllAsync();
+                if (requests == null)
+                {
+                    _logger.LogWarning("Requests not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<RequestOutputVM>(requests, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Requests with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Request.
         [HttpPost(Name = "CreateRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

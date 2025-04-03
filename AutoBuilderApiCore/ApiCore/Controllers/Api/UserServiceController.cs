@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.UserService;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a UserService by Lg.
-        //[HttpGet( Name = "GetUserServiceByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<UserServiceInfoVM>> GetByLg(UserServiceFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid UserService ID received.");
-        //        return BadRequest("Invalid UserService ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching UserService with ID: {id}", id);
-        //        var entity = await _userserviceService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("UserService not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<UserServiceInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching UserService with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetUserServiceByLanguage", Name = "GetUserServiceByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserServiceOutputVM>> GetUserServiceByLg(UserServiceFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid UserService ID received.");
+                return BadRequest("Invalid UserService ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching UserService with ID: {id}", id);
+                var entity = await _userserviceService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("UserService not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<UserServiceOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserService with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a UserServices by Lg.
+        [HttpGet("GetUserServicesByLanguage", Name = "GetUserServicesByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<UserServiceOutputVM>> GetUserServicesByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid UserService lg received.");
+                return BadRequest("Invalid UserService lg null ");
+            }
+
+            try
+            {
+                var userservices = await _userserviceService.GetAllAsync();
+                if (userservices == null)
+                {
+                    _logger.LogWarning("UserServices not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<UserServiceOutputVM>(userservices, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching UserServices with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new UserService.
         [HttpPost(Name = "CreateUserService")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

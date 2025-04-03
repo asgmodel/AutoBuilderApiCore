@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Payment;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Payment by Lg.
-        //[HttpGet( Name = "GetPaymentByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<PaymentInfoVM>> GetByLg(PaymentFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Payment ID received.");
-        //        return BadRequest("Invalid Payment ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Payment with ID: {id}", id);
-        //        var entity = await _paymentService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Payment not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<PaymentInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Payment with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetPaymentByLanguage", Name = "GetPaymentByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PaymentOutputVM>> GetPaymentByLg(PaymentFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Payment ID received.");
+                return BadRequest("Invalid Payment ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Payment with ID: {id}", id);
+                var entity = await _paymentService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Payment not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<PaymentOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Payment with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Payments by Lg.
+        [HttpGet("GetPaymentsByLanguage", Name = "GetPaymentsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<PaymentOutputVM>> GetPaymentsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Payment lg received.");
+                return BadRequest("Invalid Payment lg null ");
+            }
+
+            try
+            {
+                var payments = await _paymentService.GetAllAsync();
+                if (payments == null)
+                {
+                    _logger.LogWarning("Payments not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<PaymentOutputVM>(payments, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Payments with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Payment.
         [HttpPost(Name = "CreatePayment")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

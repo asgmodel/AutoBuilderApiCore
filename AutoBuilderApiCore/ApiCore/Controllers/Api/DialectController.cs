@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.Dialect;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a Dialect by Lg.
-        //[HttpGet( Name = "GetDialectByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<DialectInfoVM>> GetByLg(DialectFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid Dialect ID received.");
-        //        return BadRequest("Invalid Dialect ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching Dialect with ID: {id}", id);
-        //        var entity = await _dialectService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("Dialect not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<DialectInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching Dialect with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetDialectByLanguage", Name = "GetDialectByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<DialectOutputVM>> GetDialectByLg(DialectFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid Dialect ID received.");
+                return BadRequest("Invalid Dialect ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching Dialect with ID: {id}", id);
+                var entity = await _dialectService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("Dialect not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<DialectOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Dialect with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a Dialects by Lg.
+        [HttpGet("GetDialectsByLanguage", Name = "GetDialectsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<DialectOutputVM>> GetDialectsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid Dialect lg received.");
+                return BadRequest("Invalid Dialect lg null ");
+            }
+
+            try
+            {
+                var dialects = await _dialectService.GetAllAsync();
+                if (dialects == null)
+                {
+                    _logger.LogWarning("Dialects not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<DialectOutputVM>(dialects, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching Dialects with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new Dialect.
         [HttpPost(Name = "CreateDialect")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

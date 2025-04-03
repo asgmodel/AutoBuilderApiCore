@@ -56,7 +56,7 @@ else
     {
         
         NameRootApi = "ApiCore"
-        , IsAutoBuild = false,
+        ,IsAutoBuild = false,
         IsMapper = true,
         Assembly = Assembly.GetExecutingAssembly()
     });

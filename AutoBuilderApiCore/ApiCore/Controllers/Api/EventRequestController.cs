@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.EventRequest;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a EventRequest by Lg.
-        //[HttpGet( Name = "GetEventRequestByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<EventRequestInfoVM>> GetByLg(EventRequestFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid EventRequest ID received.");
-        //        return BadRequest("Invalid EventRequest ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching EventRequest with ID: {id}", id);
-        //        var entity = await _eventrequestService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("EventRequest not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<EventRequestInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching EventRequest with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetEventRequestByLanguage", Name = "GetEventRequestByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EventRequestOutputVM>> GetEventRequestByLg(EventRequestFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid EventRequest ID received.");
+                return BadRequest("Invalid EventRequest ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching EventRequest with ID: {id}", id);
+                var entity = await _eventrequestService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("EventRequest not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<EventRequestOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching EventRequest with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a EventRequests by Lg.
+        [HttpGet("GetEventRequestsByLanguage", Name = "GetEventRequestsByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<EventRequestOutputVM>> GetEventRequestsByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid EventRequest lg received.");
+                return BadRequest("Invalid EventRequest lg null ");
+            }
+
+            try
+            {
+                var eventrequests = await _eventrequestService.GetAllAsync();
+                if (eventrequests == null)
+                {
+                    _logger.LogWarning("EventRequests not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<EventRequestOutputVM>(eventrequests, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching EventRequests with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new EventRequest.
         [HttpPost(Name = "CreateEventRequest")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

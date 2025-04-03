@@ -3,9 +3,10 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using ApiCore.Services.Services;
 using Microsoft.AspNetCore.Mvc;
-using ApiCore.DyModels.VM.ModelGateway;
+using ApiCore.DyModels.VMs;
 using System.Linq.Expressions;
 using ApiCore.DyModels.Dso.Requests;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.Controllers.Api
@@ -80,36 +81,71 @@ namespace ApiCore.Controllers.Api
         }
 
         // // Get a ModelGateway by Lg.
-        //[HttpGet( Name = "GetModelGatewayByLg")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        //public async Task<ActionResult<ModelGatewayInfoVM>> GetByLg(ModelGatewayFilterVM model)
-        //{
-        //     var id=model.Id;
-        //    if (string.IsNullOrWhiteSpace(id))
-        //    {
-        //        _logger.LogWarning("Invalid ModelGateway ID received.");
-        //        return BadRequest("Invalid ModelGateway ID.");
-        //    }
-        //    try
-        //    {
-        //        _logger.LogInformation("Fetching ModelGateway with ID: {id}", id);
-        //        var entity = await _modelgatewayService.GetByIdAsync(id);
-        //        if (entity == null)
-        //        {
-        //            _logger.LogWarning("ModelGateway not found with ID: {id}", id);
-        //            return NotFound();
-        //        }
-        //        var item = _mapper.Map<ModelGatewayInfoVM>(entity);
-        //        return Ok(item);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, "Error while fetching ModelGateway with ID: {id}", id);
-        //        return StatusCode(500, "Internal Server Error");
-        //    }
-        //}
+        [HttpGet("GetModelGatewayByLanguage", Name = "GetModelGatewayByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ModelGatewayOutputVM>> GetModelGatewayByLg(ModelGatewayFilterVM model)
+        {
+            var id = model.Id;
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                _logger.LogWarning("Invalid ModelGateway ID received.");
+                return BadRequest("Invalid ModelGateway ID.");
+            }
+
+            try
+            {
+                _logger.LogInformation("Fetching ModelGateway with ID: {id}", id);
+                var entity = await _modelgatewayService.GetByIdAsync(id);
+                if (entity == null)
+                {
+                    _logger.LogWarning("ModelGateway not found with ID: {id}", id);
+                    return NotFound();
+                }
+
+                var item = _mapper.Map<ModelGatewayOutputVM>(entity, opt => opt.Items.Add(HelperTranslation.KEYLG, model.Lg));
+                return Ok(item);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ModelGateway with ID: {id}", id);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
+        // // Get a ModelGateways by Lg.
+        [HttpGet("GetModelGatewaysByLanguage", Name = "GetModelGatewaysByLg")]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ModelGatewayOutputVM>> GetModelGatewaysByLg(string? lg)
+        {
+            if (string.IsNullOrWhiteSpace(lg))
+            {
+                _logger.LogWarning("Invalid ModelGateway lg received.");
+                return BadRequest("Invalid ModelGateway lg null ");
+            }
+
+            try
+            {
+                var modelgateways = await _modelgatewayService.GetAllAsync();
+                if (modelgateways == null)
+                {
+                    _logger.LogWarning("ModelGateways not found  by  ");
+                    return NotFound();
+                }
+
+                var items = _mapper.Map<ModelGatewayOutputVM>(modelgateways, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                return Ok(items);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching ModelGateways with Lg: {lg}", lg);
+                return StatusCode(500, "Internal Server Error");
+            }
+        }
+
         // Create a new ModelGateway.
         [HttpPost(Name = "CreateModelGateway")]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

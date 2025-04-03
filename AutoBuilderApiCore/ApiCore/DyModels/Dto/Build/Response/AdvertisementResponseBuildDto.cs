@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using AutoGenerator;
+using AutoGenerator.Helper.Translation;
 using AutoGenerator.Models;
 using System;
 
@@ -11,8 +12,8 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        public ITranslationData? Title { get; set; }
-        public ITranslationData? Description { get; set; }
+        public TranslationData? Title { get; set; }
+        public TranslationData? Description { get; set; }
         /// <summary>
         /// Image property for DTO.
         /// </summary>

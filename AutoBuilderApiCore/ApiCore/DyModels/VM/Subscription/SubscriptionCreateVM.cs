@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -33,12 +34,8 @@ namespace ApiCore.DyModels.VMs
         public Nullable<DateTime> CanceledAt { get; set; }
         ///
         public String? PlanId { get; set; }
-        //
-        public PlanCreateVM? Plan { get; set; }
         ///
         public String? UserId { get; set; }
-        //
-        public ApplicationUserCreateVM? User { get; set; }
         //
         public ICollection<RequestCreateVM>? Requests { get; set; }
         //

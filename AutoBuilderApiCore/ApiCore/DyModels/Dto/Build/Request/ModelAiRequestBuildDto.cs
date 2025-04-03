@@ -1,5 +1,6 @@
 using Microsoft.CodeAnalysis;
 using AutoGenerator;
+using AutoGenerator.Helper.Translation;
 using AutoGenerator.Models;
 using System;
 
@@ -11,7 +12,7 @@ namespace ApiCore.DyModels.Dto.Build.Requests
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        public ITranslationData? Name { get; set; }
+        public TranslationData? Name { get; set; }
         /// <summary>
         /// Token property for DTO.
         /// </summary>
@@ -20,11 +21,11 @@ namespace ApiCore.DyModels.Dto.Build.Requests
         /// AbsolutePath property for DTO.
         /// </summary>
         public String? AbsolutePath { get; set; }
-        public ITranslationData? Category { get; set; }
-        public ITranslationData? Language { get; set; }
-        public ITranslationData? IsStandard { get; set; }
-        public ITranslationData? Gender { get; set; }
-        public ITranslationData? Dialect { get; set; }
+        public TranslationData? Category { get; set; }
+        public TranslationData? Language { get; set; }
+        public TranslationData? IsStandard { get; set; }
+        public TranslationData? Gender { get; set; }
+        public TranslationData? Dialect { get; set; }
         /// <summary>
         /// Type property for DTO.
         /// </summary>

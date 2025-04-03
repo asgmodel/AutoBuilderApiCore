@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -17,7 +18,5 @@ namespace ApiCore.DyModels.VMs
         public string? Description { get; set; }
         ///
         public String? LanguageId { get; set; }
-        //
-        public LanguageOutputVM? Language { get; set; }
     }
 }

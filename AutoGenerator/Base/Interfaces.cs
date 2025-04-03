@@ -48,9 +48,12 @@ namespace AutoGenerator
 
 
 
-    public interface ITranslationData:ITBase
+    public interface ITranslationData
     {
         Dictionary<string, string>? Value { get; set; }
+
+
+        string? ToFilter(string? lg);
     }
 
 }

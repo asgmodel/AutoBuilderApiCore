@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -19,7 +20,5 @@ namespace ApiCore.DyModels.VMs
         public String? OutputParameters { get; set; }
         ///
         public String? ServiceId { get; set; }
-        //
-        public ServiceOutputVM? Service { get; set; }
     }
 }

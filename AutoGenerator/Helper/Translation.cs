@@ -9,13 +9,7 @@ namespace AutoGenerator.Helper.Translation
         public T Value { get; set; }
         public string LG { get; set; }
     }
-    public interface ITranslationData
-    {
-        Dictionary<string, string>? Value { get; set; }
 
-
-        string? ToFilter(string? lg);
-    }
     public  class TranslationData: ITranslationData
     {
 

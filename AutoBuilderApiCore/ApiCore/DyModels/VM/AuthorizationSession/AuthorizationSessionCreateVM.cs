@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -23,8 +24,6 @@ namespace ApiCore.DyModels.VMs
         public Boolean IsActive { get; set; }
         ///
         public String? UserId { get; set; }
-        //
-        public ApplicationUserCreateVM? User { get; set; }
         ///
         public String? IpAddress { get; set; }
         ///

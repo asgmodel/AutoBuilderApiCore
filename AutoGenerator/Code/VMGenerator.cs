@@ -85,7 +85,9 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
                     Usings = new List<string>
                         {
                             "AutoGenerator",
-                            "AutoGenerator.Models"
+                            "AutoGenerator.Models",
+                            "AutoGenerator.Helper.Translation"
+
 
 
 
@@ -210,9 +212,7 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
             // إذا كان النوع من ضمن القائمة models
             if (models.Contains(prop.PropertyType))
             {
-                propertyDeclarations.AppendLine($@"
-        //
-        public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }}");
+               
             }
             // إذا كانت الخاصية من نوع Collection
             else if (prop.PropertyType.IsCollection())
@@ -267,7 +267,7 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
     {
         return $@"
             //
-            public ITranslationData? {name} {{ get; set; }}";
+            public TranslationData? {name} {{ get; set; }}";
     }
 }
 

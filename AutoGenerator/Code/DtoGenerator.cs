@@ -20,7 +20,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     public static string getPTrns(string name)
     {
         return $@"
-            public ITranslationData? {name} {{ get; set; }}";
+            public TranslationData? {name} {{ get; set; }}";
     }
 
 
@@ -83,7 +83,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
                 NamespaceName = $"{root}.DyModels.{type}.{subtype}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
-                Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" , "AutoGenerator.Models" }
+                Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" ,"AutoGenerator.Helper.Translation", "AutoGenerator.Models" }
 
             };
 

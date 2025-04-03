@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -10,8 +11,8 @@ namespace ApiCore.DyModels.VMs
     public class CategoryModelCreateVM : ITVM
     {
         //
-        public ITranslationData? Name { get; set; }
+        public TranslationData? Name { get; set; }
         //
-        public ITranslationData? Description { get; set; }
+        public TranslationData? Description { get; set; }
     }
 }

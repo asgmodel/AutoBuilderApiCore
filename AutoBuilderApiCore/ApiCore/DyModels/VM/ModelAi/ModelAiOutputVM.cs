@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -31,8 +32,6 @@ namespace ApiCore.DyModels.VMs
         public String? Type { get; set; }
         ///
         public String? ModelGatewayId { get; set; }
-        //
-        public ModelGatewayOutputVM? ModelGateway { get; set; }
         //
         public ICollection<ServiceOutputVM>? Services { get; set; }
         //

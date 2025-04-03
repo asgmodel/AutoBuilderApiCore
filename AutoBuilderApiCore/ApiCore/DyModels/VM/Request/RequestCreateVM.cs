@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -25,20 +26,12 @@ namespace ApiCore.DyModels.VMs
         public DateTime UpdatedAt { get; set; }
         ///
         public String? UserId { get; set; }
-        //
-        public ApplicationUserCreateVM? User { get; set; }
         ///
         public String? SubscriptionId { get; set; }
-        //
-        public SubscriptionCreateVM? Subscription { get; set; }
         ///
         public String? ServiceId { get; set; }
-        //
-        public ServiceCreateVM? Service { get; set; }
         ///
         public String? SpaceId { get; set; }
-        //
-        public SpaceCreateVM? Space { get; set; }
         //
         public ICollection<EventRequestCreateVM>? Events { get; set; }
     }

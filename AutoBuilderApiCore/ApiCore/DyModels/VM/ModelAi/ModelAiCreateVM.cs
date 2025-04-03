@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -10,27 +11,25 @@ namespace ApiCore.DyModels.VMs
     public class ModelAiCreateVM : ITVM
     {
         //
-        public ITranslationData? Name { get; set; }
+        public TranslationData? Name { get; set; }
         ///
         public String? Token { get; set; }
         ///
         public String? AbsolutePath { get; set; }
         //
-        public ITranslationData? Category { get; set; }
+        public TranslationData? Category { get; set; }
         //
-        public ITranslationData? Language { get; set; }
+        public TranslationData? Language { get; set; }
         //
-        public ITranslationData? IsStandard { get; set; }
+        public TranslationData? IsStandard { get; set; }
         //
-        public ITranslationData? Gender { get; set; }
+        public TranslationData? Gender { get; set; }
         //
-        public ITranslationData? Dialect { get; set; }
+        public TranslationData? Dialect { get; set; }
         ///
         public String? Type { get; set; }
         ///
         public String? ModelGatewayId { get; set; }
-        //
-        public ModelGatewayCreateVM? ModelGateway { get; set; }
         //
         public ICollection<ServiceCreateVM>? Services { get; set; }
         //

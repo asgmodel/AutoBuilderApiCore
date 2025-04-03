@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -10,9 +11,9 @@ namespace ApiCore.DyModels.VMs
     public class AdvertisementCreateVM : ITVM
     {
         //
-        public ITranslationData? Title { get; set; }
+        public TranslationData? Title { get; set; }
         //
-        public ITranslationData? Description { get; set; }
+        public TranslationData? Description { get; set; }
         ///
         public String? Image { get; set; }
         ///

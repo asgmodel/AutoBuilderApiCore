@@ -1,5 +1,6 @@
 using AutoGenerator;
 using AutoGenerator.Models;
+using AutoGenerator.Helper.Translation;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -21,7 +22,5 @@ namespace ApiCore.DyModels.VMs
         public String? Currency { get; set; }
         ///
         public DateOnly Date { get; set; }
-        //
-        public InvoiceCreateVM? Invoice { get; set; }
     }
 }

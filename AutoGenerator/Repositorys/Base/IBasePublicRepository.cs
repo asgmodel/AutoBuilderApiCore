@@ -2,7 +2,7 @@
 
 namespace AutoGenerator.Repositorys.Base
 {
-    public interface IBasePublicRepository<TRequest, TResponse> 
+    public interface IBasePublicRepository<TRequest, TResponse>
           where TRequest : class
           where TResponse : class
     {
@@ -22,8 +22,15 @@ namespace AutoGenerator.Repositorys.Base
         Task<bool> ExistsAsync(Expression<Func<TResponse, bool>> predicate);
         Task<int> CountAsync();
 
-   
+        Task<TResponse?> FindAsync(params object[] id);
+        Task<bool> ExistsAsync(object value, string name = "Id");
 
+        Task<PagedResponse<TResponse>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10);
+        Task<TResponse?> GetByIdAsync(object id);
+        Task DeleteAllAsync();
+        Task DeleteAsync(TRequest entity);
+        Task DeleteAsync(object value, string key = "Id");
+        Task DeleteRange(List<TRequest> entities);
     }
 
 

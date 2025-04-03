@@ -15,9 +15,10 @@ namespace AutoGenerator.Repositorys.Builder
     {
         //   يمكن فقط اضافة الدوال العامه      المتعلقة بالطبقة   
         Task<IEnumerable<TBuildResponseDto>> GetAllAsync(Expression<Func<TBuildResponseDto, bool>>? filter = null, Func<IQueryable<TBuildResponseDto>, IQueryable<TBuildResponseDto>>? include = null, Expression<Func<TBuildResponseDto, object>>? order = null);
+        Task<TBuildResponseDto?> GetByIdAsync(object id);
 
     }
-    public abstract  class BaseBuilderRepository<TModel, TBuildRequestDto, TBuildResponseDto> : IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto>,ITBuildRepository
+    public abstract class BaseBuilderRepository<TModel, TBuildRequestDto, TBuildResponseDto> : IBaseBuilderRepository<TBuildRequestDto, TBuildResponseDto>, ITBuildRepository
       where TModel : class
       where TBuildRequestDto : class
       where TBuildResponseDto : class
@@ -25,7 +26,7 @@ namespace AutoGenerator.Repositorys.Builder
 
         protected readonly IBaseRepository<TModel> _repository;
         private readonly IMapper _mapper;
-        protected readonly  ILogger _logger;
+        protected readonly ILogger _logger;
         public BaseBuilderRepository(DataContext dbContext, IMapper mapper, ILogger logger)
         {
 
@@ -37,7 +38,7 @@ namespace AutoGenerator.Repositorys.Builder
             _repository = new BaseRepository<TModel>(dbContext, logger);
             _mapper = mapper;
             _logger = logger;
-           
+
         }
 
         #region Get Methods
@@ -57,7 +58,7 @@ namespace AutoGenerator.Repositorys.Builder
         public async Task<TBuildResponseDto?> FindAsync(Expression<Func<TBuildResponseDto, bool>> predicate)
         {
 
-            return null; 
+            return null;
         }
 
         public IQueryable<TBuildResponseDto> GetQueryable()
@@ -66,6 +67,13 @@ namespace AutoGenerator.Repositorys.Builder
             return entities.Select(e => _mapper.Map<TBuildResponseDto>(e)).AsQueryable();
         }
 
+        public IQueryable<TBuildResponseDto> GetQueryable(bool noTracking = true, params string[]? includes)
+        {
+            var query = _repository.GetQueryable(noTracking: noTracking, includes: includes)
+                .ProjectTo<TBuildResponseDto>(_mapper.ConfigurationProvider);
+            return query;
+            //return entities.Select(e => _mapper.Map<TBuildResponseDto>(e)).AsQueryable();
+        }
         #endregion
 
         #region Create Methods
@@ -73,18 +81,18 @@ namespace AutoGenerator.Repositorys.Builder
         public async Task<TBuildResponseDto> CreateAsync(TBuildRequestDto entity)
         {
             var modelEntity = _mapper.Map<TModel>(entity);
-            modelEntity= await _repository.CreateAsync(modelEntity);
+            modelEntity = await _repository.CreateAsync(modelEntity);
             return _mapper.Map<TBuildResponseDto>(modelEntity);
         }
 
         public async Task<IEnumerable<TBuildResponseDto>> CreateRangeAsync(IEnumerable<TBuildRequestDto> entities)
         {
             var modelModels = _mapper.Map<IEnumerable<TModel>>(entities);
-            
+
             var listdto = new List<TBuildResponseDto>();
             foreach (var model in modelModels)
             {
-              var bresp=  await _repository.CreateAsync(model);
+                var bresp = await _repository.CreateAsync(model);
                 listdto.Add(_mapper.Map<TBuildResponseDto>(bresp));
             }
             return listdto;
@@ -97,7 +105,7 @@ namespace AutoGenerator.Repositorys.Builder
         public async Task<TBuildResponseDto> UpdateAsync(TBuildRequestDto entity)
         {
             var modelEntity = _mapper.Map<TModel>(entity);
-            modelEntity= await _repository.UpdateAsync(modelEntity);
+            modelEntity = await _repository.UpdateAsync(modelEntity);
             return _mapper.Map<TBuildResponseDto>(modelEntity);
         }
 
@@ -148,10 +156,9 @@ namespace AutoGenerator.Repositorys.Builder
         {
             throw new NotImplementedException();
         }
-
         #endregion
 
-        public async  Task<IEnumerable<TBuildResponseDto>> GetAllAsync(Expression<Func<TBuildResponseDto, bool>>? filter = null, Func<IQueryable<TBuildResponseDto>, IQueryable<TBuildResponseDto>>? include = null, Expression<Func<TBuildResponseDto, object>>? order = null)
+        public async Task<IEnumerable<TBuildResponseDto>> GetAllAsync(Expression<Func<TBuildResponseDto, bool>>? filter = null, Func<IQueryable<TBuildResponseDto>, IQueryable<TBuildResponseDto>>? include = null, Expression<Func<TBuildResponseDto, object>>? order = null)
         {
             var entities = await _repository.Get()
                 .ProjectTo<TBuildResponseDto>(_mapper.ConfigurationProvider)
@@ -168,7 +175,7 @@ namespace AutoGenerator.Repositorys.Builder
         }
 
 
-        protected TBuildResponseDto MapToBuildResponseDto( TModel model)
+        protected TBuildResponseDto MapToBuildResponseDto(TModel model)
         {
             if (model == null)
             {
@@ -176,6 +183,16 @@ namespace AutoGenerator.Repositorys.Builder
             }
 
             return _mapper.Map<TBuildResponseDto>(model);
+        }
+
+        protected IEnumerable<TBuildResponseDto> MapToBuildResponseDto(IEnumerable<TModel> model)
+        {
+            if (model == null)
+            {
+                throw new ArgumentNullException(nameof(model), "The share response DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TBuildResponseDto>>(model);
         }
 
         protected IEnumerable<TBuildResponseDto> MapToIEnumerableBuildResponseDto(IEnumerable<TModel> models)
@@ -188,18 +205,15 @@ namespace AutoGenerator.Repositorys.Builder
             return _mapper.Map<IEnumerable<TBuildResponseDto>>(models);
         }
 
-
-
-        protected TModel MapToBuildRequestDto(TBuildRequestDto  requestDto)
+        protected TModel MapToBuildRequestDto(TBuildRequestDto requestDto)
         {
-            if (requestDto == null )
+            if (requestDto == null)
             {
                 throw new ArgumentNullException(nameof(requestDto), "The share request DTO cannot be null.");
             }
 
             return _mapper.Map<TModel>(requestDto);
         }
-
 
         protected IEnumerable<TModel> MapTIEnumerableBuildRequestDto(IEnumerable<TBuildRequestDto> requestDto)
         {
@@ -211,8 +225,47 @@ namespace AutoGenerator.Repositorys.Builder
             return _mapper.Map<IEnumerable<TModel>>(requestDto);
         }
 
+        public async Task<TBuildResponseDto?> GetByIdAsync(object id)
+        {
+            return await FindAsync(id);
+        }
 
+        public async Task<TBuildResponseDto?> FindAsync(params object[] id)
+        {
+            var entity = await _repository.FindModelAsync(id);
+            return entity != null ? _mapper.Map<TBuildResponseDto>(entity) : null;
+        }
 
+        public async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            return await _repository.ExistsAsync(e => EF.Property<object>(e, name) == value);
+        }
+
+        public async Task<PagedResponse<TBuildResponseDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            var query = GetQueryable(true, includes);
+            return await query.ToPagedResponseAsync(pageNumber, pageSize);
+        }
+
+        public Task DeleteAsync(TBuildRequestDto entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task DeleteAsync(object value, string key = "Id")
+        {
+            await _repository.RemoveAsync(e => EF.Property<object>(e, key) == key);
+        }
+
+        public async Task DeleteRange(List<TBuildRequestDto> entities)
+        {
+            await _repository.RemoveRange(MapTIEnumerableBuildRequestDto(entities));
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            await _repository.RemoveAllAsync();
+        }
     }
 
 

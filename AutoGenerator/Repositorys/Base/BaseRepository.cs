@@ -1,14 +1,7 @@
-
-using AutoGenerator;
 using AutoGenerator.Data;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
 namespace AutoGenerator.Repositorys.Base
 {
     public class RepositoryException : Exception
@@ -36,6 +29,13 @@ namespace AutoGenerator.Repositorys.Base
         Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, Func<IQueryable<T>, IQueryable<T>>? include = null, int skip = 0, int take = 0, Expression<Func<T, object>>? order = null);
         Task RemoveAllAsync();
         IQueryable<T> Get(Expression<Func<T, bool>>? expression = null);
+
+        Task<PagedResponse<T>> GetAllAsPaginateAsync(int pageNumber = 1, int pageSize = 10);
+        Task<T> GetBy2Async(Expression<Func<T, bool>> filter, string[]? includes = null, bool noTracking = true);
+        Task<T?> FindModelAsync(params object[] id);
+        Task<int> RemoveRange(IEnumerable<T> entities);
+        Task<bool> ExistsAsync(Expression<Func<T, bool>> filter);
+        IQueryable<T> GetQueryable(string[]? includes = null, bool noTracking = true);
     }
 
     public sealed class BaseRepository<T> : IBaseRepository<T> where T : class
@@ -76,7 +76,6 @@ namespace AutoGenerator.Repositorys.Base
         public IBaseRepository<T> Include(Func<IQueryable<T>, IQueryable<T>> include)
         {
             query = include(Get());
-           
             return this;
 
         }
@@ -88,7 +87,7 @@ namespace AutoGenerator.Repositorys.Base
                 query = query.Include(include);
             }
             return this;
-     
+
         }
 
         public async Task<T> GetByAsync(Expression<Func<T, bool>> filter, Func<IQueryable<T>, IQueryable<T>>? setInclude = null, bool tracked = false)
@@ -111,7 +110,7 @@ namespace AutoGenerator.Repositorys.Base
         {
             try
             {
-              var  item=  (await _dbSet.AddAsync(entity)).Entity;
+                var item = (await _dbSet.AddAsync(entity)).Entity;
                 await SaveAsync();
                 return item;
             }
@@ -127,7 +126,7 @@ namespace AutoGenerator.Repositorys.Base
             try
             {
                 _db.ChangeTracker.Clear();
-             var item=   _dbSet.Update(entity).Entity;
+                var item = _dbSet.Update(entity).Entity;
                 await SaveAsync();
                 return item;
             }
@@ -257,19 +256,145 @@ namespace AutoGenerator.Repositorys.Base
             }
         }
 
-        public Task RemoveRange(List<T> entities)
+        public async Task RemoveRange(List<T> entities)
         {
-            throw new NotImplementedException();
+            try
+            {
+                _dbSet.RemoveRange(entities);
+                await SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing entity");
+                throw new RepositoryException("Error removing entity", ex);
+            }
         }
 
         public IQueryable<T> GetAll(Expression<Func<T, bool>>? filter = null, string[]? includes = null, int skip = 0, int take = 0, bool isOrdered = false, Expression<Func<T, long>>? order = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                query = query.AsNoTracking();
+                if (includes != null) Includes(includes);
+                return query;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
         }
 
-        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, Func<IQueryable<T>, IQueryable<T>>? include = null, int skip = 0, int take = 0, Expression<Func<T, object>>? order = null)
+        public async Task<List<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, Func<IQueryable<T>, IQueryable<T>>? include = null, int skip = 0, int take = 0, Expression<Func<T, object>>? order = null)
         {
-            throw new NotImplementedException();
+            try
+            {
+                query = query.AsNoTracking();
+                if (filter != null) query = query.Where(filter);
+                if (include != null) Include(include);
+                return await query.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
+        }
+
+        public async Task<PagedResponse<T>> GetAllAsPaginateAsync(int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                return await query.AsNoTracking()
+                    .ToPagedResponseAsync<T>(pageNumber, pageSize);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
+        }
+
+        public async Task<T> GetBy2Async(Expression<Func<T, bool>> filter, string[]? includes = null, bool noTracking = true)
+        {
+            try
+            {
+                if (noTracking) query = query.AsNoTracking();
+                if (filter != null) query = query.Where(filter);
+                if (includes != null) Includes(includes);
+                return await query.FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
+        }
+
+        public async Task<T?> FindModelAsync(params object[] id)
+        {
+            var entity = await _dbSet.FindAsync(id);
+            return entity;
+        }
+
+
+        public async Task<int> RemoveRange(IEnumerable<T> entities)
+        {
+            try
+            {
+                _dbSet.RemoveRange(entities);
+                return await SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing entity");
+                throw new RepositoryException("Error removing entity", ex);
+            }
+        }
+
+        public async Task<bool> ExistsAsync(Expression<Func<T, bool>> filter)
+        {
+            try
+            {
+                return await _dbSet.AnyAsync(filter);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking existence");
+                throw new RepositoryException("Error checking existence", ex);
+            }
+        }
+
+        public IQueryable<T> GetQueryable(string[]? includes = null, bool noTracking = true)
+        {
+            try
+            {
+                if (noTracking) query = query.AsNoTracking();
+                if (includes != null) Includes(includes);
+                return query;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
+        }
+    }
+
+    public static class PagedResponseExtensions
+    {
+        public static async Task<PagedResponse<T>> ToPagedResponseAsync<T>(
+            this IQueryable<T> query,
+            int pageNumber,
+            int pageSize)
+        {
+            var totalRecords = await query.CountAsync();
+            var data = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResponse<T>(data, pageNumber, pageSize, totalRecords);
         }
     }
 }

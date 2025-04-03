@@ -7,14 +7,14 @@ using System.Linq.Expressions;
 
 namespace AutoGenerator.Services.Base
 {
-    public interface IBaseService: ITBaseService
+    public interface IBaseService : ITBaseService
     {
     }
-    public abstract class BaseService<TServiceRequestDso, TServiceResponseDso> : IBasePublicRepository<TServiceRequestDso, TServiceResponseDso >, IBaseService
+    public abstract class BaseService<TServiceRequestDso, TServiceResponseDso> : IBasePublicRepository<TServiceRequestDso, TServiceResponseDso>, IBaseService
       where TServiceRequestDso : class
       where TServiceResponseDso : class
     {
-        private readonly   IMapper _mapper;
+        private readonly IMapper _mapper;
 
         protected readonly ILogger _logger;
 
@@ -36,7 +36,7 @@ namespace AutoGenerator.Services.Base
 
         private static bool IsAllowCreate()
         {
-            return 
+            return
                    typeof(ITDso).IsAssignableFrom(typeof(TServiceRequestDso)) &&
                    typeof(ITDso).IsAssignableFrom(typeof(TServiceResponseDso));
         }
@@ -92,6 +92,46 @@ namespace AutoGenerator.Services.Base
         }
 
         public virtual Task<int> CountAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TServiceResponseDso?> FindAsync(params object[] id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PagedResponse<TServiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TServiceResponseDso?> GetByIdAsync(object id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(TServiceRequestDso entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(object value, string key = "Id")
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteRange(List<TServiceRequestDso> entities)
         {
             throw new NotImplementedException();
         }

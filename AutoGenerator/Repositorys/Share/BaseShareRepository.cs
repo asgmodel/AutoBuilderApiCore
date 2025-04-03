@@ -3,7 +3,6 @@
 
 using AutoGenerator.Repositorys.Base;
 using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
@@ -12,7 +11,7 @@ namespace AutoGenerator.Repositorys.Share
     public interface IBaseShareRepository<TShareRequestDto, TShareResponseDto> : IBasePublicRepository<TShareRequestDto, TShareResponseDto>, ITBaseShareRepository
         where TShareRequestDto : class
         where TShareResponseDto : class
-  
+
     {
 
     }
@@ -69,6 +68,17 @@ namespace AutoGenerator.Repositorys.Share
             }
 
             return _mapper.Map<TShareResponseDto>(buildResponseDto);
+        }
+
+        protected IEnumerable<TShareResponseDto> MapToShareResponseDto(IEnumerable<TBuildResponseDto> buildResponseDto)
+        {
+            if (buildResponseDto == null)
+            {
+                _logger.LogError("Mapping failed: TBuildResponseDto is null.");
+                throw new ArgumentNullException(nameof(buildResponseDto), "The build response DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TShareResponseDto>>(buildResponseDto);
         }
 
         protected TShareResponseDto MapToShareResponseDto(TShareRequestDto shareRequestDto)
@@ -151,12 +161,12 @@ namespace AutoGenerator.Repositorys.Share
             throw new NotImplementedException();
         }
 
-        public virtual  Task DeleteAsync(string id)
+        public virtual Task DeleteAsync(string id)
         {
             throw new NotImplementedException();
         }
 
-        public virtual  Task DeleteRangeAsync(Expression<Func<TShareResponseDto, bool>> predicate)
+        public virtual Task DeleteRangeAsync(Expression<Func<TShareResponseDto, bool>> predicate)
         {
             throw new NotImplementedException();
         }
@@ -167,6 +177,46 @@ namespace AutoGenerator.Repositorys.Share
         }
 
         public virtual Task<int> CountAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TShareResponseDto?> FindAsync(params object[] id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<PagedResponse<TShareResponseDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<TShareResponseDto?> GetByIdAsync(object id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAllAsync()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(TShareRequestDto entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAsync(object value, string key = "Id")
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteRange(List<TShareRequestDto> entities)
         {
             throw new NotImplementedException();
         }

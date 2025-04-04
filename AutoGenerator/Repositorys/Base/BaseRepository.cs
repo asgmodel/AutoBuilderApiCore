@@ -111,7 +111,7 @@ namespace AutoGenerator.Repositorys.Base
             try
             {
                 var item = (await _dbSet.AddAsync(entity)).Entity;
-                await SaveAsync();
+              //  await SaveAsync();
                 return item;
             }
             catch (Exception ex)

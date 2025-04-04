@@ -6,6 +6,7 @@ using AutoGenerator.Repositorys.Share;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using System.Security.Cryptography;
 
 namespace AutoGenerator.Config
 {
@@ -119,16 +120,31 @@ namespace AutoGenerator.Config
                     foreach (var dto in dtoMatches)
                     {
 
-                        CreateMap(model, dto).ReverseMap().ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                        CreateMap(model, dto).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                         {
+                            Dictionary<string, object>? items = new Dictionary<string, object>();
                             try
                             {
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember, context.Items);
+                                items = context.Items;
                             }
-                            catch (Exception ex)
+                            catch { }
+
+                            return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+
+                        }));
+
+                        CreateMap(dto,model).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                        {
+
+                            Dictionary<string, object>? items = new Dictionary<string, object>();
+                            try
                             {
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember, null);
+                                items = context.Items;
                             }
+                            catch { }
+
+                            return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+
                         }));
 
                         if (!CheckIgnoreAutomateMapper(dto))
@@ -168,17 +184,32 @@ namespace AutoGenerator.Config
                     {
                         if (!CheckIgnoreAutomateMapper(vm))
                         {
-                            CreateMap(dso, vm).ReverseMap().ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                            CreateMap(dso, vm).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                             {
+                                Dictionary<string,object>? items=new Dictionary<string, object>();
                                 try
                                 {
-                                    return HelperTranslation.MapToTranslationData(src, dest, destMember, context.Items);
+                                     items = context.Items;
                                 }
-                                catch (Exception ex)
+                                catch { }
+
+                                return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+
+                            }));
+
+                            CreateMap(vm,dso).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                            {
+
+                                Dictionary<string, object>? items = new Dictionary<string, object>();
+                                try
                                 {
-                                    return HelperTranslation.MapToTranslationData(src, dest, destMember, null);
+                                    items = context.Items;
                                 }
-                            })); ;
+                                catch { }
+
+                                return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+
+                            }));
                         }
                     }
                 }

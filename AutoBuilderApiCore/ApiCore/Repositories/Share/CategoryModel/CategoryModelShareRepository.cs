@@ -1,19 +1,20 @@
-using AutoGenerator.Data;
-using AutoMapper;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using AutoGenerator.Repositorys.Builder;
 using ApiCore.DyModels.Dto.Build.Requests;
 using ApiCore.DyModels.Dto.Build.Responses;
-using AutoGenerator.Models;
 using ApiCore.DyModels.Dto.Share.Requests;
 using ApiCore.DyModels.Dto.Share.Responses;
 using ApiCore.Repositorys.Builder;
-using AutoGenerator.Repositorys.Share;
-using System.Linq.Expressions;
-using AutoGenerator.Repositorys.Base;
 using AutoGenerator;
+using AutoGenerator.Data;
+using AutoGenerator.Helper.Translation;
+using AutoGenerator.Models;
+using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Repositorys.Builder;
+using AutoGenerator.Repositorys.Share;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 
 namespace ApiCore.Repositorys.Share
 {
@@ -24,7 +25,7 @@ namespace ApiCore.Repositorys.Share
     {
         // Declare the builder repository.
         private readonly CategoryModelBuilderRepository _builder;
-        /// <summary>
+        /// <1summary>
         /// Constructor for CategoryModelShareRepository.
         /// </summary>
         public CategoryModelShareRepository(DataContext dbContext, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
@@ -79,6 +80,36 @@ namespace ApiCore.Repositorys.Share
         /// </summary>
         public override async Task<IEnumerable<CategoryModelResponseShareDto>> GetAllAsync()
         {
+
+
+            TranslationData translation = new TranslationData
+            {
+                Value = new Dictionary<string, string>
+            {
+                { "en", "Category Name" },
+                { "ar", "«”„ «·›∆…" },
+                { "fr", "Nom de la catÈgorie" }
+            }
+            };
+
+            // ≈‰‘«¡ ﬂ«∆‰ DTO ··›∆…
+            CategoryModelResponseBuildDto category = new CategoryModelResponseBuildDto
+            {
+                Id = "123",
+                Name = translation,
+                Description = new TranslationData
+                {
+                    Value = new Dictionary<string, string>
+                {
+                    { "en", "This is a sample category" },
+                    { "ar", "Â–Â ›∆…  Ã—Ì»Ì…" },
+                    { "fr", "Ceci est une catÈgorie d'exemple" }
+                }
+                }
+            };
+           
+
+            return  MapToIEnumerableShareResponseDto(new List<CategoryModelResponseBuildDto> { category });
             try
             {
                 _logger.LogInformation("Retrieving all CategoryModel entities...");

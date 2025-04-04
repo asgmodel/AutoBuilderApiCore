@@ -81,7 +81,7 @@ namespace AutoGenerator.Repositorys.Builder
         public async Task<TBuildResponseDto> CreateAsync(TBuildRequestDto entity)
         {
             var modelEntity = _mapper.Map<TModel>(entity);
-            modelEntity = await _repository.CreateAsync(modelEntity);
+            //modelEntity = await _repository.CreateAsync(modelEntity);
             return _mapper.Map<TBuildResponseDto>(modelEntity);
         }
 

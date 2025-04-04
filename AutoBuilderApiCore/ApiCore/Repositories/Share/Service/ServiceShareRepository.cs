@@ -58,6 +58,7 @@ namespace ApiCore.Repositorys.Share
         {
             try
             {
+
                 _logger.LogInformation("Creating new Service entity...");
                 // Call the create method in the builder repository.
                 var result = await _builder.CreateAsync(entity);
@@ -69,6 +70,7 @@ namespace ApiCore.Repositorys.Share
             }
             catch (Exception ex)
             {
+
                 _logger.LogError(ex, "Error while creating Service entity.");
                 return null;
             }

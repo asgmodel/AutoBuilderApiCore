@@ -42,6 +42,7 @@ namespace ApiCore.Services.Services
         {
             try
             {
+
                 _logger.LogInformation("Creating new Service entity...");
                 var result = await _builder.CreateAsync(entity);
                 var output = GetMapper().Map<ServiceResponseDso>(result);

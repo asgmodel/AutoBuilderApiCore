@@ -42,9 +42,24 @@ namespace ApiCore.Services.Services
         {
             try
             {
+
+                var resultresponce = new CategoryModelResponseDso()
+                {
+
+                    Id = entity.Id,
+                    Name = entity.Name,
+                    Description = entity.Description
+                  
+
+
+
+
+                };
                 _logger.LogInformation("Creating new CategoryModel entity...");
-                var result = await _builder.CreateAsync(entity);
-                var output = GetMapper().Map<CategoryModelResponseDso>(result);
+                //var result = await _builder.CreateAsync(entity);
+
+                var output = GetMapper().Map<CategoryModelResponseDso>(resultresponce);
+                
                 _logger.LogInformation("Created CategoryModel entity successfully.");
                 return output;
             }
@@ -73,6 +88,9 @@ namespace ApiCore.Services.Services
         {
             try
             {
+
+              
+
                 _logger.LogInformation("Retrieving all CategoryModel entities...");
                 var results = await _builder.GetAllAsync();
                 return GetMapper().Map<IEnumerable<CategoryModelResponseDso>>(results);

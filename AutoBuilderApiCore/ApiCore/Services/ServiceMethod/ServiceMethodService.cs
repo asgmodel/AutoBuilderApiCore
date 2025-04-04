@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class ServiceMethodService : BaseService<ServiceMethodRequestDso, ServiceMethodResponseDso>, IUseServiceMethodService
     {
         private readonly IServiceMethodShareRepository _builder;
-        private readonly ILogger _logger;
-        public ServiceMethodService(IServiceMethodShareRepository servicemethodShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public ServiceMethodService(IServiceMethodShareRepository buildServiceMethodShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = servicemethodShareRepository;
-            _logger = logger.CreateLogger(typeof(ServiceMethodService).FullName);
+            _builder = buildServiceMethodShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting ServiceMethod entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new ServiceMethod entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (ServiceMethodResponseDso)result;
+                var output = GetMapper().Map<ServiceMethodResponseDso>(result);
                 _logger.LogInformation("Created ServiceMethod entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<ServiceMethodResponseDso>> CreateRangeAsync(IEnumerable<ServiceMethodRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of ServiceMethod entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for ServiceMethod entities.");
-                return Task.FromResult<IEnumerable<ServiceMethodResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting ServiceMethod entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<ServiceMethodResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of ServiceMethod entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for ServiceMethod entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<ServiceMethodResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of ServiceMethod entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for ServiceMethod entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<ServiceMethodResponseDso?> FindAsync(Expression<Func<ServiceMethodResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding ServiceMethod entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for ServiceMethod entity.");
-                return Task.FromResult<ServiceMethodResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<ServiceMethodResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<ServiceMethodResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all ServiceMethod entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<ServiceMethodResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for ServiceMethod entities.");
-                return Task.FromResult<IEnumerable<ServiceMethodResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<ServiceMethodResponseDso?> GetByIdAsync(string id)
+        public override async Task<ServiceMethodResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving ServiceMethod entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<ServiceMethodResponseDso>(result);
+                _logger.LogInformation("Retrieved ServiceMethod entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for ServiceMethod entity with ID: {id}.");
-                return Task.FromResult<ServiceMethodResponseDso>(null);
-            }
-        }
-
-        public Task<ServiceMethodResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for ServiceMethod entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for ServiceMethod entity with numeric ID: {id}.");
-                return Task.FromResult<ServiceMethodResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<ServiceMethodResponseDso> for ServiceMethod entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<ServiceMethodResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for ServiceMethod entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for ServiceMethod entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<ServiceMethodResponseDso> UpdateAsync(ServiceMethodRequestDso entity)
+        public override async Task<ServiceMethodResponseDso> UpdateAsync(ServiceMethodRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating ServiceMethod entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<ServiceMethodResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for ServiceMethod entity.");
-                return Task.FromResult<ServiceMethodResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if ServiceMethod exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("ServiceMethod not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of ServiceMethod with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<ServiceMethodResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all ServiceMethods with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<ServiceMethodResponseDso>>(results.Data);
+                return new PagedResponse<ServiceMethodResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all ServiceMethods.");
+                return new PagedResponse<ServiceMethodResponseDso>(new List<ServiceMethodResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<ServiceMethodResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching ServiceMethod by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("ServiceMethod not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved ServiceMethod successfully.");
+                return GetMapper().Map<ServiceMethodResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving ServiceMethod by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting ServiceMethod with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("ServiceMethod with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting ServiceMethod with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<ServiceMethodRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<ServiceMethodRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} ServiceMethods...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} ServiceMethods deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple ServiceMethods.");
             }
         }
     }

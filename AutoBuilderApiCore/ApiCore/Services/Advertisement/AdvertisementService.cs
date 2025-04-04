@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class AdvertisementService : BaseService<AdvertisementRequestDso, AdvertisementResponseDso>, IUseAdvertisementService
     {
         private readonly IAdvertisementShareRepository _builder;
-        private readonly ILogger _logger;
-        public AdvertisementService(IAdvertisementShareRepository advertisementShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public AdvertisementService(IAdvertisementShareRepository buildAdvertisementShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = advertisementShareRepository;
-            _logger = logger.CreateLogger(typeof(AdvertisementService).FullName);
+            _builder = buildAdvertisementShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Advertisement entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Advertisement entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (AdvertisementResponseDso)result;
+                var output = GetMapper().Map<AdvertisementResponseDso>(result);
                 _logger.LogInformation("Created Advertisement entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<AdvertisementResponseDso>> CreateRangeAsync(IEnumerable<AdvertisementRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Advertisement entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Advertisement entities.");
-                return Task.FromResult<IEnumerable<AdvertisementResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Advertisement entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Advertisement entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Advertisement entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Advertisement entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Advertisement entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<AdvertisementResponseDso?> FindAsync(Expression<Func<AdvertisementResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Advertisement entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Advertisement entity.");
-                return Task.FromResult<AdvertisementResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<AdvertisementResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<AdvertisementResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Advertisement entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<AdvertisementResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Advertisement entities.");
-                return Task.FromResult<IEnumerable<AdvertisementResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<AdvertisementResponseDso?> GetByIdAsync(string id)
+        public override async Task<AdvertisementResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Advertisement entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<AdvertisementResponseDso>(result);
+                _logger.LogInformation("Retrieved Advertisement entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Advertisement entity with ID: {id}.");
-                return Task.FromResult<AdvertisementResponseDso>(null);
-            }
-        }
-
-        public Task<AdvertisementResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Advertisement entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Advertisement entity with numeric ID: {id}.");
-                return Task.FromResult<AdvertisementResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<AdvertisementResponseDso> for Advertisement entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<AdvertisementResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Advertisement entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Advertisement entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<AdvertisementResponseDso> UpdateAsync(AdvertisementRequestDso entity)
+        public override async Task<AdvertisementResponseDso> UpdateAsync(AdvertisementRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Advertisement entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<AdvertisementResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Advertisement entity.");
-                return Task.FromResult<AdvertisementResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Advertisement exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Advertisement not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Advertisement with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<AdvertisementResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Advertisements with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<AdvertisementResponseDso>>(results.Data);
+                return new PagedResponse<AdvertisementResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Advertisements.");
+                return new PagedResponse<AdvertisementResponseDso>(new List<AdvertisementResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<AdvertisementResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Advertisement by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Advertisement not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Advertisement successfully.");
+                return GetMapper().Map<AdvertisementResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Advertisement by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Advertisement with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Advertisement with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Advertisement with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<AdvertisementRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<AdvertisementRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Advertisements...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Advertisements deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Advertisements.");
             }
         }
     }

@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class UserModelAiService : BaseService<UserModelAiRequestDso, UserModelAiResponseDso>, IUseUserModelAiService
     {
         private readonly IUserModelAiShareRepository _builder;
-        private readonly ILogger _logger;
-        public UserModelAiService(IUserModelAiShareRepository usermodelaiShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public UserModelAiService(IUserModelAiShareRepository buildUserModelAiShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = usermodelaiShareRepository;
-            _logger = logger.CreateLogger(typeof(UserModelAiService).FullName);
+            _builder = buildUserModelAiShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting UserModelAi entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new UserModelAi entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (UserModelAiResponseDso)result;
+                var output = GetMapper().Map<UserModelAiResponseDso>(result);
                 _logger.LogInformation("Created UserModelAi entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<UserModelAiResponseDso>> CreateRangeAsync(IEnumerable<UserModelAiRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of UserModelAi entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for UserModelAi entities.");
-                return Task.FromResult<IEnumerable<UserModelAiResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting UserModelAi entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<UserModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of UserModelAi entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for UserModelAi entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<UserModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of UserModelAi entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for UserModelAi entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<UserModelAiResponseDso?> FindAsync(Expression<Func<UserModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding UserModelAi entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for UserModelAi entity.");
-                return Task.FromResult<UserModelAiResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<UserModelAiResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<UserModelAiResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all UserModelAi entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<UserModelAiResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for UserModelAi entities.");
-                return Task.FromResult<IEnumerable<UserModelAiResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<UserModelAiResponseDso?> GetByIdAsync(string id)
+        public override async Task<UserModelAiResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving UserModelAi entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<UserModelAiResponseDso>(result);
+                _logger.LogInformation("Retrieved UserModelAi entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for UserModelAi entity with ID: {id}.");
-                return Task.FromResult<UserModelAiResponseDso>(null);
-            }
-        }
-
-        public Task<UserModelAiResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for UserModelAi entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for UserModelAi entity with numeric ID: {id}.");
-                return Task.FromResult<UserModelAiResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<UserModelAiResponseDso> for UserModelAi entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<UserModelAiResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for UserModelAi entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for UserModelAi entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<UserModelAiResponseDso> UpdateAsync(UserModelAiRequestDso entity)
+        public override async Task<UserModelAiResponseDso> UpdateAsync(UserModelAiRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating UserModelAi entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<UserModelAiResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for UserModelAi entity.");
-                return Task.FromResult<UserModelAiResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if UserModelAi exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("UserModelAi not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of UserModelAi with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<UserModelAiResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all UserModelAis with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<UserModelAiResponseDso>>(results.Data);
+                return new PagedResponse<UserModelAiResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all UserModelAis.");
+                return new PagedResponse<UserModelAiResponseDso>(new List<UserModelAiResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<UserModelAiResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching UserModelAi by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("UserModelAi not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved UserModelAi successfully.");
+                return GetMapper().Map<UserModelAiResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving UserModelAi by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting UserModelAi with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("UserModelAi with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting UserModelAi with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<UserModelAiRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<UserModelAiRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} UserModelAis...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} UserModelAis deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple UserModelAis.");
             }
         }
     }

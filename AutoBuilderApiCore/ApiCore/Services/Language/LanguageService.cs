@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class LanguageService : BaseService<LanguageRequestDso, LanguageResponseDso>, IUseLanguageService
     {
         private readonly ILanguageShareRepository _builder;
-        private readonly ILogger _logger;
-        public LanguageService(ILanguageShareRepository languageShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public LanguageService(ILanguageShareRepository buildLanguageShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = languageShareRepository;
-            _logger = logger.CreateLogger(typeof(LanguageService).FullName);
+            _builder = buildLanguageShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Language entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Language entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (LanguageResponseDso)result;
+                var output = GetMapper().Map<LanguageResponseDso>(result);
                 _logger.LogInformation("Created Language entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<LanguageResponseDso>> CreateRangeAsync(IEnumerable<LanguageRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Language entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Language entities.");
-                return Task.FromResult<IEnumerable<LanguageResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Language entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Language entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Language entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Language entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Language entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<LanguageResponseDso?> FindAsync(Expression<Func<LanguageResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Language entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Language entity.");
-                return Task.FromResult<LanguageResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<LanguageResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<LanguageResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Language entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<LanguageResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Language entities.");
-                return Task.FromResult<IEnumerable<LanguageResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<LanguageResponseDso?> GetByIdAsync(string id)
+        public override async Task<LanguageResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Language entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<LanguageResponseDso>(result);
+                _logger.LogInformation("Retrieved Language entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Language entity with ID: {id}.");
-                return Task.FromResult<LanguageResponseDso>(null);
-            }
-        }
-
-        public Task<LanguageResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Language entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Language entity with numeric ID: {id}.");
-                return Task.FromResult<LanguageResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<LanguageResponseDso> for Language entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<LanguageResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Language entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Language entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<LanguageResponseDso> UpdateAsync(LanguageRequestDso entity)
+        public override async Task<LanguageResponseDso> UpdateAsync(LanguageRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Language entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<LanguageResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Language entity.");
-                return Task.FromResult<LanguageResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Language exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Language not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Language with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<LanguageResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Languages with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<LanguageResponseDso>>(results.Data);
+                return new PagedResponse<LanguageResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Languages.");
+                return new PagedResponse<LanguageResponseDso>(new List<LanguageResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<LanguageResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Language by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Language not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Language successfully.");
+                return GetMapper().Map<LanguageResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Language by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Language with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Language with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Language with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<LanguageRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<LanguageRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Languages...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Languages deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Languages.");
             }
         }
     }

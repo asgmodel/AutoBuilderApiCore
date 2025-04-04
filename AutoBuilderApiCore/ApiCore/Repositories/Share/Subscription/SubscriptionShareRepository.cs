@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator;
 using System;
 
 namespace ApiCore.Repositorys.Share
@@ -23,8 +24,6 @@ namespace ApiCore.Repositorys.Share
     {
         // Declare the builder repository.
         private readonly SubscriptionBuilderRepository _builder;
-        // Declare a logger for the repository.
-        private readonly ILogger _logger;
         /// <summary>
         /// Constructor for SubscriptionShareRepository.
         /// </summary>
@@ -32,8 +31,7 @@ namespace ApiCore.Repositorys.Share
         {
             // Initialize the builder repository.
             _builder = new SubscriptionBuilderRepository(dbContext, mapper, logger.CreateLogger(typeof(SubscriptionShareRepository).FullName));
-            // Initialize the logger.
-            _logger = logger.CreateLogger(typeof(SubscriptionShareRepository).FullName);
+        // Initialize the logger.
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Counting Subscription entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -64,7 +62,7 @@ namespace ApiCore.Repositorys.Share
                 // Call the create method in the builder repository.
                 var result = await _builder.CreateAsync(entity);
                 // Convert the result to ResponseShareDto type.
-                var output = (SubscriptionResponseShareDto)result;
+                var output = MapToShareResponseDto(result);
                 _logger.LogInformation("Created Subscription entity successfully.");
                 // Return the final result.
                 return output;
@@ -77,138 +75,36 @@ namespace ApiCore.Repositorys.Share
         }
 
         /// <summary>
-        /// Method to create a range of entities asynchronously.
-        /// </summary>
-        public override Task<IEnumerable<SubscriptionResponseShareDto>> CreateRangeAsync(IEnumerable<SubscriptionRequestShareDto> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Subscription entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Subscription entities.");
-                return Task.FromResult<IEnumerable<SubscriptionResponseShareDto>>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a specific entity.
-        /// </summary>
-        public override Task DeleteAsync(string id)
-        {
-            try
-            {
-                _logger.LogInformation($"Deleting Subscription entity with ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error while deleting Subscription entity with ID: {id}.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a range of entities based on a condition.
-        /// </summary>
-        public override Task DeleteRangeAsync(Expression<Func<SubscriptionResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Subscription entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Subscription entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to check if an entity exists based on a condition.
-        /// </summary>
-        public override Task<bool> ExistsAsync(Expression<Func<SubscriptionResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Subscription entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Subscription entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        /// <summary>
-        /// Method to find an entity based on a condition.
-        /// </summary>
-        public override Task<SubscriptionResponseShareDto?> FindAsync(Expression<Func<SubscriptionResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Subscription entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Subscription entity.");
-                return Task.FromResult<SubscriptionResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
         /// Method to retrieve all entities.
         /// </summary>
-        public override Task<IEnumerable<SubscriptionResponseShareDto>> GetAllAsync()
+        public override async Task<IEnumerable<SubscriptionResponseShareDto>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Subscription entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(await _builder.GetAllAsync());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Subscription entities.");
-                return Task.FromResult<IEnumerable<SubscriptionResponseShareDto>>(null);
+                return null;
             }
         }
 
         /// <summary>
         /// Method to get an entity by its unique ID.
         /// </summary>
-        public override Task<SubscriptionResponseShareDto?> GetByIdAsync(string id)
+        public override async Task<SubscriptionResponseShareDto?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Subscription entity with ID: {id}...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Subscription entity with ID: {id}.");
-                return Task.FromResult<SubscriptionResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to get data using a specific ID.
-        /// </summary>
-        public Task<SubscriptionResponseShareDto> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Subscription entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Subscription entity with numeric ID: {id}.");
-                return Task.FromResult<SubscriptionResponseShareDto>(null);
+                return null;
             }
         }
 
@@ -220,7 +116,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<SubscriptionResponseShareDto> for Subscription entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(_builder.GetQueryable().ToList()).AsQueryable();
             }
             catch (Exception ex)
             {
@@ -249,17 +145,104 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to update a specific entity.
         /// </summary>
-        public override Task<SubscriptionResponseShareDto> UpdateAsync(SubscriptionRequestShareDto entity)
+        public override async Task<SubscriptionResponseShareDto> UpdateAsync(SubscriptionRequestShareDto entity)
         {
             try
             {
                 _logger.LogInformation("Updating Subscription entity...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.UpdateAsync(entity));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Subscription entity.");
-                return Task.FromResult<SubscriptionResponseShareDto>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Subscription exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Subscription not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Subscription with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<SubscriptionResponseShareDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Subscriptions with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = MapToIEnumerableShareResponseDto(results.Data);
+                return new PagedResponse<SubscriptionResponseShareDto>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Subscriptions.");
+                return new PagedResponse<SubscriptionResponseShareDto>(new List<SubscriptionResponseShareDto>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<SubscriptionResponseShareDto?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Subscription by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Subscription not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Subscription successfully.");
+                return MapToShareResponseDto(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Subscription by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Subscription with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Subscription with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Subscription with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<SubscriptionRequestShareDto> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<SubscriptionRequestBuildDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Subscriptions...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Subscriptions deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Subscriptions.");
             }
         }
     }

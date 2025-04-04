@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class PaymentService : BaseService<PaymentRequestDso, PaymentResponseDso>, IUsePaymentService
     {
         private readonly IPaymentShareRepository _builder;
-        private readonly ILogger _logger;
-        public PaymentService(IPaymentShareRepository paymentShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public PaymentService(IPaymentShareRepository buildPaymentShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = paymentShareRepository;
-            _logger = logger.CreateLogger(typeof(PaymentService).FullName);
+            _builder = buildPaymentShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Payment entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Payment entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (PaymentResponseDso)result;
+                var output = GetMapper().Map<PaymentResponseDso>(result);
                 _logger.LogInformation("Created Payment entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<PaymentResponseDso>> CreateRangeAsync(IEnumerable<PaymentRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Payment entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Payment entities.");
-                return Task.FromResult<IEnumerable<PaymentResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Payment entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Payment entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Payment entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Payment entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Payment entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<PaymentResponseDso?> FindAsync(Expression<Func<PaymentResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Payment entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Payment entity.");
-                return Task.FromResult<PaymentResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<PaymentResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<PaymentResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Payment entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<PaymentResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Payment entities.");
-                return Task.FromResult<IEnumerable<PaymentResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<PaymentResponseDso?> GetByIdAsync(string id)
+        public override async Task<PaymentResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Payment entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<PaymentResponseDso>(result);
+                _logger.LogInformation("Retrieved Payment entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Payment entity with ID: {id}.");
-                return Task.FromResult<PaymentResponseDso>(null);
-            }
-        }
-
-        public Task<PaymentResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Payment entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Payment entity with numeric ID: {id}.");
-                return Task.FromResult<PaymentResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<PaymentResponseDso> for Payment entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<PaymentResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Payment entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Payment entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<PaymentResponseDso> UpdateAsync(PaymentRequestDso entity)
+        public override async Task<PaymentResponseDso> UpdateAsync(PaymentRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Payment entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<PaymentResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Payment entity.");
-                return Task.FromResult<PaymentResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Payment exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Payment not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Payment with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<PaymentResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Payments with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<PaymentResponseDso>>(results.Data);
+                return new PagedResponse<PaymentResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Payments.");
+                return new PagedResponse<PaymentResponseDso>(new List<PaymentResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<PaymentResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Payment by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Payment not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Payment successfully.");
+                return GetMapper().Map<PaymentResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Payment by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Payment with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Payment with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Payment with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<PaymentRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<PaymentRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Payments...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Payments deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Payments.");
             }
         }
     }

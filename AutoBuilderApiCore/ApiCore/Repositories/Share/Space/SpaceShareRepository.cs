@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator;
 using System;
 
 namespace ApiCore.Repositorys.Share
@@ -23,8 +24,6 @@ namespace ApiCore.Repositorys.Share
     {
         // Declare the builder repository.
         private readonly SpaceBuilderRepository _builder;
-        // Declare a logger for the repository.
-        private readonly ILogger _logger;
         /// <summary>
         /// Constructor for SpaceShareRepository.
         /// </summary>
@@ -32,8 +31,7 @@ namespace ApiCore.Repositorys.Share
         {
             // Initialize the builder repository.
             _builder = new SpaceBuilderRepository(dbContext, mapper, logger.CreateLogger(typeof(SpaceShareRepository).FullName));
-            // Initialize the logger.
-            _logger = logger.CreateLogger(typeof(SpaceShareRepository).FullName);
+        // Initialize the logger.
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Counting Space entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -64,7 +62,7 @@ namespace ApiCore.Repositorys.Share
                 // Call the create method in the builder repository.
                 var result = await _builder.CreateAsync(entity);
                 // Convert the result to ResponseShareDto type.
-                var output = (SpaceResponseShareDto)result;
+                var output = MapToShareResponseDto(result);
                 _logger.LogInformation("Created Space entity successfully.");
                 // Return the final result.
                 return output;
@@ -77,138 +75,36 @@ namespace ApiCore.Repositorys.Share
         }
 
         /// <summary>
-        /// Method to create a range of entities asynchronously.
-        /// </summary>
-        public override Task<IEnumerable<SpaceResponseShareDto>> CreateRangeAsync(IEnumerable<SpaceRequestShareDto> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Space entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Space entities.");
-                return Task.FromResult<IEnumerable<SpaceResponseShareDto>>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a specific entity.
-        /// </summary>
-        public override Task DeleteAsync(string id)
-        {
-            try
-            {
-                _logger.LogInformation($"Deleting Space entity with ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error while deleting Space entity with ID: {id}.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a range of entities based on a condition.
-        /// </summary>
-        public override Task DeleteRangeAsync(Expression<Func<SpaceResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Space entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Space entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to check if an entity exists based on a condition.
-        /// </summary>
-        public override Task<bool> ExistsAsync(Expression<Func<SpaceResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Space entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Space entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        /// <summary>
-        /// Method to find an entity based on a condition.
-        /// </summary>
-        public override Task<SpaceResponseShareDto?> FindAsync(Expression<Func<SpaceResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Space entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Space entity.");
-                return Task.FromResult<SpaceResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
         /// Method to retrieve all entities.
         /// </summary>
-        public override Task<IEnumerable<SpaceResponseShareDto>> GetAllAsync()
+        public override async Task<IEnumerable<SpaceResponseShareDto>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Space entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(await _builder.GetAllAsync());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Space entities.");
-                return Task.FromResult<IEnumerable<SpaceResponseShareDto>>(null);
+                return null;
             }
         }
 
         /// <summary>
         /// Method to get an entity by its unique ID.
         /// </summary>
-        public override Task<SpaceResponseShareDto?> GetByIdAsync(string id)
+        public override async Task<SpaceResponseShareDto?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Space entity with ID: {id}...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Space entity with ID: {id}.");
-                return Task.FromResult<SpaceResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to get data using a specific ID.
-        /// </summary>
-        public Task<SpaceResponseShareDto> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Space entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Space entity with numeric ID: {id}.");
-                return Task.FromResult<SpaceResponseShareDto>(null);
+                return null;
             }
         }
 
@@ -220,7 +116,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<SpaceResponseShareDto> for Space entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(_builder.GetQueryable().ToList()).AsQueryable();
             }
             catch (Exception ex)
             {
@@ -249,17 +145,104 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to update a specific entity.
         /// </summary>
-        public override Task<SpaceResponseShareDto> UpdateAsync(SpaceRequestShareDto entity)
+        public override async Task<SpaceResponseShareDto> UpdateAsync(SpaceRequestShareDto entity)
         {
             try
             {
                 _logger.LogInformation("Updating Space entity...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.UpdateAsync(entity));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Space entity.");
-                return Task.FromResult<SpaceResponseShareDto>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Space exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Space not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Space with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<SpaceResponseShareDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Spaces with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = MapToIEnumerableShareResponseDto(results.Data);
+                return new PagedResponse<SpaceResponseShareDto>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Spaces.");
+                return new PagedResponse<SpaceResponseShareDto>(new List<SpaceResponseShareDto>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<SpaceResponseShareDto?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Space by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Space not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Space successfully.");
+                return MapToShareResponseDto(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Space by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Space with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Space with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Space with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<SpaceRequestShareDto> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<SpaceRequestBuildDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Spaces...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Spaces deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Spaces.");
             }
         }
     }

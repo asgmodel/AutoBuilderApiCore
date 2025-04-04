@@ -96,42 +96,42 @@ namespace AutoGenerator.Services.Base
             throw new NotImplementedException();
         }
 
-        public Task<TServiceResponseDso?> FindAsync(params object[] id)
+        public virtual Task<TServiceResponseDso?> FindAsync(params object[] id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> ExistsAsync(object value, string name = "Id")
+        public virtual  Task<bool> ExistsAsync(object value, string name = "Id")
         {
             throw new NotImplementedException();
         }
 
-        public Task<PagedResponse<TServiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        public virtual Task<PagedResponse<TServiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TServiceResponseDso?> GetByIdAsync(object id)
+        public virtual Task<TServiceResponseDso?> GetByIdAsync(object id)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAllAsync()
+        public virtual  Task DeleteAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(TServiceRequestDso entity)
+        public virtual Task DeleteAsync(TServiceRequestDso entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(object value, string key = "Id")
+        public virtual Task DeleteAsync(object value, string key = "Id")
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteRange(List<TServiceRequestDso> entities)
+        public virtual Task DeleteRange(List<TServiceRequestDso> entities)
         {
             throw new NotImplementedException();
         }

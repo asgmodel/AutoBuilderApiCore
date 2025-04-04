@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class ApplicationUserService : BaseService<ApplicationUserRequestDso, ApplicationUserResponseDso>, IUseApplicationUserService
     {
         private readonly IApplicationUserShareRepository _builder;
-        private readonly ILogger _logger;
-        public ApplicationUserService(IApplicationUserShareRepository applicationuserShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public ApplicationUserService(IApplicationUserShareRepository buildApplicationUserShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = applicationuserShareRepository;
-            _logger = logger.CreateLogger(typeof(ApplicationUserService).FullName);
+            _builder = buildApplicationUserShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting ApplicationUser entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new ApplicationUser entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (ApplicationUserResponseDso)result;
+                var output = GetMapper().Map<ApplicationUserResponseDso>(result);
                 _logger.LogInformation("Created ApplicationUser entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<ApplicationUserResponseDso>> CreateRangeAsync(IEnumerable<ApplicationUserRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of ApplicationUser entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for ApplicationUser entities.");
-                return Task.FromResult<IEnumerable<ApplicationUserResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting ApplicationUser entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<ApplicationUserResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of ApplicationUser entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for ApplicationUser entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<ApplicationUserResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of ApplicationUser entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for ApplicationUser entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<ApplicationUserResponseDso?> FindAsync(Expression<Func<ApplicationUserResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding ApplicationUser entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for ApplicationUser entity.");
-                return Task.FromResult<ApplicationUserResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<ApplicationUserResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<ApplicationUserResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all ApplicationUser entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<ApplicationUserResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for ApplicationUser entities.");
-                return Task.FromResult<IEnumerable<ApplicationUserResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<ApplicationUserResponseDso?> GetByIdAsync(string id)
+        public override async Task<ApplicationUserResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving ApplicationUser entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<ApplicationUserResponseDso>(result);
+                _logger.LogInformation("Retrieved ApplicationUser entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for ApplicationUser entity with ID: {id}.");
-                return Task.FromResult<ApplicationUserResponseDso>(null);
-            }
-        }
-
-        public Task<ApplicationUserResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for ApplicationUser entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for ApplicationUser entity with numeric ID: {id}.");
-                return Task.FromResult<ApplicationUserResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<ApplicationUserResponseDso> for ApplicationUser entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<ApplicationUserResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for ApplicationUser entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for ApplicationUser entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<ApplicationUserResponseDso> UpdateAsync(ApplicationUserRequestDso entity)
+        public override async Task<ApplicationUserResponseDso> UpdateAsync(ApplicationUserRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating ApplicationUser entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<ApplicationUserResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for ApplicationUser entity.");
-                return Task.FromResult<ApplicationUserResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if ApplicationUser exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("ApplicationUser not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of ApplicationUser with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<ApplicationUserResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all ApplicationUsers with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<ApplicationUserResponseDso>>(results.Data);
+                return new PagedResponse<ApplicationUserResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all ApplicationUsers.");
+                return new PagedResponse<ApplicationUserResponseDso>(new List<ApplicationUserResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<ApplicationUserResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching ApplicationUser by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("ApplicationUser not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved ApplicationUser successfully.");
+                return GetMapper().Map<ApplicationUserResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving ApplicationUser by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting ApplicationUser with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("ApplicationUser with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting ApplicationUser with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<ApplicationUserRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<ApplicationUserRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} ApplicationUsers...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} ApplicationUsers deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple ApplicationUsers.");
             }
         }
     }

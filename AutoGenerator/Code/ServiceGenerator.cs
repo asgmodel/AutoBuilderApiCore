@@ -1,5 +1,6 @@
 ﻿using AutoGenerator.ApiFolder;
 using AutoGenerator.Helper.Translation;
+using AutoGenerator.TM;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
 using System.Reflection;
@@ -72,7 +73,7 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
                                     ,
                         Usings = new List<string>
                         {
-                            "AutoGenerator.Data",
+                            "AutoGenerator",
                             "AutoMapper",
 
                             "Microsoft.Extensions.Logging",
@@ -171,9 +172,9 @@ public interface I{className}Service<TServiceRequestDso, TServiceResponseDso>
 
         private static string createTCS(string className)
         {
+            return TmService.GetTmService(className);
 
-
-            return $@"
+        return $@"
 public class {className}Service : BaseService<{className}RequestDso, 
 {className}ResponseDso>, IUse{className}Service
 {{

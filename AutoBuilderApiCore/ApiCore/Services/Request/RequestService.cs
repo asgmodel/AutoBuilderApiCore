@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class RequestService : BaseService<RequestRequestDso, RequestResponseDso>, IUseRequestService
     {
         private readonly IRequestShareRepository _builder;
-        private readonly ILogger _logger;
-        public RequestService(IRequestShareRepository requestShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public RequestService(IRequestShareRepository buildRequestShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = requestShareRepository;
-            _logger = logger.CreateLogger(typeof(RequestService).FullName);
+            _builder = buildRequestShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Request entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Request entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (RequestResponseDso)result;
+                var output = GetMapper().Map<RequestResponseDso>(result);
                 _logger.LogInformation("Created Request entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<RequestResponseDso>> CreateRangeAsync(IEnumerable<RequestRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Request entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Request entities.");
-                return Task.FromResult<IEnumerable<RequestResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Request entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<RequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Request entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Request entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<RequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Request entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Request entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<RequestResponseDso?> FindAsync(Expression<Func<RequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Request entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Request entity.");
-                return Task.FromResult<RequestResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<RequestResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<RequestResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Request entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<RequestResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Request entities.");
-                return Task.FromResult<IEnumerable<RequestResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<RequestResponseDso?> GetByIdAsync(string id)
+        public override async Task<RequestResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Request entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<RequestResponseDso>(result);
+                _logger.LogInformation("Retrieved Request entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Request entity with ID: {id}.");
-                return Task.FromResult<RequestResponseDso>(null);
-            }
-        }
-
-        public Task<RequestResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Request entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Request entity with numeric ID: {id}.");
-                return Task.FromResult<RequestResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<RequestResponseDso> for Request entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<RequestResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Request entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Request entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<RequestResponseDso> UpdateAsync(RequestRequestDso entity)
+        public override async Task<RequestResponseDso> UpdateAsync(RequestRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Request entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<RequestResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Request entity.");
-                return Task.FromResult<RequestResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Request exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Request not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Request with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<RequestResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Requests with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<RequestResponseDso>>(results.Data);
+                return new PagedResponse<RequestResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Requests.");
+                return new PagedResponse<RequestResponseDso>(new List<RequestResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<RequestResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Request by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Request not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Request successfully.");
+                return GetMapper().Map<RequestResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Request by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Request with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Request with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Request with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<RequestRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<RequestRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Requests...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Requests deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Requests.");
             }
         }
     }

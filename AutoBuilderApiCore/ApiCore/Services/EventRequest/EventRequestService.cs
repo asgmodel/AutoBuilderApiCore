@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class EventRequestService : BaseService<EventRequestRequestDso, EventRequestResponseDso>, IUseEventRequestService
     {
         private readonly IEventRequestShareRepository _builder;
-        private readonly ILogger _logger;
-        public EventRequestService(IEventRequestShareRepository eventrequestShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public EventRequestService(IEventRequestShareRepository buildEventRequestShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = eventrequestShareRepository;
-            _logger = logger.CreateLogger(typeof(EventRequestService).FullName);
+            _builder = buildEventRequestShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting EventRequest entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new EventRequest entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (EventRequestResponseDso)result;
+                var output = GetMapper().Map<EventRequestResponseDso>(result);
                 _logger.LogInformation("Created EventRequest entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<EventRequestResponseDso>> CreateRangeAsync(IEnumerable<EventRequestRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of EventRequest entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for EventRequest entities.");
-                return Task.FromResult<IEnumerable<EventRequestResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting EventRequest entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<EventRequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of EventRequest entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for EventRequest entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<EventRequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of EventRequest entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for EventRequest entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<EventRequestResponseDso?> FindAsync(Expression<Func<EventRequestResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding EventRequest entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for EventRequest entity.");
-                return Task.FromResult<EventRequestResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<EventRequestResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<EventRequestResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all EventRequest entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<EventRequestResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for EventRequest entities.");
-                return Task.FromResult<IEnumerable<EventRequestResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<EventRequestResponseDso?> GetByIdAsync(string id)
+        public override async Task<EventRequestResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving EventRequest entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<EventRequestResponseDso>(result);
+                _logger.LogInformation("Retrieved EventRequest entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for EventRequest entity with ID: {id}.");
-                return Task.FromResult<EventRequestResponseDso>(null);
-            }
-        }
-
-        public Task<EventRequestResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for EventRequest entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for EventRequest entity with numeric ID: {id}.");
-                return Task.FromResult<EventRequestResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<EventRequestResponseDso> for EventRequest entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<EventRequestResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for EventRequest entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for EventRequest entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<EventRequestResponseDso> UpdateAsync(EventRequestRequestDso entity)
+        public override async Task<EventRequestResponseDso> UpdateAsync(EventRequestRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating EventRequest entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<EventRequestResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for EventRequest entity.");
-                return Task.FromResult<EventRequestResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if EventRequest exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("EventRequest not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of EventRequest with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<EventRequestResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all EventRequests with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<EventRequestResponseDso>>(results.Data);
+                return new PagedResponse<EventRequestResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all EventRequests.");
+                return new PagedResponse<EventRequestResponseDso>(new List<EventRequestResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<EventRequestResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching EventRequest by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("EventRequest not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved EventRequest successfully.");
+                return GetMapper().Map<EventRequestResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving EventRequest by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting EventRequest with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("EventRequest with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting EventRequest with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<EventRequestRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<EventRequestRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} EventRequests...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} EventRequests deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple EventRequests.");
             }
         }
     }

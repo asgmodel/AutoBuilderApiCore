@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class AuthorizationSessionService : BaseService<AuthorizationSessionRequestDso, AuthorizationSessionResponseDso>, IUseAuthorizationSessionService
     {
         private readonly IAuthorizationSessionShareRepository _builder;
-        private readonly ILogger _logger;
-        public AuthorizationSessionService(IAuthorizationSessionShareRepository authorizationsessionShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public AuthorizationSessionService(IAuthorizationSessionShareRepository buildAuthorizationSessionShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = authorizationsessionShareRepository;
-            _logger = logger.CreateLogger(typeof(AuthorizationSessionService).FullName);
+            _builder = buildAuthorizationSessionShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting AuthorizationSession entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new AuthorizationSession entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (AuthorizationSessionResponseDso)result;
+                var output = GetMapper().Map<AuthorizationSessionResponseDso>(result);
                 _logger.LogInformation("Created AuthorizationSession entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<AuthorizationSessionResponseDso>> CreateRangeAsync(IEnumerable<AuthorizationSessionRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of AuthorizationSession entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for AuthorizationSession entities.");
-                return Task.FromResult<IEnumerable<AuthorizationSessionResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting AuthorizationSession entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of AuthorizationSession entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for AuthorizationSession entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of AuthorizationSession entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for AuthorizationSession entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<AuthorizationSessionResponseDso?> FindAsync(Expression<Func<AuthorizationSessionResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding AuthorizationSession entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for AuthorizationSession entity.");
-                return Task.FromResult<AuthorizationSessionResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<AuthorizationSessionResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<AuthorizationSessionResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all AuthorizationSession entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<AuthorizationSessionResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for AuthorizationSession entities.");
-                return Task.FromResult<IEnumerable<AuthorizationSessionResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<AuthorizationSessionResponseDso?> GetByIdAsync(string id)
+        public override async Task<AuthorizationSessionResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving AuthorizationSession entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<AuthorizationSessionResponseDso>(result);
+                _logger.LogInformation("Retrieved AuthorizationSession entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for AuthorizationSession entity with ID: {id}.");
-                return Task.FromResult<AuthorizationSessionResponseDso>(null);
-            }
-        }
-
-        public Task<AuthorizationSessionResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for AuthorizationSession entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for AuthorizationSession entity with numeric ID: {id}.");
-                return Task.FromResult<AuthorizationSessionResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<AuthorizationSessionResponseDso> for AuthorizationSession entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<AuthorizationSessionResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for AuthorizationSession entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for AuthorizationSession entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<AuthorizationSessionResponseDso> UpdateAsync(AuthorizationSessionRequestDso entity)
+        public override async Task<AuthorizationSessionResponseDso> UpdateAsync(AuthorizationSessionRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating AuthorizationSession entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<AuthorizationSessionResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for AuthorizationSession entity.");
-                return Task.FromResult<AuthorizationSessionResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if AuthorizationSession exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("AuthorizationSession not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of AuthorizationSession with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<AuthorizationSessionResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all AuthorizationSessions with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<AuthorizationSessionResponseDso>>(results.Data);
+                return new PagedResponse<AuthorizationSessionResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all AuthorizationSessions.");
+                return new PagedResponse<AuthorizationSessionResponseDso>(new List<AuthorizationSessionResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<AuthorizationSessionResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching AuthorizationSession by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("AuthorizationSession not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved AuthorizationSession successfully.");
+                return GetMapper().Map<AuthorizationSessionResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving AuthorizationSession by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting AuthorizationSession with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("AuthorizationSession with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting AuthorizationSession with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<AuthorizationSessionRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<AuthorizationSessionRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} AuthorizationSessions...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} AuthorizationSessions deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple AuthorizationSessions.");
             }
         }
     }

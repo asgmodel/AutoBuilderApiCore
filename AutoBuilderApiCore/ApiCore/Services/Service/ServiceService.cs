@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class ServiceService : BaseService<ServiceRequestDso, ServiceResponseDso>, IUseServiceService
     {
         private readonly IServiceShareRepository _builder;
-        private readonly ILogger _logger;
-        public ServiceService(IServiceShareRepository serviceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public ServiceService(IServiceShareRepository buildServiceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = serviceShareRepository;
-            _logger = logger.CreateLogger(typeof(ServiceService).FullName);
+            _builder = buildServiceShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Service entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Service entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (ServiceResponseDso)result;
+                var output = GetMapper().Map<ServiceResponseDso>(result);
                 _logger.LogInformation("Created Service entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<ServiceResponseDso>> CreateRangeAsync(IEnumerable<ServiceRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Service entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Service entities.");
-                return Task.FromResult<IEnumerable<ServiceResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Service entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<ServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Service entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Service entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<ServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Service entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Service entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<ServiceResponseDso?> FindAsync(Expression<Func<ServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Service entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Service entity.");
-                return Task.FromResult<ServiceResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<ServiceResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<ServiceResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Service entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<ServiceResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Service entities.");
-                return Task.FromResult<IEnumerable<ServiceResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<ServiceResponseDso?> GetByIdAsync(string id)
+        public override async Task<ServiceResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Service entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<ServiceResponseDso>(result);
+                _logger.LogInformation("Retrieved Service entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Service entity with ID: {id}.");
-                return Task.FromResult<ServiceResponseDso>(null);
-            }
-        }
-
-        public Task<ServiceResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Service entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Service entity with numeric ID: {id}.");
-                return Task.FromResult<ServiceResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<ServiceResponseDso> for Service entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<ServiceResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Service entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Service entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<ServiceResponseDso> UpdateAsync(ServiceRequestDso entity)
+        public override async Task<ServiceResponseDso> UpdateAsync(ServiceRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Service entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<ServiceResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Service entity.");
-                return Task.FromResult<ServiceResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Service exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Service not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Service with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<ServiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Services with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<ServiceResponseDso>>(results.Data);
+                return new PagedResponse<ServiceResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Services.");
+                return new PagedResponse<ServiceResponseDso>(new List<ServiceResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<ServiceResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Service by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Service not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Service successfully.");
+                return GetMapper().Map<ServiceResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Service by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Service with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Service with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Service with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<ServiceRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<ServiceRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Services...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Services deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Services.");
             }
         }
     }

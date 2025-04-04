@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class ModelAiService : BaseService<ModelAiRequestDso, ModelAiResponseDso>, IUseModelAiService
     {
         private readonly IModelAiShareRepository _builder;
-        private readonly ILogger _logger;
-        public ModelAiService(IModelAiShareRepository modelaiShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public ModelAiService(IModelAiShareRepository buildModelAiShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = modelaiShareRepository;
-            _logger = logger.CreateLogger(typeof(ModelAiService).FullName);
+            _builder = buildModelAiShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting ModelAi entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new ModelAi entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (ModelAiResponseDso)result;
+                var output = GetMapper().Map<ModelAiResponseDso>(result);
                 _logger.LogInformation("Created ModelAi entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<ModelAiResponseDso>> CreateRangeAsync(IEnumerable<ModelAiRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of ModelAi entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for ModelAi entities.");
-                return Task.FromResult<IEnumerable<ModelAiResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting ModelAi entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of ModelAi entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for ModelAi entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of ModelAi entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for ModelAi entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<ModelAiResponseDso?> FindAsync(Expression<Func<ModelAiResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding ModelAi entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for ModelAi entity.");
-                return Task.FromResult<ModelAiResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<ModelAiResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<ModelAiResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all ModelAi entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<ModelAiResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for ModelAi entities.");
-                return Task.FromResult<IEnumerable<ModelAiResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<ModelAiResponseDso?> GetByIdAsync(string id)
+        public override async Task<ModelAiResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving ModelAi entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<ModelAiResponseDso>(result);
+                _logger.LogInformation("Retrieved ModelAi entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for ModelAi entity with ID: {id}.");
-                return Task.FromResult<ModelAiResponseDso>(null);
-            }
-        }
-
-        public Task<ModelAiResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for ModelAi entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for ModelAi entity with numeric ID: {id}.");
-                return Task.FromResult<ModelAiResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<ModelAiResponseDso> for ModelAi entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<ModelAiResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for ModelAi entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for ModelAi entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<ModelAiResponseDso> UpdateAsync(ModelAiRequestDso entity)
+        public override async Task<ModelAiResponseDso> UpdateAsync(ModelAiRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating ModelAi entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<ModelAiResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for ModelAi entity.");
-                return Task.FromResult<ModelAiResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if ModelAi exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("ModelAi not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of ModelAi with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<ModelAiResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all ModelAis with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<ModelAiResponseDso>>(results.Data);
+                return new PagedResponse<ModelAiResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all ModelAis.");
+                return new PagedResponse<ModelAiResponseDso>(new List<ModelAiResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<ModelAiResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching ModelAi by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("ModelAi not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved ModelAi successfully.");
+                return GetMapper().Map<ModelAiResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving ModelAi by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting ModelAi with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("ModelAi with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting ModelAi with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<ModelAiRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<ModelAiRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} ModelAis...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} ModelAis deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple ModelAis.");
             }
         }
     }

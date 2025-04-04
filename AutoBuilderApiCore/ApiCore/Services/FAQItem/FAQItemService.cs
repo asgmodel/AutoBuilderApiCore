@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class FAQItemService : BaseService<FAQItemRequestDso, FAQItemResponseDso>, IUseFAQItemService
     {
         private readonly IFAQItemShareRepository _builder;
-        private readonly ILogger _logger;
-        public FAQItemService(IFAQItemShareRepository faqitemShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public FAQItemService(IFAQItemShareRepository buildFAQItemShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = faqitemShareRepository;
-            _logger = logger.CreateLogger(typeof(FAQItemService).FullName);
+            _builder = buildFAQItemShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting FAQItem entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new FAQItem entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (FAQItemResponseDso)result;
+                var output = GetMapper().Map<FAQItemResponseDso>(result);
                 _logger.LogInformation("Created FAQItem entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<FAQItemResponseDso>> CreateRangeAsync(IEnumerable<FAQItemRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of FAQItem entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for FAQItem entities.");
-                return Task.FromResult<IEnumerable<FAQItemResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting FAQItem entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of FAQItem entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for FAQItem entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of FAQItem entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for FAQItem entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<FAQItemResponseDso?> FindAsync(Expression<Func<FAQItemResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding FAQItem entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for FAQItem entity.");
-                return Task.FromResult<FAQItemResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<FAQItemResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<FAQItemResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all FAQItem entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<FAQItemResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for FAQItem entities.");
-                return Task.FromResult<IEnumerable<FAQItemResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<FAQItemResponseDso?> GetByIdAsync(string id)
+        public override async Task<FAQItemResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving FAQItem entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<FAQItemResponseDso>(result);
+                _logger.LogInformation("Retrieved FAQItem entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for FAQItem entity with ID: {id}.");
-                return Task.FromResult<FAQItemResponseDso>(null);
-            }
-        }
-
-        public Task<FAQItemResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for FAQItem entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for FAQItem entity with numeric ID: {id}.");
-                return Task.FromResult<FAQItemResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<FAQItemResponseDso> for FAQItem entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<FAQItemResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for FAQItem entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for FAQItem entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<FAQItemResponseDso> UpdateAsync(FAQItemRequestDso entity)
+        public override async Task<FAQItemResponseDso> UpdateAsync(FAQItemRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating FAQItem entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<FAQItemResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for FAQItem entity.");
-                return Task.FromResult<FAQItemResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if FAQItem exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("FAQItem not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of FAQItem with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<FAQItemResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all FAQItems with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<FAQItemResponseDso>>(results.Data);
+                return new PagedResponse<FAQItemResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all FAQItems.");
+                return new PagedResponse<FAQItemResponseDso>(new List<FAQItemResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<FAQItemResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching FAQItem by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("FAQItem not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved FAQItem successfully.");
+                return GetMapper().Map<FAQItemResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving FAQItem by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting FAQItem with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("FAQItem with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting FAQItem with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<FAQItemRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<FAQItemRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} FAQItems...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} FAQItems deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple FAQItems.");
             }
         }
     }

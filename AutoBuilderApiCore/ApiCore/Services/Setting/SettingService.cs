@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class SettingService : BaseService<SettingRequestDso, SettingResponseDso>, IUseSettingService
     {
         private readonly ISettingShareRepository _builder;
-        private readonly ILogger _logger;
-        public SettingService(ISettingShareRepository settingShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public SettingService(ISettingShareRepository buildSettingShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = settingShareRepository;
-            _logger = logger.CreateLogger(typeof(SettingService).FullName);
+            _builder = buildSettingShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Setting entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Setting entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (SettingResponseDso)result;
+                var output = GetMapper().Map<SettingResponseDso>(result);
                 _logger.LogInformation("Created Setting entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<SettingResponseDso>> CreateRangeAsync(IEnumerable<SettingRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Setting entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Setting entities.");
-                return Task.FromResult<IEnumerable<SettingResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Setting entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<SettingResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Setting entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Setting entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<SettingResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Setting entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Setting entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<SettingResponseDso?> FindAsync(Expression<Func<SettingResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Setting entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Setting entity.");
-                return Task.FromResult<SettingResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<SettingResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<SettingResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Setting entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<SettingResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Setting entities.");
-                return Task.FromResult<IEnumerable<SettingResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<SettingResponseDso?> GetByIdAsync(string id)
+        public override async Task<SettingResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Setting entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<SettingResponseDso>(result);
+                _logger.LogInformation("Retrieved Setting entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Setting entity with ID: {id}.");
-                return Task.FromResult<SettingResponseDso>(null);
-            }
-        }
-
-        public Task<SettingResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Setting entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Setting entity with numeric ID: {id}.");
-                return Task.FromResult<SettingResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<SettingResponseDso> for Setting entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<SettingResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Setting entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Setting entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<SettingResponseDso> UpdateAsync(SettingRequestDso entity)
+        public override async Task<SettingResponseDso> UpdateAsync(SettingRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Setting entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<SettingResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Setting entity.");
-                return Task.FromResult<SettingResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Setting exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Setting not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Setting with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<SettingResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Settings with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<SettingResponseDso>>(results.Data);
+                return new PagedResponse<SettingResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Settings.");
+                return new PagedResponse<SettingResponseDso>(new List<SettingResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<SettingResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Setting by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Setting not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Setting successfully.");
+                return GetMapper().Map<SettingResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Setting by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Setting with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Setting with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Setting with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<SettingRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<SettingRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Settings...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Settings deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Settings.");
             }
         }
     }

@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator;
 using System;
 
 namespace ApiCore.Repositorys.Share
@@ -23,8 +24,6 @@ namespace ApiCore.Repositorys.Share
     {
         // Declare the builder repository.
         private readonly TypeModelBuilderRepository _builder;
-        // Declare a logger for the repository.
-        private readonly ILogger _logger;
         /// <summary>
         /// Constructor for TypeModelShareRepository.
         /// </summary>
@@ -32,8 +31,7 @@ namespace ApiCore.Repositorys.Share
         {
             // Initialize the builder repository.
             _builder = new TypeModelBuilderRepository(dbContext, mapper, logger.CreateLogger(typeof(TypeModelShareRepository).FullName));
-            // Initialize the logger.
-            _logger = logger.CreateLogger(typeof(TypeModelShareRepository).FullName);
+        // Initialize the logger.
         }
 
         /// <summary>
@@ -44,7 +42,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Counting TypeModel entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -64,7 +62,7 @@ namespace ApiCore.Repositorys.Share
                 // Call the create method in the builder repository.
                 var result = await _builder.CreateAsync(entity);
                 // Convert the result to ResponseShareDto type.
-                var output = (TypeModelResponseShareDto)result;
+                var output = MapToShareResponseDto(result);
                 _logger.LogInformation("Created TypeModel entity successfully.");
                 // Return the final result.
                 return output;
@@ -77,138 +75,36 @@ namespace ApiCore.Repositorys.Share
         }
 
         /// <summary>
-        /// Method to create a range of entities asynchronously.
-        /// </summary>
-        public override Task<IEnumerable<TypeModelResponseShareDto>> CreateRangeAsync(IEnumerable<TypeModelRequestShareDto> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of TypeModel entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for TypeModel entities.");
-                return Task.FromResult<IEnumerable<TypeModelResponseShareDto>>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a specific entity.
-        /// </summary>
-        public override Task DeleteAsync(string id)
-        {
-            try
-            {
-                _logger.LogInformation($"Deleting TypeModel entity with ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error while deleting TypeModel entity with ID: {id}.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to delete a range of entities based on a condition.
-        /// </summary>
-        public override Task DeleteRangeAsync(Expression<Func<TypeModelResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of TypeModel entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for TypeModel entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        /// <summary>
-        /// Method to check if an entity exists based on a condition.
-        /// </summary>
-        public override Task<bool> ExistsAsync(Expression<Func<TypeModelResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of TypeModel entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for TypeModel entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        /// <summary>
-        /// Method to find an entity based on a condition.
-        /// </summary>
-        public override Task<TypeModelResponseShareDto?> FindAsync(Expression<Func<TypeModelResponseShareDto, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding TypeModel entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for TypeModel entity.");
-                return Task.FromResult<TypeModelResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
         /// Method to retrieve all entities.
         /// </summary>
-        public override Task<IEnumerable<TypeModelResponseShareDto>> GetAllAsync()
+        public override async Task<IEnumerable<TypeModelResponseShareDto>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all TypeModel entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(await _builder.GetAllAsync());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for TypeModel entities.");
-                return Task.FromResult<IEnumerable<TypeModelResponseShareDto>>(null);
+                return null;
             }
         }
 
         /// <summary>
         /// Method to get an entity by its unique ID.
         /// </summary>
-        public override Task<TypeModelResponseShareDto?> GetByIdAsync(string id)
+        public override async Task<TypeModelResponseShareDto?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving TypeModel entity with ID: {id}...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for TypeModel entity with ID: {id}.");
-                return Task.FromResult<TypeModelResponseShareDto>(null);
-            }
-        }
-
-        /// <summary>
-        /// Method to get data using a specific ID.
-        /// </summary>
-        public Task<TypeModelResponseShareDto> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for TypeModel entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for TypeModel entity with numeric ID: {id}.");
-                return Task.FromResult<TypeModelResponseShareDto>(null);
+                return null;
             }
         }
 
@@ -220,7 +116,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<TypeModelResponseShareDto> for TypeModel entities...");
-                throw new NotImplementedException();
+                return MapToIEnumerableShareResponseDto(_builder.GetQueryable().ToList()).AsQueryable();
             }
             catch (Exception ex)
             {
@@ -249,17 +145,104 @@ namespace ApiCore.Repositorys.Share
         /// <summary>
         /// Method to update a specific entity.
         /// </summary>
-        public override Task<TypeModelResponseShareDto> UpdateAsync(TypeModelRequestShareDto entity)
+        public override async Task<TypeModelResponseShareDto> UpdateAsync(TypeModelRequestShareDto entity)
         {
             try
             {
                 _logger.LogInformation("Updating TypeModel entity...");
-                throw new NotImplementedException();
+                return MapToShareResponseDto(await _builder.UpdateAsync(entity));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for TypeModel entity.");
-                return Task.FromResult<TypeModelResponseShareDto>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if TypeModel exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("TypeModel not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of TypeModel with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<TypeModelResponseShareDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all TypeModels with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = MapToIEnumerableShareResponseDto(results.Data);
+                return new PagedResponse<TypeModelResponseShareDto>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all TypeModels.");
+                return new PagedResponse<TypeModelResponseShareDto>(new List<TypeModelResponseShareDto>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<TypeModelResponseShareDto?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching TypeModel by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("TypeModel not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved TypeModel successfully.");
+                return MapToShareResponseDto(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving TypeModel by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting TypeModel with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("TypeModel with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting TypeModel with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<TypeModelRequestShareDto> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<TypeModelRequestBuildDto>().ToList();
+                _logger.LogInformation("Deleting {Count} TypeModels...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} TypeModels deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple TypeModels.");
             }
         }
     }

@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class PlanFeatureService : BaseService<PlanFeatureRequestDso, PlanFeatureResponseDso>, IUsePlanFeatureService
     {
         private readonly IPlanFeatureShareRepository _builder;
-        private readonly ILogger _logger;
-        public PlanFeatureService(IPlanFeatureShareRepository planfeatureShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public PlanFeatureService(IPlanFeatureShareRepository buildPlanFeatureShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = planfeatureShareRepository;
-            _logger = logger.CreateLogger(typeof(PlanFeatureService).FullName);
+            _builder = buildPlanFeatureShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting PlanFeature entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new PlanFeature entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (PlanFeatureResponseDso)result;
+                var output = GetMapper().Map<PlanFeatureResponseDso>(result);
                 _logger.LogInformation("Created PlanFeature entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<PlanFeatureResponseDso>> CreateRangeAsync(IEnumerable<PlanFeatureRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of PlanFeature entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for PlanFeature entities.");
-                return Task.FromResult<IEnumerable<PlanFeatureResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting PlanFeature entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<PlanFeatureResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of PlanFeature entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for PlanFeature entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<PlanFeatureResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of PlanFeature entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for PlanFeature entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<PlanFeatureResponseDso?> FindAsync(Expression<Func<PlanFeatureResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding PlanFeature entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for PlanFeature entity.");
-                return Task.FromResult<PlanFeatureResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<PlanFeatureResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<PlanFeatureResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all PlanFeature entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<PlanFeatureResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for PlanFeature entities.");
-                return Task.FromResult<IEnumerable<PlanFeatureResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<PlanFeatureResponseDso?> GetByIdAsync(string id)
+        public override async Task<PlanFeatureResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving PlanFeature entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<PlanFeatureResponseDso>(result);
+                _logger.LogInformation("Retrieved PlanFeature entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for PlanFeature entity with ID: {id}.");
-                return Task.FromResult<PlanFeatureResponseDso>(null);
-            }
-        }
-
-        public Task<PlanFeatureResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for PlanFeature entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for PlanFeature entity with numeric ID: {id}.");
-                return Task.FromResult<PlanFeatureResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<PlanFeatureResponseDso> for PlanFeature entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<PlanFeatureResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for PlanFeature entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for PlanFeature entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<PlanFeatureResponseDso> UpdateAsync(PlanFeatureRequestDso entity)
+        public override async Task<PlanFeatureResponseDso> UpdateAsync(PlanFeatureRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating PlanFeature entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<PlanFeatureResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for PlanFeature entity.");
-                return Task.FromResult<PlanFeatureResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if PlanFeature exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("PlanFeature not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of PlanFeature with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<PlanFeatureResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all PlanFeatures with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<PlanFeatureResponseDso>>(results.Data);
+                return new PagedResponse<PlanFeatureResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all PlanFeatures.");
+                return new PagedResponse<PlanFeatureResponseDso>(new List<PlanFeatureResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<PlanFeatureResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching PlanFeature by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("PlanFeature not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved PlanFeature successfully.");
+                return GetMapper().Map<PlanFeatureResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving PlanFeature by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting PlanFeature with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("PlanFeature with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting PlanFeature with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<PlanFeatureRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<PlanFeatureRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} PlanFeatures...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} PlanFeatures deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple PlanFeatures.");
             }
         }
     }

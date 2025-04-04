@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class DialectService : BaseService<DialectRequestDso, DialectResponseDso>, IUseDialectService
     {
         private readonly IDialectShareRepository _builder;
-        private readonly ILogger _logger;
-        public DialectService(IDialectShareRepository dialectShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public DialectService(IDialectShareRepository buildDialectShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = dialectShareRepository;
-            _logger = logger.CreateLogger(typeof(DialectService).FullName);
+            _builder = buildDialectShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Dialect entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Dialect entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (DialectResponseDso)result;
+                var output = GetMapper().Map<DialectResponseDso>(result);
                 _logger.LogInformation("Created Dialect entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<DialectResponseDso>> CreateRangeAsync(IEnumerable<DialectRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Dialect entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Dialect entities.");
-                return Task.FromResult<IEnumerable<DialectResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Dialect entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<DialectResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Dialect entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Dialect entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<DialectResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Dialect entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Dialect entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<DialectResponseDso?> FindAsync(Expression<Func<DialectResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Dialect entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Dialect entity.");
-                return Task.FromResult<DialectResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<DialectResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<DialectResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Dialect entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<DialectResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Dialect entities.");
-                return Task.FromResult<IEnumerable<DialectResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<DialectResponseDso?> GetByIdAsync(string id)
+        public override async Task<DialectResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Dialect entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<DialectResponseDso>(result);
+                _logger.LogInformation("Retrieved Dialect entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Dialect entity with ID: {id}.");
-                return Task.FromResult<DialectResponseDso>(null);
-            }
-        }
-
-        public Task<DialectResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Dialect entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Dialect entity with numeric ID: {id}.");
-                return Task.FromResult<DialectResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<DialectResponseDso> for Dialect entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<DialectResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Dialect entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Dialect entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<DialectResponseDso> UpdateAsync(DialectRequestDso entity)
+        public override async Task<DialectResponseDso> UpdateAsync(DialectRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Dialect entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<DialectResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Dialect entity.");
-                return Task.FromResult<DialectResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Dialect exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Dialect not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Dialect with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<DialectResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Dialects with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<DialectResponseDso>>(results.Data);
+                return new PagedResponse<DialectResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Dialects.");
+                return new PagedResponse<DialectResponseDso>(new List<DialectResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<DialectResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Dialect by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Dialect not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Dialect successfully.");
+                return GetMapper().Map<DialectResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Dialect by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Dialect with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Dialect with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Dialect with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<DialectRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<DialectRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Dialects...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Dialects deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Dialects.");
             }
         }
     }

@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class PlanService : BaseService<PlanRequestDso, PlanResponseDso>, IUsePlanService
     {
         private readonly IPlanShareRepository _builder;
-        private readonly ILogger _logger;
-        public PlanService(IPlanShareRepository planShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public PlanService(IPlanShareRepository buildPlanShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = planShareRepository;
-            _logger = logger.CreateLogger(typeof(PlanService).FullName);
+            _builder = buildPlanShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Plan entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Plan entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (PlanResponseDso)result;
+                var output = GetMapper().Map<PlanResponseDso>(result);
                 _logger.LogInformation("Created Plan entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<PlanResponseDso>> CreateRangeAsync(IEnumerable<PlanRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Plan entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Plan entities.");
-                return Task.FromResult<IEnumerable<PlanResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Plan entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<PlanResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Plan entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Plan entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<PlanResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Plan entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Plan entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<PlanResponseDso?> FindAsync(Expression<Func<PlanResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Plan entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Plan entity.");
-                return Task.FromResult<PlanResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<PlanResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<PlanResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Plan entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<PlanResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Plan entities.");
-                return Task.FromResult<IEnumerable<PlanResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<PlanResponseDso?> GetByIdAsync(string id)
+        public override async Task<PlanResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Plan entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<PlanResponseDso>(result);
+                _logger.LogInformation("Retrieved Plan entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Plan entity with ID: {id}.");
-                return Task.FromResult<PlanResponseDso>(null);
-            }
-        }
-
-        public Task<PlanResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Plan entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Plan entity with numeric ID: {id}.");
-                return Task.FromResult<PlanResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<PlanResponseDso> for Plan entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<PlanResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Plan entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Plan entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<PlanResponseDso> UpdateAsync(PlanRequestDso entity)
+        public override async Task<PlanResponseDso> UpdateAsync(PlanRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Plan entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<PlanResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Plan entity.");
-                return Task.FromResult<PlanResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Plan exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Plan not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Plan with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<PlanResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Plans with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<PlanResponseDso>>(results.Data);
+                return new PagedResponse<PlanResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Plans.");
+                return new PagedResponse<PlanResponseDso>(new List<PlanResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<PlanResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Plan by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Plan not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Plan successfully.");
+                return GetMapper().Map<PlanResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Plan by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Plan with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Plan with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Plan with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<PlanRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<PlanRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Plans...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Plans deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Plans.");
             }
         }
     }

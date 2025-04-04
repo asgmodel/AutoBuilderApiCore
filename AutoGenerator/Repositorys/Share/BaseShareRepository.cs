@@ -115,6 +115,19 @@ namespace AutoGenerator.Repositorys.Share
             return _mapper.Map<IEnumerable<TShareRequestDto>>(buildRequestDto);
         }
 
+
+        protected IEnumerable<TShareResponseDto> MapToIEnumerableShareResponseDto(IEnumerable<TBuildResponseDto> buildResponseDto)
+        {
+            if (buildResponseDto == null)
+            {
+                _logger.LogError("Mapping failed: TBuildRequestDto is null.");
+                throw new ArgumentNullException(nameof(buildResponseDto), "The build request DTO cannot be null.");
+            }
+
+            return _mapper.Map<IEnumerable<TShareResponseDto>>(buildResponseDto);
+        }
+
+
         protected TBuildResponseDto MapToBuildResponseDto(TShareResponseDto shareResponseDto)
         {
             if (shareResponseDto == null)
@@ -181,42 +194,42 @@ namespace AutoGenerator.Repositorys.Share
             throw new NotImplementedException();
         }
 
-        public Task<TShareResponseDto?> FindAsync(params object[] id)
+        public virtual Task<TShareResponseDto?> FindAsync(params object[] id)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> ExistsAsync(object value, string name = "Id")
+        public virtual  Task<bool> ExistsAsync(object value, string name = "Id")
         {
             throw new NotImplementedException();
         }
 
-        public Task<PagedResponse<TShareResponseDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        public virtual  Task<PagedResponse<TShareResponseDto>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
         {
             throw new NotImplementedException();
         }
 
-        public Task<TShareResponseDto?> GetByIdAsync(object id)
+        public virtual Task<TShareResponseDto?> GetByIdAsync(object id)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAllAsync()
+        public virtual Task DeleteAllAsync()
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(TShareRequestDto entity)
+        public virtual Task DeleteAsync(TShareRequestDto entity)
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteAsync(object value, string key = "Id")
+        public virtual Task DeleteAsync(object value, string key = "Id")
         {
             throw new NotImplementedException();
         }
 
-        public Task DeleteRange(List<TShareRequestDto> entities)
+        public  virtual Task DeleteRange(List<TShareRequestDto> entities)
         {
             throw new NotImplementedException();
         }

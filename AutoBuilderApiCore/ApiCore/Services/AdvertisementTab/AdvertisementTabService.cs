@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class AdvertisementTabService : BaseService<AdvertisementTabRequestDso, AdvertisementTabResponseDso>, IUseAdvertisementTabService
     {
         private readonly IAdvertisementTabShareRepository _builder;
-        private readonly ILogger _logger;
-        public AdvertisementTabService(IAdvertisementTabShareRepository advertisementtabShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public AdvertisementTabService(IAdvertisementTabShareRepository buildAdvertisementTabShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = advertisementtabShareRepository;
-            _logger = logger.CreateLogger(typeof(AdvertisementTabService).FullName);
+            _builder = buildAdvertisementTabShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting AdvertisementTab entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new AdvertisementTab entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (AdvertisementTabResponseDso)result;
+                var output = GetMapper().Map<AdvertisementTabResponseDso>(result);
                 _logger.LogInformation("Created AdvertisementTab entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<AdvertisementTabResponseDso>> CreateRangeAsync(IEnumerable<AdvertisementTabRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of AdvertisementTab entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for AdvertisementTab entities.");
-                return Task.FromResult<IEnumerable<AdvertisementTabResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting AdvertisementTab entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<AdvertisementTabResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of AdvertisementTab entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for AdvertisementTab entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<AdvertisementTabResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of AdvertisementTab entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for AdvertisementTab entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<AdvertisementTabResponseDso?> FindAsync(Expression<Func<AdvertisementTabResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding AdvertisementTab entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for AdvertisementTab entity.");
-                return Task.FromResult<AdvertisementTabResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<AdvertisementTabResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<AdvertisementTabResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all AdvertisementTab entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<AdvertisementTabResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for AdvertisementTab entities.");
-                return Task.FromResult<IEnumerable<AdvertisementTabResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<AdvertisementTabResponseDso?> GetByIdAsync(string id)
+        public override async Task<AdvertisementTabResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving AdvertisementTab entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<AdvertisementTabResponseDso>(result);
+                _logger.LogInformation("Retrieved AdvertisementTab entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for AdvertisementTab entity with ID: {id}.");
-                return Task.FromResult<AdvertisementTabResponseDso>(null);
-            }
-        }
-
-        public Task<AdvertisementTabResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for AdvertisementTab entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for AdvertisementTab entity with numeric ID: {id}.");
-                return Task.FromResult<AdvertisementTabResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<AdvertisementTabResponseDso> for AdvertisementTab entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<AdvertisementTabResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for AdvertisementTab entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for AdvertisementTab entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<AdvertisementTabResponseDso> UpdateAsync(AdvertisementTabRequestDso entity)
+        public override async Task<AdvertisementTabResponseDso> UpdateAsync(AdvertisementTabRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating AdvertisementTab entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<AdvertisementTabResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for AdvertisementTab entity.");
-                return Task.FromResult<AdvertisementTabResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if AdvertisementTab exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("AdvertisementTab not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of AdvertisementTab with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<AdvertisementTabResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all AdvertisementTabs with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<AdvertisementTabResponseDso>>(results.Data);
+                return new PagedResponse<AdvertisementTabResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all AdvertisementTabs.");
+                return new PagedResponse<AdvertisementTabResponseDso>(new List<AdvertisementTabResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<AdvertisementTabResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching AdvertisementTab by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("AdvertisementTab not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved AdvertisementTab successfully.");
+                return GetMapper().Map<AdvertisementTabResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving AdvertisementTab by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting AdvertisementTab with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("AdvertisementTab with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting AdvertisementTab with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<AdvertisementTabRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<AdvertisementTabRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} AdvertisementTabs...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} AdvertisementTabs deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple AdvertisementTabs.");
             }
         }
     }

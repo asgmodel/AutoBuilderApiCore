@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class InvoiceService : BaseService<InvoiceRequestDso, InvoiceResponseDso>, IUseInvoiceService
     {
         private readonly IInvoiceShareRepository _builder;
-        private readonly ILogger _logger;
-        public InvoiceService(IInvoiceShareRepository invoiceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public InvoiceService(IInvoiceShareRepository buildInvoiceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = invoiceShareRepository;
-            _logger = logger.CreateLogger(typeof(InvoiceService).FullName);
+            _builder = buildInvoiceShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Invoice entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new Invoice entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (InvoiceResponseDso)result;
+                var output = GetMapper().Map<InvoiceResponseDso>(result);
                 _logger.LogInformation("Created Invoice entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<InvoiceResponseDso>> CreateRangeAsync(IEnumerable<InvoiceRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of Invoice entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for Invoice entities.");
-                return Task.FromResult<IEnumerable<InvoiceResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting Invoice entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of Invoice entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for Invoice entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of Invoice entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for Invoice entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<InvoiceResponseDso?> FindAsync(Expression<Func<InvoiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding Invoice entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for Invoice entity.");
-                return Task.FromResult<InvoiceResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<InvoiceResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<InvoiceResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all Invoice entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<InvoiceResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for Invoice entities.");
-                return Task.FromResult<IEnumerable<InvoiceResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<InvoiceResponseDso?> GetByIdAsync(string id)
+        public override async Task<InvoiceResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving Invoice entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<InvoiceResponseDso>(result);
+                _logger.LogInformation("Retrieved Invoice entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for Invoice entity with ID: {id}.");
-                return Task.FromResult<InvoiceResponseDso>(null);
-            }
-        }
-
-        public Task<InvoiceResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for Invoice entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for Invoice entity with numeric ID: {id}.");
-                return Task.FromResult<InvoiceResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<InvoiceResponseDso> for Invoice entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<InvoiceResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for Invoice entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for Invoice entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<InvoiceResponseDso> UpdateAsync(InvoiceRequestDso entity)
+        public override async Task<InvoiceResponseDso> UpdateAsync(InvoiceRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating Invoice entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<InvoiceResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for Invoice entity.");
-                return Task.FromResult<InvoiceResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if Invoice exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("Invoice not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of Invoice with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<InvoiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all Invoices with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<InvoiceResponseDso>>(results.Data);
+                return new PagedResponse<InvoiceResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all Invoices.");
+                return new PagedResponse<InvoiceResponseDso>(new List<InvoiceResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<InvoiceResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching Invoice by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("Invoice not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved Invoice successfully.");
+                return GetMapper().Map<InvoiceResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving Invoice by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting Invoice with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("Invoice with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting Invoice with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<InvoiceRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<InvoiceRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} Invoices...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} Invoices deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple Invoices.");
             }
         }
     }

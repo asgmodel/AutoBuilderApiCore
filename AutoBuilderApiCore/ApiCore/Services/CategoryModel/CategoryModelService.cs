@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class CategoryModelService : BaseService<CategoryModelRequestDso, CategoryModelResponseDso>, IUseCategoryModelService
     {
         private readonly ICategoryModelShareRepository _builder;
-        private readonly ILogger _logger;
-        public CategoryModelService(ICategoryModelShareRepository categorymodelShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public CategoryModelService(ICategoryModelShareRepository buildCategoryModelShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = categorymodelShareRepository;
-            _logger = logger.CreateLogger(typeof(CategoryModelService).FullName);
+            _builder = buildCategoryModelShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting CategoryModel entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new CategoryModel entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (CategoryModelResponseDso)result;
+                var output = GetMapper().Map<CategoryModelResponseDso>(result);
                 _logger.LogInformation("Created CategoryModel entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<CategoryModelResponseDso>> CreateRangeAsync(IEnumerable<CategoryModelRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of CategoryModel entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for CategoryModel entities.");
-                return Task.FromResult<IEnumerable<CategoryModelResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting CategoryModel entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<CategoryModelResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of CategoryModel entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for CategoryModel entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<CategoryModelResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of CategoryModel entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for CategoryModel entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<CategoryModelResponseDso?> FindAsync(Expression<Func<CategoryModelResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding CategoryModel entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for CategoryModel entity.");
-                return Task.FromResult<CategoryModelResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<CategoryModelResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<CategoryModelResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all CategoryModel entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<CategoryModelResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for CategoryModel entities.");
-                return Task.FromResult<IEnumerable<CategoryModelResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<CategoryModelResponseDso?> GetByIdAsync(string id)
+        public override async Task<CategoryModelResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving CategoryModel entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<CategoryModelResponseDso>(result);
+                _logger.LogInformation("Retrieved CategoryModel entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for CategoryModel entity with ID: {id}.");
-                return Task.FromResult<CategoryModelResponseDso>(null);
-            }
-        }
-
-        public Task<CategoryModelResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for CategoryModel entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for CategoryModel entity with numeric ID: {id}.");
-                return Task.FromResult<CategoryModelResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<CategoryModelResponseDso> for CategoryModel entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<CategoryModelResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for CategoryModel entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for CategoryModel entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<CategoryModelResponseDso> UpdateAsync(CategoryModelRequestDso entity)
+        public override async Task<CategoryModelResponseDso> UpdateAsync(CategoryModelRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating CategoryModel entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<CategoryModelResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for CategoryModel entity.");
-                return Task.FromResult<CategoryModelResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if CategoryModel exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("CategoryModel not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of CategoryModel with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<CategoryModelResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all CategoryModels with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<CategoryModelResponseDso>>(results.Data);
+                return new PagedResponse<CategoryModelResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all CategoryModels.");
+                return new PagedResponse<CategoryModelResponseDso>(new List<CategoryModelResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<CategoryModelResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching CategoryModel by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("CategoryModel not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved CategoryModel successfully.");
+                return GetMapper().Map<CategoryModelResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving CategoryModel by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting CategoryModel with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("CategoryModel with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting CategoryModel with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<CategoryModelRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<CategoryModelRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} CategoryModels...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} CategoryModels deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple CategoryModels.");
             }
         }
     }

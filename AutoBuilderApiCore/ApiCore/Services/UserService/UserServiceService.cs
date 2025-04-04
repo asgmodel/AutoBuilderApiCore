@@ -1,4 +1,4 @@
-using AutoGenerator.Data;
+using AutoGenerator;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
@@ -19,11 +19,9 @@ namespace ApiCore.Services.Services
     public class UserServiceService : BaseService<UserServiceRequestDso, UserServiceResponseDso>, IUseUserServiceService
     {
         private readonly IUserServiceShareRepository _builder;
-        private readonly ILogger _logger;
-        public UserServiceService(IUserServiceShareRepository userserviceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        public UserServiceService(IUserServiceShareRepository buildUserServiceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = userserviceShareRepository;
-            _logger = logger.CreateLogger(typeof(UserServiceService).FullName);
+            _builder = buildUserServiceShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -31,7 +29,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting UserService entities...");
-                throw new NotImplementedException();
+                return _builder.CountAsync();
             }
             catch (Exception ex)
             {
@@ -46,7 +44,7 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation("Creating new UserService entity...");
                 var result = await _builder.CreateAsync(entity);
-                var output = (UserServiceResponseDso)result;
+                var output = GetMapper().Map<UserServiceResponseDso>(result);
                 _logger.LogInformation("Created UserService entity successfully.");
                 return output;
             }
@@ -57,26 +55,12 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task<IEnumerable<UserServiceResponseDso>> CreateRangeAsync(IEnumerable<UserServiceRequestDso> entities)
-        {
-            try
-            {
-                _logger.LogInformation("Creating a range of UserService entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in CreateRangeAsync for UserService entities.");
-                return Task.FromResult<IEnumerable<UserServiceResponseDso>>(null);
-            }
-        }
-
         public override Task DeleteAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Deleting UserService entity with ID: {id}...");
-                throw new NotImplementedException();
+                return _builder.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -85,87 +69,35 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public override Task DeleteRangeAsync(Expression<Func<UserServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Deleting a range of UserService entities based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in DeleteRangeAsync for UserService entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<bool> ExistsAsync(Expression<Func<UserServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Checking existence of UserService entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in ExistsAsync for UserService entity.");
-                return Task.FromResult(false);
-            }
-        }
-
-        public override Task<UserServiceResponseDso?> FindAsync(Expression<Func<UserServiceResponseDso, bool>> predicate)
-        {
-            try
-            {
-                _logger.LogInformation("Finding UserService entity based on condition...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in FindAsync for UserService entity.");
-                return Task.FromResult<UserServiceResponseDso>(null);
-            }
-        }
-
-        public override Task<IEnumerable<UserServiceResponseDso>> GetAllAsync()
+        public override async Task<IEnumerable<UserServiceResponseDso>> GetAllAsync()
         {
             try
             {
                 _logger.LogInformation("Retrieving all UserService entities...");
-                throw new NotImplementedException();
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<IEnumerable<UserServiceResponseDso>>(results);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in GetAllAsync for UserService entities.");
-                return Task.FromResult<IEnumerable<UserServiceResponseDso>>(null);
+                return null;
             }
         }
 
-        public override Task<UserServiceResponseDso?> GetByIdAsync(string id)
+        public override async Task<UserServiceResponseDso?> GetByIdAsync(string id)
         {
             try
             {
                 _logger.LogInformation($"Retrieving UserService entity with ID: {id}...");
-                throw new NotImplementedException();
+                var result = await _builder.GetByIdAsync(id);
+                var item = GetMapper().Map<UserServiceResponseDso>(result);
+                _logger.LogInformation("Retrieved UserService entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in GetByIdAsync for UserService entity with ID: {id}.");
-                return Task.FromResult<UserServiceResponseDso>(null);
-            }
-        }
-
-        public Task<UserServiceResponseDso> getData(int id)
-        {
-            try
-            {
-                _logger.LogInformation($"Getting data for UserService entity with numeric ID: {id}...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in getData for UserService entity with numeric ID: {id}.");
-                return Task.FromResult<UserServiceResponseDso>(null);
+                return null;
             }
         }
 
@@ -174,7 +106,9 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<UserServiceResponseDso> for UserService entities...");
-                throw new NotImplementedException();
+                var queryable = _builder.GetQueryable();
+                var result = GetMapper().ProjectTo<UserServiceResponseDso>(queryable);
+                return result;
             }
             catch (Exception ex)
             {
@@ -183,31 +117,105 @@ namespace ApiCore.Services.Services
             }
         }
 
-        public Task SaveChangesAsync()
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database for UserService entities...");
-                throw new NotImplementedException();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error in SaveChangesAsync for UserService entities.");
-                return Task.CompletedTask;
-            }
-        }
-
-        public override Task<UserServiceResponseDso> UpdateAsync(UserServiceRequestDso entity)
+        public override async Task<UserServiceResponseDso> UpdateAsync(UserServiceRequestDso entity)
         {
             try
             {
                 _logger.LogInformation("Updating UserService entity...");
-                throw new NotImplementedException();
+                var result = await _builder.UpdateAsync(entity);
+                return GetMapper().Map<UserServiceResponseDso>(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error in UpdateAsync for UserService entity.");
-                return Task.FromResult<UserServiceResponseDso>(null);
+                return null;
+            }
+        }
+
+        public override async Task<bool> ExistsAsync(object value, string name = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Checking if UserService exists with {Key}: {Value}", name, value);
+                var exists = await _builder.ExistsAsync(value, name);
+                if (!exists)
+                {
+                    _logger.LogWarning("UserService not found with {Key}: {Value}", name, value);
+                }
+
+                return exists;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while checking existence of UserService with {Key}: {Value}", name, value);
+                return false;
+            }
+        }
+
+        public override async Task<PagedResponse<UserServiceResponseDso>> GetAllAsync(string[]? includes = null, int pageNumber = 1, int pageSize = 10)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching all UserServices with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
+                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var items = GetMapper().Map<List<UserServiceResponseDso>>(results.Data);
+                return new PagedResponse<UserServiceResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while fetching all UserServices.");
+                return new PagedResponse<UserServiceResponseDso>(new List<UserServiceResponseDso>(), pageNumber, pageSize, 0);
+            }
+        }
+
+        public override async Task<UserServiceResponseDso?> GetByIdAsync(object id)
+        {
+            try
+            {
+                _logger.LogInformation("Fetching UserService by ID: {Id}", id);
+                var result = await _builder.GetByIdAsync(id);
+                if (result == null)
+                {
+                    _logger.LogWarning("UserService not found with ID: {Id}", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Retrieved UserService successfully.");
+                return GetMapper().Map<UserServiceResponseDso>(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while retrieving UserService by ID: {Id}", id);
+                return null;
+            }
+        }
+
+        public override async Task DeleteAsync(object value, string key = "Id")
+        {
+            try
+            {
+                _logger.LogInformation("Deleting UserService with {Key}: {Value}", key, value);
+                await _builder.DeleteAsync(value, key);
+                _logger.LogInformation("UserService with {Key}: {Value} deleted successfully.", key, value);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting UserService with {Key}: {Value}", key, value);
+            }
+        }
+
+        public override async Task DeleteRange(List<UserServiceRequestDso> entities)
+        {
+            try
+            {
+                var builddtos = entities.OfType<UserServiceRequestShareDto>().ToList();
+                _logger.LogInformation("Deleting {Count} UserServices...", 201);
+                await _builder.DeleteRange(builddtos);
+                _logger.LogInformation("{Count} UserServices deleted successfully.", 202);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting multiple UserServices.");
             }
         }
     }

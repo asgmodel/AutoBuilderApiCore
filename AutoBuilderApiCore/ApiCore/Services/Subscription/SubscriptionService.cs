@@ -90,7 +90,6 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation($"Retrieving Subscription entity with ID: {id}...");
                 var result = await _builder.GetByIdAsync(id);
-                var  active= result.Roles.CheckRole("Active");
 
                 if (result.Roles.IsSuccessLayer())
                 {

@@ -8,7 +8,7 @@ namespace AutoGenerator.Helper.Translation
 
     public class RoleCase
     {
-        public Dictionary<string, Func<bool, object>> Roles { set; get; }
+        private Dictionary<string, Func<bool, object>> Roles { set; get; }
 
         public RoleCase()
         {

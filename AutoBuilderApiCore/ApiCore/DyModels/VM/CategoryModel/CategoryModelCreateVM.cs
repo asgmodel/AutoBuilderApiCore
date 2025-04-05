@@ -12,7 +12,7 @@ namespace ApiCore.DyModels.VMs
     {
         //
         public TranslationData? Name { get; set; }
-       
+        //
         public TranslationData? Description { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        public TranslationData? Name { get; set; }
+        public TranslationData? Name { get; set; } = new();
         /// <summary>
         /// Token property for DTO.
         /// </summary>
@@ -21,11 +21,11 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// AbsolutePath property for DTO.
         /// </summary>
         public String? AbsolutePath { get; set; }
-        public TranslationData? Category { get; set; }
-        public TranslationData? Language { get; set; }
-        public TranslationData? IsStandard { get; set; }
-        public TranslationData? Gender { get; set; }
-        public TranslationData? Dialect { get; set; }
+        public TranslationData? Category { get; set; } = new();
+        public TranslationData? Language { get; set; } = new();
+        public TranslationData? IsStandard { get; set; } = new();
+        public TranslationData? Gender { get; set; } = new();
+        public TranslationData? Dialect { get; set; } = new();
         /// <summary>
         /// Type property for DTO.
         /// </summary>

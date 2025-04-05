@@ -16,8 +16,8 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// ProductId property for DTO.
         /// </summary>
         public String? ProductId { get; set; }
-        public TranslationData? ProductName { get; set; }
-        public TranslationData? Description { get; set; }
+        public TranslationData? ProductName { get; set; } = new();
+        public TranslationData? Description { get; set; } = new();
         public ICollection<String>? Images { get; set; }
         /// <summary>
         /// BillingPeriod property for DTO.

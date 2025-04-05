@@ -12,7 +12,7 @@ namespace ApiCore.DyModels.Dto.Build.Requests
         /// Id property for DTO.
         /// </summary>
         public String? Id { get; set; }
-        public TranslationData? Name { get; set; }
-        public TranslationData? Description { get; set; }
+        public TranslationData? Name { get; set; } = new();
+        public TranslationData? Description { get; set; } = new();
     }
 }

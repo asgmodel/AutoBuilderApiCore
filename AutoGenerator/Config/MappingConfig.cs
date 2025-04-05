@@ -122,28 +122,19 @@ namespace AutoGenerator.Config
 
                         CreateMap(model, dto).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                         {
-                            Dictionary<string, object>? items = new Dictionary<string, object>();
-                            try
-                            {
-                                items = context.Items;
-                            }
-                            catch { }
+                           
 
-                            return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+                            return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
 
                         }));
 
                         CreateMap(dto,model).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                         {
 
-                            Dictionary<string, object>? items = new Dictionary<string, object>();
-                            try
-                            {
-                                items = context.Items;
-                            }
-                            catch { }
+                           
+                           
 
-                            return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+                            return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
 
                         }));
 
@@ -186,28 +177,19 @@ namespace AutoGenerator.Config
                         {
                             CreateMap(dso, vm).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                             {
-                                Dictionary<string,object>? items=new Dictionary<string, object>();
-                                try
-                                {
-                                     items = context.Items;
-                                }
-                                catch { }
+                              
 
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+                                return HelperTranslation.MapToTranslationData(src, dest, destMember,context);
 
                             }));
 
                             CreateMap(vm,dso).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
                             {
 
-                                Dictionary<string, object>? items = new Dictionary<string, object>();
-                                try
-                                {
-                                    items = context.Items;
-                                }
-                                catch { }
+                              
+                               
 
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember, items);
+                                return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
 
                             }));
                         }

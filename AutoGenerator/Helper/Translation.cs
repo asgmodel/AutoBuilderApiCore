@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using AutoMapper;
+using Newtonsoft.Json;
 
 namespace AutoGenerator.Helper.Translation   
 {
@@ -72,7 +73,7 @@ namespace AutoGenerator.Helper.Translation
 
 
 
-        public static object MapToTranslationData<S, D>(S src, D dest, object destMember,Dictionary<string,object>? items)
+        public static object MapToTranslationData<S, D>(S src, D dest, object destMember, ResolutionContext context)
         {
 
 
@@ -94,10 +95,16 @@ namespace AutoGenerator.Helper.Translation
 
             // Try to get the property value from src using the identified name
             var item = src.GetType().GetProperty(name)?.GetValue(src);
-
+            if(item is ITranslationData &&destMember is ITranslationData)
+            {
+                return item;
+            }
             // Check if item is of type ITranslationData
             if (item is ITranslationData translationData)
             {
+                Dictionary<string, object>? items = new Dictionary<string, object>();
+                context.TryGetItems(out items);
+
                 if (items != null && items.ContainsKey(KEYLG))
                     return translationData.ToFilter((string)items[KEYLG]);
 

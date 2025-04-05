@@ -16,8 +16,8 @@ namespace ApiCore.DyModels.Dto.Build.ResponseTs
         /// AdvertisementId property for DTO.
         /// </summary>
         public String? AdvertisementId { get; set; }
-        public TranslationData? Title { get; set; }
-        public TranslationData? Description { get; set; }
+        public TranslationData? Title { get; set; } = new();
+        public TranslationData? Description { get; set; } = new();
         /// <summary>
         /// ImageAlt property for DTO.
         /// </summary>

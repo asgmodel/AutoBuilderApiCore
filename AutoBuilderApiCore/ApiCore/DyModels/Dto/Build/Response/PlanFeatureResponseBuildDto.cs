@@ -12,8 +12,8 @@ namespace ApiCore.DyModels.Dto.Build.Responses
         /// Id property for DTO.
         /// </summary>
         public Int32 Id { get; set; }
-        public TranslationData? Name { get; set; }
-        public TranslationData? Description { get; set; }
+        public TranslationData? Name { get; set; } = new();
+        public TranslationData? Description { get; set; } = new();
         /// <summary>
         /// PlanId property for DTO.
         /// </summary>

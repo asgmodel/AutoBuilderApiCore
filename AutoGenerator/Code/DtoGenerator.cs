@@ -20,7 +20,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     public static string getPTrns(string name)
     {
         return $@"
-            public TranslationData? {name} {{ get; set; }}";
+            public TranslationData? {name} {{ get; set; }}=new();";
     }
 
 

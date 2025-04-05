@@ -12,7 +12,7 @@ namespace ApiCore.DyModels.VMs
     {
         ///
         public string? Id { get; set; }
-       
-        public string? Lg { get; set; } = "Ar";
+        ///
+        public string? Lg { get; set; }
     }
 }

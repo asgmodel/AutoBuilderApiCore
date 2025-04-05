@@ -97,7 +97,7 @@ namespace ApiCore.Controllers.Api
             try
             {
                 _logger.LogInformation("Fetching Invoice with ID: {id}", id);
-                var entity = await _invoiceService.FindAsync(id);
+                var entity = await _invoiceService.GetByIdAsync(id);
                 if (entity == null)
                 {
                     _logger.LogWarning("Invoice not found with ID: {id}", id);

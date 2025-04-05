@@ -31,14 +31,13 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<CategoryModelCreateVM>>> GetAll()
+        public async Task<ActionResult<IEnumerable<CategoryModelOutputVM>>> GetAll()
         {
             try
             {
                 _logger.LogInformation("Fetching all CategoryModels...");
                 var result = await _categorymodelService.GetAllAsync();
-                
-                var items = _mapper.Map<List<CategoryModelCreateVM>>(result);
+                var items = _mapper.Map<List<CategoryModelOutputVM>>(result);
                 return Ok(items);
             }
             catch (Exception ex)
@@ -120,7 +119,7 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<IEnumerable<CategoryModelOutputVM>>> GetCategoryModelsByLg(string? lg)
+        public async Task<ActionResult<CategoryModelOutputVM>> GetCategoryModelsByLg(string? lg)
         {
             if (string.IsNullOrWhiteSpace(lg))
             {
@@ -130,13 +129,14 @@ namespace ApiCore.Controllers.Api
 
             try
             {
-                var categorymodels = (await _categorymodelService.GetAllAsync()).ToList();
+                var categorymodels = await _categorymodelService.GetAllAsync();
                 if (categorymodels == null)
                 {
                     _logger.LogWarning("CategoryModels not found  by  ");
                     return NotFound();
                 }
-                var items = _mapper.Map<List<CategoryModelOutputVM>>(categorymodels, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+
+                var items = _mapper.Map<CategoryModelOutputVM>(categorymodels, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
                 return Ok(items);
             }
             catch (Exception ex)
@@ -167,15 +167,8 @@ namespace ApiCore.Controllers.Api
 
             try
             {
-
                 _logger.LogInformation("Creating new CategoryModel with data: {@model}", model);
                 var item = _mapper.Map<CategoryModelRequestDso>(model);
-                if (item == null)
-                {
-                    _logger.LogWarning("Invalid data provided for creating CategoryModel.");
-                    return BadRequest("Invalid data provided.");
-                }
-
                 var createdEntity = await _categorymodelService.CreateAsync(item);
                 var createdItem = _mapper.Map<CategoryModelOutputVM>(createdEntity);
                 return Ok(createdItem);
@@ -210,11 +203,6 @@ namespace ApiCore.Controllers.Api
             {
                 _logger.LogInformation("Creating multiple CategoryModels.");
                 var items = _mapper.Map<List<CategoryModelRequestDso>>(models);
-                if(items == null || !items.Any())
-                {
-                    _logger.LogWarning("No valid data provided for creating multiple CategoryModels.");
-                    return BadRequest("No valid data provided.");
-                }
                 var createdEntities = await _categorymodelService.CreateRangeAsync(items);
                 var createdItems = _mapper.Map<List<CategoryModelOutputVM>>(createdEntities);
                 return Ok(createdItems);

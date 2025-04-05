@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using AutoGenerator.Config;
+using AutoMapper;
 using Newtonsoft.Json;
 
 namespace AutoGenerator.Helper.Translation   
@@ -88,6 +89,9 @@ namespace AutoGenerator.Helper.Translation
             var name = dest.GetType().GetProperties()
                             .FirstOrDefault(p => p.GetValue(dest) == destMember)?.Name;
 
+
+           
+
             if (string.IsNullOrEmpty(name))
             {
                 return destMember; // If property name is not found or it's null, return destMember as is
@@ -95,14 +99,23 @@ namespace AutoGenerator.Helper.Translation
 
             // Try to get the property value from src using the identified name
             var item = src.GetType().GetProperty(name)?.GetValue(src);
-            if(item is ITranslationData &&destMember is ITranslationData)
+           
+
+            
+          
+
+
+                if (item is ITranslationData &&destMember is ITranslationData)
             {
                 return item;
             }
             // Check if item is of type ITranslationData
             if (item is ITranslationData translationData)
             {
-                Dictionary<string, object>? items = new Dictionary<string, object>();
+
+           
+                     
+                    Dictionary<string, object>? items = new Dictionary<string, object>();
                 context.TryGetItems(out items);
 
                 if (items != null && items.ContainsKey(KEYLG))
@@ -120,6 +133,16 @@ namespace AutoGenerator.Helper.Translation
                 return ConvertToTranslationData((string)item);
             }
 
+            var filterlg = dest.GetType().GetProperties().Where(t => GlobalAttribute.CheckFilterLGEnabled(t.PropertyType)).FirstOrDefault();
+            if (filterlg != null)
+            {
+                var lg =filterlg.GetValue(dest);
+
+
+                return getTranslationValueByLG(item.ToString(),lg.ToString());
+
+
+            }
             // If item is not null, return its value
             if (item != null)
             {

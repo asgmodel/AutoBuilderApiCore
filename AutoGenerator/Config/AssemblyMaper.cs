@@ -1,5 +1,6 @@
 
 using System;
+using System.Reflection;
 
 namespace AutoGenerator.Config
 {
@@ -20,6 +21,19 @@ namespace AutoGenerator.Config
     }
 
 
+     
+    [AttributeUsage(AttributeTargets.Property , Inherited = false, AllowMultiple = false)]
+    public class FilterLGEnabledAttribute : Attribute
+    {
+        public bool IsEnable { get; set; }
+
+        // Constructor to define whether mapping is enabled or not.
+        public FilterLGEnabledAttribute(bool isenable = true)
+        {
+            IsEnable = IsEnable;
+        }
+    }
+
 
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Property, Inherited = false, AllowMultiple = false)]
@@ -32,6 +46,21 @@ namespace AutoGenerator.Config
         {
             IgnoreMapping = ignoreMapping;
         }
+    }
+
+
+
+    public  class GlobalAttribute
+    {
+
+        public static bool CheckFilterLGEnabled(Type type)
+        {
+            var attribute = type.GetCustomAttribute<FilterLGEnabledAttribute>();
+
+            // Return true if the attribute exists and IgnoreMapping is true, otherwise false
+            return attribute != null && attribute.IsEnable;
+        }
+
     }
 
 }

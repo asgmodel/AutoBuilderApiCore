@@ -20,16 +20,18 @@
         "Build": [
           "Request",
           "Response",
-          "ResponseT"
+          "ResponseFilter"
         ],
         "Share": [
           "Request",
-          "Response"
+          "Response",
+          "ResponseFilter"
         ]
       },
       "Dso": [
         "Request",
-        "Response"
+        "Response",
+        "ResponseFilter"
       ]
 
     }

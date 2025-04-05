@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Helper.Translation;
 using AutoGenerator.Models;
+using AutoGenerator.Config;
 using System;
 
 namespace ApiCore.DyModels.Dto.Build.Requests

@@ -132,6 +132,7 @@ namespace ApiCore.Repositorys.Share
         {
             try
             {
+
                 _logger.LogInformation("Saving changes to the database for CategoryModel entities...");
                 throw new NotImplementedException();
             }
@@ -215,6 +216,11 @@ namespace ApiCore.Repositorys.Share
                 _logger.LogError(ex, "Error while retrieving CategoryModel by ID: {Id}", id);
                 return null;
             }
+        }
+
+        public override Task DeleteAsync(string id)
+        {
+            return _builder.DeleteAsync(id);
         }
 
         public override async Task DeleteAsync(object value, string key = "Id")

@@ -24,6 +24,12 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
     }
 
 
+    public static string getTostr(string name)
+    {
+        return $@"
+            public string? {name} {{ get; set; }}";
+    }
+
     public static string getTampBuildRepo(string name, string type, string tag)
     {
         return $@"
@@ -87,6 +93,10 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
             };
 
+            if(isbuild)
+            {
+                options.Usings.Add($"AutoGenerator.Config");
+            }
             if (!isbuild)
             {
                 options.BaseClass = $"{model.Name}{NamespaceName}Build{type}";
@@ -95,10 +105,11 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
 
 
 
+
             }
 
             else
-                options.AdditionalCode += GenerateDtoProperties(options.Properties, models, $"{NamespaceName}{subtype}{type}");
+                options.AdditionalCode += GenerateDtoProperties(options.Properties, models, $"{NamespaceName}{subtype}{type}", NamespaceName);
 
 
             options.Properties = new List<PropertyInfo>().ToArray();
@@ -142,7 +153,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
         }
     }
 
-    public static string GenerateDtoProperties(PropertyInfo[] properties, List<Type> models, string end)
+    public static string GenerateDtoProperties(PropertyInfo[] properties, List<Type> models, string end,string subtype)
     {
         var propertyDeclarations = new StringBuilder();
 
@@ -179,7 +190,7 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             // إذا كان لديها `ToTranslationAttribute`
             else if (prop.GetCustomAttributes<ToTranslationAttribute>().Any())
             {
-                propertyDeclarations.AppendLine(getPTrns(prop.Name));
+                propertyDeclarations.AppendLine(subtype != "ResponseFilter"? getPTrns(prop.Name):getTostr(prop.Name));
             }
             // الحالات الأخرى (الافتراضية)
             else
@@ -192,7 +203,12 @@ public class DtoGenerator : GenericClassGenerator, ITGenerator
             }
         }
 
-        return propertyDeclarations.ToString();
+        if(subtype== "ResponseFilter")
+            propertyDeclarations.AppendLine($@"
+           [FilterLGEnabled]
+           public string? Lg {{get; set; }}");
+
+            return propertyDeclarations.ToString();
     }
 
 

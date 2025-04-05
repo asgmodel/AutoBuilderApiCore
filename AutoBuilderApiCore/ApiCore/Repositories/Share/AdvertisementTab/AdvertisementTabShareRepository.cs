@@ -217,6 +217,11 @@ namespace ApiCore.Repositorys.Share
             }
         }
 
+        public override Task DeleteAsync(string id)
+        {
+            return _builder.DeleteAsync(id);
+        }
+
         public override async Task DeleteAsync(object value, string key = "Id")
         {
             try

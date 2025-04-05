@@ -90,6 +90,7 @@ namespace AutoGenerator.Config
             // Return true if the attribute exists and IgnoreMapping is true, otherwise false
             return attribute != null && attribute.IgnoreMapping;
         }
+
         public  static Assembly? AssemblyShare { get; set; }
         public MappingConfig()
         {

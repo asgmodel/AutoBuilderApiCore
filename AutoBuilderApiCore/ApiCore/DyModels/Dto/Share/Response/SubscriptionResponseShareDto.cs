@@ -9,5 +9,8 @@ namespace ApiCore.DyModels.Dto.Share.Responses
 {
     public class SubscriptionResponseShareDto : SubscriptionResponseBuildDto, ITShareDto
     {
+
+   
+      public RoleCase? Roles { get; set; }
     }
 }

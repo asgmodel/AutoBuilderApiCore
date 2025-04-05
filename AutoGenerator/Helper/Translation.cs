@@ -6,6 +6,59 @@ namespace AutoGenerator.Helper.Translation
 {
 
 
+    public class RoleCase
+    {
+        public Dictionary<string, Func<bool, object>> Roles { set; get; }
+
+        public RoleCase()
+        {
+            Roles = new Dictionary<string, Func<bool, object>>();
+        }
+
+        public void Add(string key, Func<bool, object> func)
+        {
+            Roles.Add(key, func);
+        }
+
+
+
+        public  Dictionary<string,bool> GetRoles()
+        {
+            Dictionary<string, bool> roles = new Dictionary<string, bool>();
+            foreach (var item in Roles)
+            {
+                roles.Add(item.Key, item.Value(false) != null);
+            }
+            return roles;
+        }
+
+        public  bool CheckRole(string key)
+        {
+            if (Roles.ContainsKey(key))
+            {
+                return Roles[key](true) != null;
+            }
+            return false;
+        }
+
+
+        public  bool IsSuccessLayer()
+        {
+            foreach(var item in Roles)
+            {
+                if (item.Value(true) == null)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+
+        }
+
+    }
+
+
     public class TranslationView<T>
     {
         public T Value { get; set; }

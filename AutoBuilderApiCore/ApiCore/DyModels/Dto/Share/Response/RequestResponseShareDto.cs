@@ -9,5 +9,7 @@ namespace ApiCore.DyModels.Dto.Share.Responses
 {
     public class RequestResponseShareDto : RequestResponseBuildDto, ITShareDto
     {
+    
+
     }
 }

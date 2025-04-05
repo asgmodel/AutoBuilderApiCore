@@ -99,7 +99,18 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation($"Retrieving Subscription entity with ID: {id}...");
-                return MapToShareResponseDto(await _builder.GetByIdAsync(id));
+                var  item= MapToShareResponseDto(await _builder.GetByIdAsync(id));
+
+                
+
+                 item.Roles=new AutoGenerator.Helper.Translation.RoleCase();
+
+
+                item.Roles.Add("Inactive", (x) => false);
+                
+
+                _logger.LogInformation("Retrieved Subscription successfully.");
+                return item;
             }
             catch (Exception ex)
             {

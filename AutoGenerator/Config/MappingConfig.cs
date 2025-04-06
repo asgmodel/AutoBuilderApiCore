@@ -106,7 +106,7 @@ namespace AutoGenerator.Config
         public MappingConfig()
         {
 
-
+            
             var assembly = AssemblyShare;
 
             var assemblymodel = Assembly.GetExecutingAssembly();

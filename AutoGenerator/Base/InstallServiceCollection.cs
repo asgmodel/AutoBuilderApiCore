@@ -1,10 +1,13 @@
 ﻿using AutoGenerator.ApiFolder;
 using AutoGenerator.Config;
+using AutoGenerator.Schedulers;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Quartz;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +51,19 @@ namespace AutoGenerator
                     serviceCollection.AddAutoScope(option.Assembly);
                     serviceCollection.AddAutoTransient(option.Assembly);
                     serviceCollection.AddAutoSingleton(option.Assembly);
+
+                    serviceCollection.AddQuartz(q =>
+                    {
+                        q.UseMicrosoftDependencyInjectionJobFactory();
+                    });
+
+                    serviceCollection.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+                    serviceCollection.AddSingleton<IHostedService, JobScheduler>(prv =>
+                    {
+                        var jobScheduler = new JobScheduler(prv.GetRequiredService<ISchedulerFactory>(), option.Assembly);
+                        return jobScheduler;
+                    });
                 }
 
             }

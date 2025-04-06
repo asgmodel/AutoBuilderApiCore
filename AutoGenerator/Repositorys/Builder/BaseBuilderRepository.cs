@@ -1,5 +1,6 @@
 ﻿
 using AutoGenerator.Data;
+using AutoGenerator.Helper;
 using AutoGenerator.Repositorys.Base;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
@@ -265,6 +266,29 @@ namespace AutoGenerator.Repositorys.Builder
         public async Task DeleteAllAsync()
         {
             await _repository.RemoveAllAsync();
+        }
+
+
+        public async Task<PagedResponse<TBuildResponseDto>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            var response = await _repository.GetAllByAsync(conditions, options);
+            return MapToPagedResponse(response);
+        }
+        public async Task<TBuildResponseDto> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            var item = await _repository.GetOneByAsync(conditions, options);
+            var response = _mapper.Map<TBuildResponseDto>(item);
+            return response;
+        }
+
+        protected PagedResponse<TBuildResponseDto> MapToPagedResponse(PagedResponse<TModel> response)
+        {
+            if (response == null)
+            {
+                throw new ArgumentNullException(nameof(response), "The pagination cannot be null.");
+            }
+
+            return response.ToResponse(_mapper.Map<IEnumerable<TBuildResponseDto>>(response.Data));
         }
     }
 

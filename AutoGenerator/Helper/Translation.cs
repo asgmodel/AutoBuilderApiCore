@@ -6,58 +6,93 @@ namespace AutoGenerator.Helper.Translation
 {
 
 
-    public class RoleCase
+
+
+
+
+
+
+
+
+
+
+
+
+    public interface IRoleCase
     {
-        private Dictionary<string, Func<bool, object>> Roles { set; get; }
+        void Add(string key, Func<bool, object> func);
+        void Update(string key, Func<bool, object> func);
+        bool Remove(string key);
+        bool CheckRole(string key);
+        bool AllRolesPass();
+        Dictionary<string, bool> PreviewRoles();
+        List<string> ListRoles();
+    }
+
+
+
+public class RoleCase : IRoleCase
+    {
+        private readonly Dictionary<string, Func<bool, object>> _roles;
 
         public RoleCase()
         {
-            Roles = new Dictionary<string, Func<bool, object>>();
+            _roles = new Dictionary<string, Func<bool, object>>();
         }
 
         public void Add(string key, Func<bool, object> func)
         {
-            Roles.Add(key, func);
+            if (_roles.ContainsKey(key))
+                throw new ArgumentException($"Role '{key}' already exists.");
+
+            _roles[key] = func;
         }
 
-
-
-        public  Dictionary<string,bool> GetRoles()
+        public void Update(string key, Func<bool, object> func)
         {
-            Dictionary<string, bool> roles = new Dictionary<string, bool>();
-            foreach (var item in Roles)
-            {
-                roles.Add(item.Key, item.Value(false) != null);
-            }
-            return roles;
+            if (!_roles.ContainsKey(key))
+                throw new KeyNotFoundException($"Role '{key}' does not exist.");
+
+            _roles[key] = func;
         }
 
-        public  bool CheckRole(string key)
+        public bool Remove(string key)
         {
-            if (Roles.ContainsKey(key))
-            {
-                return Roles[key](true) != null;
-            }
-            return false;
+            return _roles.Remove(key);
         }
 
-
-        public  bool IsSuccessLayer()
+        public bool CheckRole(string key)
         {
-            foreach(var item in Roles)
+            return _roles.ContainsKey(key) && _roles[key](true) != null;
+        }
+
+        public bool AllRolesPass()
+        {
+            foreach (var role in _roles.Values)
             {
-                if (item.Value(true) == null)
-                {
+                if (role(true) == null)
                     return false;
-                }
             }
 
             return true;
-
         }
 
-    }
+        public Dictionary<string, bool> PreviewRoles()
+        {
+            var result = new Dictionary<string, bool>();
+            foreach (var role in _roles)
+            {
+                result[role.Key] = role.Value(false) != null;
+            }
 
+            return result;
+        }
+
+        public List<string> ListRoles()
+        {
+            return new List<string>(_roles.Keys);
+        }
+    }
 
     public class TranslationView<T>
     {

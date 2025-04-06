@@ -66,6 +66,7 @@ public class GenericClassGenerator : ITGenerator
         if (!options.Usings.Contains("System"))
             options.Usings.Add("System");
 
+
         List<UsingDirectiveSyntax> usingDirectives = options.Usings
             .Where(ns => !string.IsNullOrWhiteSpace(ns))
             .Select(ns => SyntaxFactory.UsingDirective(SyntaxFactory.ParseName(ns)))

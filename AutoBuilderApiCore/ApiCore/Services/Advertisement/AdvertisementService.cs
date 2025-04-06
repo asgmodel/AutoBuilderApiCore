@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
 using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Services.Services
@@ -216,6 +217,37 @@ namespace ApiCore.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple Advertisements.");
+            }
+        }
+
+        public override async Task<PagedResponse<AdvertisementResponseDso>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all Advertisement entities...");
+                var results = await _builder.GetAllAsync();
+                var response = await _builder.GetAllByAsync(conditions, options);
+                return response.ToResponse(GetMapper().Map<IEnumerable<AdvertisementResponseDso>>(response.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllAsync for Advertisement entities.");
+                return null;
+            }
+        }
+
+        public override async Task<AdvertisementResponseDso?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving Advertisement entity...");
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<AdvertisementResponseDso>(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOneByAsync  for Advertisement entity.");
+                return null;
             }
         }
     }

@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
 using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Services.Services

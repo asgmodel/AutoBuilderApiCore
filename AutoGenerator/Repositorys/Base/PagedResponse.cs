@@ -12,8 +12,8 @@ public abstract class PagedResponseBase
 
 public class PagedResponse<T> : PagedResponseBase
 {
-    public string SortBy { get; set; }
-    public string SortDirection { get; set; }
+    public string? SortBy { get; set; }
+    public string? SortDirection { get; set; }
     public IEnumerable<T> Data { get; set; }
 
     public PagedResponse(IEnumerable<T> data, int pageNumber, int pageSize, int totalRecords)
@@ -23,6 +23,24 @@ public class PagedResponse<T> : PagedResponseBase
         TotalRecords = totalRecords;
         TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
         Data = data;
+    }
+
+    public PagedResponse(IEnumerable<T> data, int pageNumber, int pageSize, int totalRecords, string? sortBy, string? sortDirection)
+    {
+        PageNumber = pageNumber;
+        PageSize = pageSize;
+        TotalRecords = totalRecords;
+        TotalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+        Data = data;
+        SortBy = sortBy;
+        SortDirection = sortDirection;
+    }
+
+    public PagedResponse<T2> ToResponse<T2>(IEnumerable<T2> data)
+    {
+        var response = new PagedResponse<T2>(data, PageNumber, PageSize, TotalRecords, SortBy, SortDirection);
+        response.TotalPages = TotalPages;
+        return response;
     }
 }
 

@@ -1,6 +1,7 @@
 ﻿
 
 
+using AutoGenerator.Conditions;
 using AutoGenerator.Helper.Translation;
 using AutoGenerator.Repositorys.Share;
 using AutoMapper;
@@ -65,6 +66,16 @@ namespace AutoGenerator.Config
             {
                 serviceCollection.AddSingleton(singleton);
             }
+
+
+            serviceCollection.AddSingleton<IConditionChecker>(provider =>
+            {
+                var checker =new  ConditionChecker();
+                ConfigValidator.Register(checker, assembly);
+                return checker;
+
+            });
+            
         }
 
         public static void AddAutoTransient(this IServiceCollection serviceCollection, Assembly? assembly)

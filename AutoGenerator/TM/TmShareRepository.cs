@@ -247,8 +247,40 @@
          }}
      }}
 
- }}
+ 
 
+    public override async Task<PagedResponse<{nameShareTM}ResponseShareDto>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {{
+            try
+            {{
+                _logger.LogInformation(""[Share]Retrieving  {nameShareTM} entities as pagination..."");
+                return MapToPagedResponse(await _builder.GetAllByAsync(conditions, options));
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""[Share]Error in GetAllByAsync for {nameShareTM} entities as pagination."");
+                return null;
+            }}
+        }}
+
+        public override async Task<{nameShareTM}ResponseShareDto?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {{
+            try
+            {{
+                _logger.LogInformation(""[Share]Retrieving {nameShareTM} entity..."");
+                var results = await _builder.GetAllAsync();
+                return MapToShareResponseDto(await _builder.GetOneByAsync(conditions, options));
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""[Share]Error in GetOneByAsync  for {nameShareTM} entity."");
+                return null;
+            }}
+        }}
+
+
+
+}}
 
 ";
         }

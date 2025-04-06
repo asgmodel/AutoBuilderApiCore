@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using AutoGenerator.Helper;
+using System.Linq.Expressions;
 
 namespace AutoGenerator.Repositorys.Base
 {
@@ -31,6 +32,9 @@ namespace AutoGenerator.Repositorys.Base
         Task DeleteAsync(TRequest entity);
         Task DeleteAsync(object value, string key = "Id");
         Task DeleteRange(List<TRequest> entities);
+
+        Task<PagedResponse<TResponse>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null);
+        Task<TResponse?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null);
     }
 
 

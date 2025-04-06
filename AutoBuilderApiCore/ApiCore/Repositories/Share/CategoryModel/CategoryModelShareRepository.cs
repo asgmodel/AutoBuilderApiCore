@@ -13,6 +13,7 @@ using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using AutoGenerator.Repositorys.Base;
 using AutoGenerator;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Repositorys.Share
@@ -132,7 +133,6 @@ namespace ApiCore.Repositorys.Share
         {
             try
             {
-
                 _logger.LogInformation("Saving changes to the database for CategoryModel entities...");
                 throw new NotImplementedException();
             }
@@ -249,6 +249,35 @@ namespace ApiCore.Repositorys.Share
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple CategoryModels.");
+            }
+        }
+
+        public override async Task<PagedResponse<CategoryModelResponseShareDto>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("[Share]Retrieving  CategoryModel entities as pagination...");
+                return MapToPagedResponse(await _builder.GetAllByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[Share]Error in GetAllByAsync for CategoryModel entities as pagination.");
+                return null;
+            }
+        }
+
+        public override async Task<CategoryModelResponseShareDto?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("[Share]Retrieving CategoryModel entity...");
+                var results = await _builder.GetAllAsync();
+                return MapToShareResponseDto(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[Share]Error in GetOneByAsync  for CategoryModel entity.");
+                return null;
             }
         }
     }

@@ -90,7 +90,8 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
                             $"{root}.Repositorys.Share",
                             "System.Linq.Expressions",
                             $"{root}.Repositorys.Builder",
-                            "AutoGenerator.Repositorys.Base"
+                            "AutoGenerator.Repositorys.Base",
+                            "AutoGenerator.Helper"
 
 
 

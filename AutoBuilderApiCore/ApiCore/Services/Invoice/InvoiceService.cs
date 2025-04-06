@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
 using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Services.Services
@@ -216,6 +217,37 @@ namespace ApiCore.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple Invoices.");
+            }
+        }
+
+        public override async Task<PagedResponse<InvoiceResponseDso>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all Invoice entities...");
+                var results = await _builder.GetAllAsync();
+                var response = await _builder.GetAllByAsync(conditions, options);
+                return response.ToResponse(GetMapper().Map<IEnumerable<InvoiceResponseDso>>(response.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllAsync for Invoice entities.");
+                return null;
+            }
+        }
+
+        public override async Task<InvoiceResponseDso?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving Invoice entity...");
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<InvoiceResponseDso>(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOneByAsync  for Invoice entity.");
+                return null;
             }
         }
     }

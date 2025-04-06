@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
 using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Services.Services
@@ -216,6 +217,37 @@ namespace ApiCore.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple AuthorizationSessions.");
+            }
+        }
+
+        public override async Task<PagedResponse<AuthorizationSessionResponseDso>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all AuthorizationSession entities...");
+                var results = await _builder.GetAllAsync();
+                var response = await _builder.GetAllByAsync(conditions, options);
+                return response.ToResponse(GetMapper().Map<IEnumerable<AuthorizationSessionResponseDso>>(response.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllAsync for AuthorizationSession entities.");
+                return null;
+            }
+        }
+
+        public override async Task<AuthorizationSessionResponseDso?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving AuthorizationSession entity...");
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<AuthorizationSessionResponseDso>(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOneByAsync  for AuthorizationSession entity.");
+                return null;
             }
         }
     }

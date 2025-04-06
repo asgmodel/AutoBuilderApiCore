@@ -13,6 +13,7 @@ using AutoGenerator.Repositorys.Share;
 using System.Linq.Expressions;
 using AutoGenerator.Repositorys.Base;
 using AutoGenerator;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Repositorys.Share
@@ -99,18 +100,7 @@ namespace ApiCore.Repositorys.Share
             try
             {
                 _logger.LogInformation($"Retrieving Subscription entity with ID: {id}...");
-                var  item= MapToShareResponseDto(await _builder.GetByIdAsync(id));
-
-                
-
-                 item.Roles=new AutoGenerator.Helper.Translation.RoleCase();
-
-
-                item.Roles.Add("Inactive", (x) => false);
-                
-
-                _logger.LogInformation("Retrieved Subscription successfully.");
-                return item;
+                return MapToShareResponseDto(await _builder.GetByIdAsync(id));
             }
             catch (Exception ex)
             {
@@ -259,6 +249,35 @@ namespace ApiCore.Repositorys.Share
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple Subscriptions.");
+            }
+        }
+
+        public override async Task<PagedResponse<SubscriptionResponseShareDto>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("[Share]Retrieving  Subscription entities as pagination...");
+                return MapToPagedResponse(await _builder.GetAllByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[Share]Error in GetAllByAsync for Subscription entities as pagination.");
+                return null;
+            }
+        }
+
+        public override async Task<SubscriptionResponseShareDto?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("[Share]Retrieving Subscription entity...");
+                var results = await _builder.GetAllAsync();
+                return MapToShareResponseDto(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[Share]Error in GetOneByAsync  for Subscription entity.");
+                return null;
             }
         }
     }

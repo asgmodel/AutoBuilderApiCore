@@ -15,7 +15,7 @@
   ],
   "DyModels": [
     {
-      "VM": [ ],
+      "VM": [],
       "Dto": {
         "Build": [
           "Request",
@@ -44,6 +44,7 @@
 
   "Helper": [],
   "Data": [],
-  "Enums": []
+  "Enums": [],
+  "Validators": []
 
 }

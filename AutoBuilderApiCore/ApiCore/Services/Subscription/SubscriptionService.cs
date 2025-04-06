@@ -12,6 +12,7 @@ using ApiCore.Repositorys.Share;
 using System.Linq.Expressions;
 using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Helper;
 using System;
 
 namespace ApiCore.Services.Services
@@ -90,21 +91,9 @@ namespace ApiCore.Services.Services
             {
                 _logger.LogInformation($"Retrieving Subscription entity with ID: {id}...");
                 var result = await _builder.GetByIdAsync(id);
-
-                if (result.Roles.IsSuccessLayer())
-                {
-
-                    var item = GetMapper().Map<SubscriptionResponseDso>(result);
-
-                    _logger.LogInformation("Retrieved Subscription entity successfully.");
-                    return item;
-                }
-
-                _logger.LogWarning("Subscription entity not found with ID: {Id}", id);
-
-                 
-
-                return null;
+                var item = GetMapper().Map<SubscriptionResponseDso>(result);
+                _logger.LogInformation("Retrieved Subscription entity successfully.");
+                return item;
             }
             catch (Exception ex)
             {
@@ -228,6 +217,37 @@ namespace ApiCore.Services.Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while deleting multiple Subscriptions.");
+            }
+        }
+
+        public override async Task<PagedResponse<SubscriptionResponseDso>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving all Subscription entities...");
+                var results = await _builder.GetAllAsync();
+                var response = await _builder.GetAllByAsync(conditions, options);
+                return response.ToResponse(GetMapper().Map<IEnumerable<SubscriptionResponseDso>>(response.Data));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAllAsync for Subscription entities.");
+                return null;
+            }
+        }
+
+        public override async Task<SubscriptionResponseDso?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                _logger.LogInformation("Retrieving Subscription entity...");
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<SubscriptionResponseDso>(await _builder.GetOneByAsync(conditions, options));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetOneByAsync  for Subscription entity.");
+                return null;
             }
         }
     }

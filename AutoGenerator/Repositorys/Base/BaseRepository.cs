@@ -1,6 +1,8 @@
 using AutoGenerator.Data;
+using AutoGenerator.Helper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 using System.Linq.Expressions;
 namespace AutoGenerator.Repositorys.Base
 {
@@ -36,6 +38,10 @@ namespace AutoGenerator.Repositorys.Base
         Task<int> RemoveRange(IEnumerable<T> entities);
         Task<bool> ExistsAsync(Expression<Func<T, bool>> filter);
         IQueryable<T> GetQueryable(string[]? includes = null, bool noTracking = true);
+
+
+        Task<PagedResponse<T>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null);
+        Task<T?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null);
     }
 
     public sealed class BaseRepository<T> : IBaseRepository<T> where T : class
@@ -111,7 +117,7 @@ namespace AutoGenerator.Repositorys.Base
             try
             {
                 var item = (await _dbSet.AddAsync(entity)).Entity;
-              //  await SaveAsync();
+                await SaveAsync();
                 return item;
             }
             catch (Exception ex)
@@ -378,6 +384,131 @@ namespace AutoGenerator.Repositorys.Base
                 _logger.LogError(ex, "Error retrieving entity");
                 throw new RepositoryException("Error retrieving entity", ex);
             }
+        }
+
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Get all entities by filtering
+        /// </summary>
+        /// <param name="conditions"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        /// <exception cref="RepositoryException"></exception>
+        public async Task<PagedResponse<T>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                var parameter = Expression.Parameter(typeof(T), "e");
+
+                var fullExpression = BuildExpression(conditions, parameter);
+                var lambda = Expression.Lambda<Func<T, bool>>(fullExpression, parameter);
+                query = query.AsNoTracking().Where(lambda);
+                options ??= new ParamOptions();
+                if (options.Includes.Count > 0) Includes([.. options.Includes]);
+
+                var result = await query.ToPagedResponseAsync(options.PageNumber, options.PageSize);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entities", ex);
+            }
+        }
+
+        /// <summary>
+        /// Get one entity by filtering
+        /// </summary>
+        /// <param name="conditions"></param>
+        /// <param name="options"></param>
+        /// <returns></returns>
+        /// <exception cref="RepositoryException"></exception>
+        public async Task<T?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            try
+            {
+                var parameter = Expression.Parameter(typeof(T), "e");
+
+                var fullExpression = BuildExpression(conditions, parameter);
+                var lambda = Expression.Lambda<Func<T, bool>>(fullExpression, parameter);
+                query = query.AsNoTracking().Where(lambda);
+                options ??= new ParamOptions();
+                if (options.Includes.Count > 0) Includes([.. options.Includes]);
+
+                var result = await query.FirstOrDefaultAsync();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving entity");
+                throw new RepositoryException("Error retrieving entity", ex);
+            }
+        }
+
+        private Expression BuildExpression(List<FilterCondition> group, ParameterExpression? parameter)
+        {
+            Expression? finalExpression = null;
+            foreach (var condition in group)
+            {
+                Expression? expression = null;
+                if (condition.Group?.Any() == true)
+                {
+                    finalExpression = BuildExpression(condition.Group, parameter);
+                }
+
+                if (!string.IsNullOrEmpty(condition.PropertyName))
+                {
+                    var member = Expression.PropertyOrField(parameter, condition.PropertyName);
+                    var constant = Expression.Constant(condition.Value);
+                    switch (condition.Operator)
+                    {
+                        case FilterOperator.Equals: expression = Expression.Equal(member, constant); break;
+                        case FilterOperator.NotEqual: expression = Expression.NotEqual(member, constant); break;
+                        case FilterOperator.GreaterThan: expression = Expression.GreaterThan(member, constant); break;
+                        case FilterOperator.GreaterThanOrEqual: expression = Expression.GreaterThanOrEqual(member, constant); break;
+                        case FilterOperator.LessThan: expression = Expression.LessThan(member, constant); break;
+                        case FilterOperator.LessThanOrEqual: expression = Expression.LessThanOrEqual(member, constant); break;
+                        case FilterOperator.Contains: expression = Expression.Call(member, "Contains", null, constant); break;
+                        case FilterOperator.NotContains: expression = Expression.Not(Expression.Call(member, "Contains", null, constant)); break;
+                        case FilterOperator.StartsWith: expression = Expression.Call(member, "StartsWith", null, constant); break;
+                        case FilterOperator.EndsWith: expression = Expression.Call(member, "EndsWith", null, constant); break;
+                        case FilterOperator.In: expression = In(condition, member); break;
+                        case FilterOperator.NotIn: expression = NotIn(condition, member); break;
+                    }
+                }
+
+                if (expression == null) continue;
+
+                finalExpression = finalExpression == null
+                    ? expression
+                    : condition.Logic == FilterLogic.And
+                        ? Expression.AndAlso(finalExpression, expression)
+                        : Expression.OrElse(finalExpression, expression);
+            }
+
+            return finalExpression!;
+        }
+
+        private Expression? In(FilterCondition condition, MemberExpression member)
+        {
+            var values = (condition.Value as IEnumerable)?.Cast<object>()?.ToList();
+            if (values is not null)
+            {
+                var containsMethod = typeof(List<object>).GetMethod("Contains", new[] { typeof(object) })!;
+                return Expression.Call(Expression.Constant(values), containsMethod, Expression.Convert(member, typeof(object)));
+            }
+
+            return null;
+        }
+
+        private Expression? NotIn(FilterCondition condition, MemberExpression member)
+        {
+            var expression = In(condition, member);
+            if (expression is not null) expression = Expression.Not(expression);
+
+            return expression;
         }
     }
 

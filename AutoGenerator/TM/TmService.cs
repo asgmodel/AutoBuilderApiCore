@@ -233,11 +233,49 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             _logger.LogError(ex,""Error while deleting multiple {classNameServiceTM}s."");
         }}
     }}
+
+
+
+
+
+
+    public override async Task<PagedResponse<{classNameServiceTM}ResponseDso>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {{
+            try
+            {{
+                _logger.LogInformation(""Retrieving all {classNameServiceTM} entities..."");
+                var results = await _builder.GetAllAsync();
+                var response = await _builder.GetAllByAsync(conditions, options);
+                return response.ToResponse(GetMapper().Map<IEnumerable<{classNameServiceTM}ResponseDso>>(response.Data));
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error in GetAllAsync for {classNameServiceTM} entities."");
+                return null;
+            }}
+        }}
+
+        public override async Task<{classNameServiceTM}ResponseDso?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {{
+            try
+            {{
+                _logger.LogInformation(""Retrieving {classNameServiceTM} entity..."");
+                var results = await _builder.GetAllAsync();
+                return GetMapper().Map<{classNameServiceTM}ResponseDso>(await _builder.GetOneByAsync(conditions, options));
+            }}
+            catch (Exception ex)
+            {{
+                _logger.LogError(ex, ""Error in GetOneByAsync  for {classNameServiceTM} entity."");
+                return null;
+            }}
+        }}
+
 }}
 
-
-
 ";
+
+
+
         }
 
 

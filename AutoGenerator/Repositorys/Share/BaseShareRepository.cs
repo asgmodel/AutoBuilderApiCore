@@ -1,6 +1,7 @@
 ﻿
 
 
+using AutoGenerator.Helper;
 using AutoGenerator.Repositorys.Base;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
@@ -230,6 +231,24 @@ namespace AutoGenerator.Repositorys.Share
         }
 
         public  virtual Task DeleteRange(List<TShareRequestDto> entities)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual Task<PagedResponse<TShareResponseDto>> GetAllByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
+        {
+            throw new NotImplementedException();
+        }
+        protected PagedResponse<TShareResponseDto> MapToPagedResponse(PagedResponse<TBuildResponseDto> response)
+        {
+            if (response == null)
+            {
+                throw new ArgumentNullException(nameof(response), "The pagination cannot be null.");
+            }
+
+            return response.ToResponse(_mapper.Map<IEnumerable<TShareResponseDto>>(response.Data));
+        }
+        public virtual Task<TShareResponseDto?> GetOneByAsync(List<FilterCondition> conditions, ParamOptions? options = null)
         {
             throw new NotImplementedException();
         }

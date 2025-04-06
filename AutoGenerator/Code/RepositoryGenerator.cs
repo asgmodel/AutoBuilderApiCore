@@ -108,7 +108,8 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                             "AutoGenerator.Repositorys.Share",
                             "System.Linq.Expressions",
                             "AutoGenerator.Repositorys.Base",
-                            "AutoGenerator"
+                            "AutoGenerator",
+                            "AutoGenerator.Helper",
                 });
 
                 }

@@ -166,7 +166,7 @@ public class RoleCase : IRoleCase
         {
 
 
-            
+
             // Ensure that neither src nor dest are null
             if (src == null || dest == null)
             {
@@ -178,7 +178,7 @@ public class RoleCase : IRoleCase
                             .FirstOrDefault(p => p.GetValue(dest) == destMember)?.Name;
 
 
-           
+
 
             if (string.IsNullOrEmpty(name))
             {
@@ -187,13 +187,13 @@ public class RoleCase : IRoleCase
 
             // Try to get the property value from src using the identified name
             var item = src.GetType().GetProperty(name)?.GetValue(src);
-           
-
-            
-          
 
 
-                if (item is ITranslationData &&destMember is ITranslationData)
+
+
+
+
+            if (item is ITranslationData && destMember is ITranslationData)
             {
                 return item;
             }
@@ -201,9 +201,9 @@ public class RoleCase : IRoleCase
             if (item is ITranslationData translationData)
             {
 
-           
-                     
-                    Dictionary<string, object>? items = new Dictionary<string, object>();
+
+
+                Dictionary<string, object>? items = new Dictionary<string, object>();
                 context.TryGetItems(out items);
 
                 if (items != null && items.ContainsKey(KEYLG))
@@ -224,10 +224,10 @@ public class RoleCase : IRoleCase
             var filterlg = dest.GetType().GetProperties().Where(t => GlobalAttribute.CheckFilterLGEnabled(t.PropertyType)).FirstOrDefault();
             if (filterlg != null)
             {
-                var lg =filterlg.GetValue(dest);
+                var lg = filterlg.GetValue(dest);
 
 
-                return getTranslationValueByLG(item.ToString(),lg.ToString());
+                return getTranslationValueByLG(item.ToString(), lg.ToString());
 
 
             }
@@ -248,60 +248,64 @@ public class RoleCase : IRoleCase
         }
 
 
-        public static object MapToStringData<S, D>(S src, D dest, object destMember, Dictionary<string, object>? items)
+        public static void MapToProcessAfter<S, D>(S src, D dest, ResolutionContext context)
         {
-            // Ensure that neither src nor dest are null
-            if (src == null || dest == null)
+
+
+
+            var destitems = dest.GetType().GetProperties().Where(t => t is ITranslationData || GlobalAttribute.CheckFilterLGEnabled(t.PropertyType));
+            foreach (var destitem in destitems)
             {
-                return destMember;
-            }
 
-            // Try to get the property name in model based on the value of destMember
-            var name = dest.GetType().GetProperties()
-                            .FirstOrDefault(p => p.GetValue(dest) == destMember)?.Name;
+                var kname = destitem.Name;
 
-            if (string.IsNullOrEmpty(name))
-            {
-                return destMember; // If property name is not found or it's null, return destMember as is
-            }
+                if (string.IsNullOrEmpty(kname))
+                {
+                    continue;
+                }
 
-            // Try to get the property value from src using the identified name
-            var item = src.GetType().GetProperty(name)?.GetValue(src);
-
-            // Check if item is of type ITranslationData
-            if (item is ITranslationData translationData)
-            {
-                if (items != null && items.ContainsKey(KEYLG))
-                     return translationData.ToFilter((string)items[KEYLG]);
-
-                else 
-            
-                     return ConvertTranslationDataToText(translationData.Value); // Convert ITranslationData to text
                 
+                var item = src.GetType().GetProperty(kname)?.GetValue(src);
+                var filterlg = dest.GetType().GetProperties().Where(t => GlobalAttribute.CheckFilterLGEnabled(t.PropertyType)).FirstOrDefault();
+           
+               var lg = filterlg.GetValue(dest);
+
+                    if (item is ITranslationData translationData && !(destitem is ITranslationData))
+                {
+
+
+
+
+
+                    Dictionary<string, object>? items = new Dictionary<string, object>();
+                    context.TryGetItems(out items);
+                    if (items != null && items.ContainsKey(KEYLG))
+                        destitem.SetValue(dest, translationData.ToFilter((string)items[KEYLG]));
+
+                    else
+
+                        destitem.SetValue(dest, ConvertTranslationDataToText(translationData.Value)); // Convert ITranslationData to text
+
+
+                }else if(lg!=null)
+                {
+
+
+                    destitem.SetValue(dest, getTranslationValueByLG(item.ToString(), lg.ToString()));
+                }
+                else if (destitem is ITranslationData && item is string)
+                {
+                    // Convert the string to ITranslationData
+                    destitem.SetValue(dest, ConvertToTranslationData((string)item));
+                }
+              
+
+
+
+
 
             }
-            // Check if destMember is of type ITranslationData
-            else if (destMember is ITranslationData)
-            {
-                // Convert the string to ITranslationData
-                return ConvertToTranslationData(item as string);
-            }
 
-            // If item is not null, return its value
-            if (item != null)
-            {
-                return item;
-            }
-
-            // If destMember is not null and types match, return item
-            if (destMember != null && item?.GetType() == destMember?.GetType())
-            {
-                return item;
-            }
-
-            // In case none of the above conditions are met, return destMember as is
-            return destMember;
         }
-
     }
 }

@@ -132,23 +132,22 @@ namespace AutoGenerator.Config
                     foreach (var dto in dtoMatches)
                     {
 
-                        CreateMap(model, dto).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
-                        {
-                           
-
-                            return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
-
-                        }));
-
-                        CreateMap(dto,model).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                        CreateMap(model, dto).AfterMap((src, dest,context) =>
                         {
 
-                           
-                           
 
-                            return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
+                            HelperTranslation.MapToProcessAfter(src, dest, context);
 
-                        }));
+                        });
+
+                        CreateMap(dto,model).AfterMap((src, dest, context) =>
+                        {
+
+
+                            HelperTranslation.MapToProcessAfter(src, dest, context);
+
+                        });
+
 
                         if (!CheckIgnoreAutomateMapper(dto))
                         {
@@ -187,23 +186,21 @@ namespace AutoGenerator.Config
                     {
                         if (!CheckIgnoreAutomateMapper(vm))
                         {
-                            CreateMap(dso, vm).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
-                            {
-                              
-
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember,context);
-
-                            }));
-
-                            CreateMap(vm,dso).ForAllMembers(opt => opt.MapFrom((src, dest, destMember, context) =>
+                            CreateMap(dso, vm).AfterMap((src, dest, context) =>
                             {
 
-                              
-                               
 
-                                return HelperTranslation.MapToTranslationData(src, dest, destMember, context);
+                                HelperTranslation.MapToProcessAfter(src, dest, context);
 
-                            }));
+                            });
+
+                            CreateMap(vm,dso).AfterMap((src, dest, context) =>
+                            {
+
+
+                                HelperTranslation.MapToProcessAfter(src, dest, context);
+
+                            });
                         }
                     }
                 }

@@ -27,7 +27,6 @@ namespace AutoGenerator.Conditions
         where EValidator : Enum
     {
 
-        private static readonly IConditionChecker _checker=new ConditionChecker();
 
         protected readonly ConditionProvider<EValidator> _provider;
 

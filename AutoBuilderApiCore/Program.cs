@@ -70,13 +70,13 @@ else
     var app = builder.Build();
 
 
-    app.UseSchedulersCore(new OptionScheduler()
-    {
-        Assembly = Assembly.GetExecutingAssembly(),
+    //app.UseSchedulersCore(new OptionScheduler()
+    //{
+    //    Assembly = Assembly.GetExecutingAssembly(),
     
     
        
-    });
+    //});
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

@@ -1,6 +1,9 @@
 ﻿using AutoGenerator.ApiFolder;
+using AutoGenerator.Conditions;
 using AutoGenerator.Config;
+using AutoGenerator.Data;
 using AutoGenerator.Schedulers;
+using AutoMapper;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -58,12 +61,22 @@ namespace AutoGenerator
                     });
 
                     serviceCollection.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+                //    serviceCollection.AddSingleton<IHostedService, SchedulerJobProvider>(prv =>
+                //{
 
-                    serviceCollection.AddSingleton<IHostedService, JobScheduler>(prv =>
-                    {
-                        var jobScheduler = new JobScheduler(prv.GetRequiredService<ISchedulerFactory>(), option.Assembly);
-                        return jobScheduler;
-                    });
+                //    var context = prv.GetService<DataContext>();
+
+                 
+                //    var jobOptions = ConfigScheduler.getJobOptions(context, option.Assembly);
+                //    var schedulerJobProvider = new SchedulerJobProvider(prv.GetRequiredService<ISchedulerFactory>(), jobOptions);
+                //    return schedulerJobProvider;
+                //});
+
+                    //serviceCollection.AddSingleton<IHostedService, JobScheduler>(prv =>
+                    //{
+                    //    var jobScheduler = new JobScheduler(prv.GetRequiredService<ISchedulerFactory>(), option.Assembly);
+                    //    return jobScheduler;
+                    //});
                 }
 
             }

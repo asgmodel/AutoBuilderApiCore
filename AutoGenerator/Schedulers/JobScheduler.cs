@@ -9,7 +9,10 @@ public class JobScheduler : IHostedService
     private readonly ISchedulerFactory _schedulerFactory;
     private IScheduler _scheduler;
 
+
     private readonly Assembly? assemblyShare;
+
+
 
     public JobScheduler(ISchedulerFactory schedulerFactory,Assembly assembly)
     {

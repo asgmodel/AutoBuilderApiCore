@@ -5,6 +5,8 @@ namespace AutoGenerator.Schedulers;
 
 public class JobOptions
 {
+
+    public Type? JobType { get; set; } 
     public JobOptions()
     {
     }
@@ -22,7 +24,6 @@ public class JobOptions
     public string JobGroup { get; set; } = "group1"; // مجموعة المهمة
     public string TriggerName { get; set; } = "trigger1";
     public string TriggerGroup { get; set; } = "group1"; // مجموعة الـ Trigger
-    public string JobType { get; set; } = "AutoGenerator.Schedulers.BaseJob"; // نوع المهمة
     public string JobData { get; set; } = ""; // بيانات إضافية للمهمة
     public string JobDataType { get; set; } = ""; // نوع البيانات الإضافية
     public string JobDataValue { get; set; } = ""; // قيمة البيانات الإضافية
@@ -49,7 +50,9 @@ public class CJober : IJob
     }
 }
 
-
+public interface ITJob {
+    JobOptions Options { get; }
+}
 public abstract class BaseJob : CJober, ITJob
 {
     protected readonly JobOptions _options;
@@ -60,15 +63,21 @@ public abstract class BaseJob : CJober, ITJob
     public BaseJob()
     {
         _options = new JobOptions();
-        InitializeJobOptions();
+        initialize();
     }
     
     public  JobOptions Options
     {
         get { return _options; }
     }
+    
+    private  void initialize()
+    {
+        InitializeJobOptions();
+    }
     abstract  protected void InitializeJobOptions();
 
+    
 
     public override Task Execute(IJobExecutionContext context)
     {

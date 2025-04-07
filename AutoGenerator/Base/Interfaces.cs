@@ -58,7 +58,7 @@ namespace AutoGenerator
     }
 
 
-    public   interface  ITJob   { }
+   
 
    
 }

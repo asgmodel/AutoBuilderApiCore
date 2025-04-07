@@ -27,13 +27,23 @@ namespace ApiCore.Validators
 
     public class SpaceValidator : BaseValidator<SpaceResponseFilterDso, SpaceValidatorStates>, ITValidator
     {
+
+        private readonly IConditionChecker _checker;
+
+        public SpaceValidator(IConditionChecker checker)
+        {
+            _checker = checker;
+
+
+        }
         protected override void InitializeConditions()
         {
             _provider.Register(
                 SpaceValidatorStates.IsActive,
                 new LambdaCondition<SpaceResponseFilterDso>(
                     nameof(SpaceValidatorStates.IsActive),
-                    context => context.IsGlobal == true,
+
+                    context => IsActive(context),
                     "Space is not active"
                 )
             );
@@ -41,6 +51,31 @@ namespace ApiCore.Validators
 
             
 
+
+            
+
+        }
+
+
+
+        private  bool IsActive(SpaceResponseFilterDso context)
+        {
+            if (context.IsGlobal == true&& 
+                _checker.Check(SubscriptionValidatorStates.IsActive,context.Subscription))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        private  bool IsFull(SpaceResponseFilterDso context)
+        {
+
+            if (context.IsGlobal == true)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

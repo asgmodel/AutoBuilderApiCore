@@ -1,5 +1,7 @@
+using ApiCore.Schedulers;
 using AutoGenerator;
 using AutoGenerator.ApiFolder;
+using AutoGenerator.Conditions;
 using AutoGenerator.Config;
 using AutoGenerator.Data;
 using Microsoft.EntityFrameworkCore;
@@ -63,9 +65,18 @@ else
     //builder.Services.AddAutoMapper(typeof(MappingConfig));
     //builder.Services.AddScoped<IInvoiceShareRepository, InvoiceShareRepository>();
 
-    //builder.Services.AddScoped<IUseInvoiceService, InvoiceService>();
+    builder.Services.AddScoped<ScapeJob>();
 
     var app = builder.Build();
+
+
+    app.UseSchedulersCore(new OptionScheduler()
+    {
+        Assembly = Assembly.GetExecutingAssembly(),
+    
+    
+       
+    });
 
     // Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())

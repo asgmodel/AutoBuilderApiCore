@@ -33,6 +33,7 @@ namespace ApiCore.Services.Services
         public override Task<int> CountAsync()
         {
 
+
             _checker.Check(SpaceValidatorStates.IsActive, new SpaceResponseFilterDso
             {
                 IsGlobal = true,

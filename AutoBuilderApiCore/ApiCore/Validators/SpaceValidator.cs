@@ -71,7 +71,7 @@ namespace ApiCore.Validators
         private  bool IsFull(SpaceResponseFilterDso context)
         {
 
-            if (context.IsGlobal == true)
+            if (IsActive(context))
             {
                 return false;
             }

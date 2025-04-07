@@ -1,6 +1,7 @@
 using ApiCore.DyModels.Dso.Requests;
 using ApiCore.DyModels.Dso.ResponseFilters;
 using ApiCore.DyModels.VMs;
+using ApiCore.Repositorys.Builder;
 using ApiCore.Services.Services;
 using AutoGenerator.Conditions;
 using AutoGenerator.Helper.Translation;
@@ -27,8 +28,18 @@ namespace ApiCore.Validators
 
     public class SubscriptionValidator : BaseValidator<SubscriptionResponseFilterDso, SubscriptionValidatorStates>, ITValidator
     {
+        //  «·«›÷· «· ⁄«„·  „⁄  context   
+        /// <summary>
+        ///  «” Œœ„Â   ›Ì   ⁄„Ì„ «·‘—Êÿ «·Œ«’… »«·ÃœÊ·   
+        ///checker  ÌÃÌ» «·«” ›«œÂ „‰ «·‘—Êÿ «·„Õ„·Â   Ê«·„ Ê›—Â ›Ì  
+        /// </summary>
+        private readonly   SubscriptionBuilderRepository subscription  ;
         public SubscriptionValidator(IConditionChecker checker) : base(checker)
         {
+            subscription=new SubscriptionBuilderRepository(checker.Injector.DataContext,
+                checker.Injector.Mapper,
+                 null
+                );
         }
 
         protected override void InitializeConditions()
@@ -37,14 +48,14 @@ namespace ApiCore.Validators
                 SubscriptionValidatorStates.IsActive,
                 new LambdaCondition<SubscriptionResponseFilterDso>(
                     nameof(SpaceValidatorStates.IsActive),
-                    context => context.AllowedSpaces==10,
+                    context => isAcive(context),
                     "Space is not active"
                 )
             );
 
 
             _provider.Register(
-                SubscriptionValidatorStates.IsActive,
+                SubscriptionValidatorStates.IsValid,
                 new LambdaCondition<SubscriptionOutputVM>(
                     nameof(SpaceValidatorStates.IsActive),
                     context => context.AllowedSpaces == 10,
@@ -54,6 +65,16 @@ namespace ApiCore.Validators
 
 
 
+        }
+
+
+        bool isAcive(SubscriptionResponseFilterDso context)
+        {
+            if (context.AllowedRequests==10)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

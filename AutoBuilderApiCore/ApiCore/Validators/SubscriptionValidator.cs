@@ -33,7 +33,8 @@ namespace ApiCore.Validators
         ///  «” Œœ„Â   ›Ì   ⁄„Ì„ «·‘—Êÿ «·Œ«’… »«·ÃœÊ·   
         ///checker  ÌÃÌ» «·«” ›«œÂ „‰ «·‘—Êÿ «·„Õ„·Â   Ê«·„ Ê›—Â ›Ì  
         /// </summary>
-        private readonly   SubscriptionBuilderRepository subscription  ;
+        private readonly   SubscriptionBuilderRepository subscription  ; // Â–«  „Ã—œ „À«·  ÌÊ÷Õ ·ﬂ «‰ﬂ Ì„ﬂ‰   «·«” ›œÂ „‰ ﬂ·  ÿ»ﬁ«  «·—Ì»Ê“ Ì   
+
         public SubscriptionValidator(IConditionChecker checker) : base(checker)
         {
             subscription=new SubscriptionBuilderRepository(checker.Injector.DataContext,

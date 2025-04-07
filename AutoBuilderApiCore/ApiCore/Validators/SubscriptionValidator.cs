@@ -37,10 +37,10 @@ namespace ApiCore.Validators
 
         public SubscriptionValidator(IConditionChecker checker) : base(checker)
         {
-            subscription=new SubscriptionBuilderRepository(checker.Injector.DataContext,
-                checker.Injector.Mapper,
-                 null
-                );
+            //subscription=new SubscriptionBuilderRepository(checker.Injector.DataContext,
+            //    checker.Injector.Mapper,
+            //     null
+            //    );
         }
 
         protected override void InitializeConditions()

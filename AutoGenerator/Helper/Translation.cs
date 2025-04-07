@@ -1,8 +1,9 @@
 ﻿using AutoGenerator.Config;
 using AutoMapper;
 using Newtonsoft.Json;
+using System.Reflection;
 
-namespace AutoGenerator.Helper.Translation   
+namespace AutoGenerator.Helper.Translation
 {
 
 
@@ -31,7 +32,7 @@ namespace AutoGenerator.Helper.Translation
 
 
 
-public class RoleCase : IRoleCase
+    public class RoleCase : IRoleCase
     {
         private readonly Dictionary<string, Func<bool, object>> _roles;
 
@@ -100,21 +101,27 @@ public class RoleCase : IRoleCase
         public string LG { get; set; }
     }
 
-    public  class TranslationData: ITranslationData
+    public class TranslationData : ITranslationData
     {
 
         public Dictionary<string, string>? Value { get; set; }
 
         public string? ToFilter(string? lg)
         {
-            
-            if(Value == null&& Value.ContainsKey(lg))
-                return  null;
+
+            if (Value == null && Value.ContainsKey(lg))
+                return null;
 
             return Value[lg];
 
 
 
+        }
+
+
+        public static implicit operator TranslationData(string text)
+        {
+            return HelperTranslation.ConvertToTranslationData(text);
         }
     }
 
@@ -247,8 +254,53 @@ public class RoleCase : IRoleCase
             return destMember;
         }
 
-
         public static void MapToProcessAfter<S, D>(S src, D dest, ResolutionContext context)
+        {
+
+
+
+            var srcitems = src.GetType().GetProperties().Where(t => typeof(ITranslationData).IsAssignableFrom(t.PropertyType) && t.PropertyType.IsClass);
+            foreach (var srcitem in srcitems)
+            {
+
+                var kname = srcitem.Name;
+
+                if (string.IsNullOrEmpty(kname))
+                {
+                    continue;
+                }
+
+                var item = src.GetType().GetProperty(kname)?.GetValue(src) as ITranslationData;
+                var destitem = dest.GetType().GetProperty(kname);
+
+
+                if (!(destitem is ITranslationData))
+                {
+
+
+
+
+
+                    Dictionary<string, object>? items = new Dictionary<string, object>();
+                    context.TryGetItems(out items);
+                    if (items != null && items.ContainsKey(KEYLG))
+                        destitem.SetValue(dest, item.ToFilter((string)items[KEYLG]));
+
+                    else
+
+                        destitem.SetValue(dest, ConvertTranslationDataToText(item.Value)); // Convert ITranslationData to text
+
+
+                }
+
+
+
+
+
+            }
+
+        }
+        public static void MapToProcessAfterT<S, D>(S src, D dest, ResolutionContext context)
         {
 
 
@@ -264,13 +316,13 @@ public class RoleCase : IRoleCase
                     continue;
                 }
 
-                
+
                 var item = src.GetType().GetProperty(kname)?.GetValue(src);
                 var filterlg = dest.GetType().GetProperties().Where(t => GlobalAttribute.CheckFilterLGEnabled(t.PropertyType)).FirstOrDefault();
-           
-               var lg = filterlg.GetValue(dest);
 
-                    if (item is ITranslationData translationData && !(destitem is ITranslationData))
+                var lg = filterlg.GetValue(dest);
+
+                if (item is ITranslationData translationData && !(destitem is ITranslationData))
                 {
 
 
@@ -287,7 +339,8 @@ public class RoleCase : IRoleCase
                         destitem.SetValue(dest, ConvertTranslationDataToText(translationData.Value)); // Convert ITranslationData to text
 
 
-                }else if(lg!=null)
+                }
+                else if (lg != null)
                 {
 
 
@@ -298,7 +351,7 @@ public class RoleCase : IRoleCase
                     // Convert the string to ITranslationData
                     destitem.SetValue(dest, ConvertToTranslationData((string)item));
                 }
-              
+
 
 
 

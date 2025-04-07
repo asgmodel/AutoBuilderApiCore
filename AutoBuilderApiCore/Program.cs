@@ -4,6 +4,8 @@ using AutoGenerator.ApiFolder;
 using AutoGenerator.Conditions;
 using AutoGenerator.Config;
 using AutoGenerator.Data;
+using Microsoft.AspNet.Identity.EntityFramework;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Models;
@@ -17,7 +19,12 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddDbContext<DataContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+     .AddEntityFrameworkStores<DataContext>()
+     .AddDefaultTokenProviders();
 /// <summary>
 /// generate
 ///
@@ -50,8 +57,6 @@ if (args.Length>0&&args[0].Contains("generate"))
 }
 else
 {
-   builder.Services.AddDbContext<DataContext>(options =>
-   options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 
     builder.Services.AddAutoBuilderApiCore(new()
@@ -64,9 +69,7 @@ else
     });
     //builder.Services.AddAutoMapper(typeof(MappingConfig));
     //builder.Services.AddScoped<IInvoiceShareRepository, InvoiceShareRepository>();
-
-    builder.Services.AddScoped<ScapeJob>();
-
+ 
     var app = builder.Build();
 
 

@@ -3,6 +3,7 @@ using ApiCore.DyModels.Dso.ResponseFilters;
 using ApiCore.DyModels.VMs;
 using ApiCore.Services.Services;
 using AutoGenerator.Conditions;
+using AutoGenerator.Conditions;
 using AutoGenerator.Helper.Translation;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
@@ -28,12 +29,10 @@ namespace ApiCore.Validators
     public class SpaceValidator : BaseValidator<SpaceResponseFilterDso, SpaceValidatorStates>, ITValidator
     {
 
-        private readonly IConditionChecker _checker;
 
-        public SpaceValidator(IConditionChecker checker)
+        public SpaceValidator(IConditionChecker checker  ) : base(checker)
         {
-            _checker = checker;
-
+           
 
         }
         protected override void InitializeConditions()
@@ -47,6 +46,7 @@ namespace ApiCore.Validators
                     "Space is not active"
                 )
             );
+
 
 
             

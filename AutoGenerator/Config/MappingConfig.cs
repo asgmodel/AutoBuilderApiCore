@@ -2,6 +2,7 @@
 
 
 using AutoGenerator.Conditions;
+using AutoGenerator.Data;
 using AutoGenerator.Helper.Translation;
 using AutoGenerator.Repositorys.Share;
 using AutoMapper;
@@ -54,6 +55,24 @@ namespace AutoGenerator.Config
 
 
 
+            serviceCollection.AddScoped<ITFactoryInjector, TFactoryInjector>();
+            serviceCollection.AddScoped<IConditionChecker, ConditionChecker>(provider =>
+            {
+
+                var injector = provider.GetRequiredService<ITFactoryInjector>();
+
+
+                var checker = new ConditionChecker(injector);
+
+
+
+                ConfigValidator.Register(checker, assembly);
+                return checker;
+
+            });
+
+
+
 
 
         }
@@ -68,14 +87,8 @@ namespace AutoGenerator.Config
             }
 
 
-            serviceCollection.AddSingleton<IConditionChecker>(provider =>
-            {
-                var checker =new  ConditionChecker();
-                ConfigValidator.Register(checker, assembly);
-                return checker;
 
-            });
-            
+           
         }
 
         public static void AddAutoTransient(this IServiceCollection serviceCollection, Assembly? assembly)

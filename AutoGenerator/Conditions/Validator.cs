@@ -30,8 +30,10 @@ namespace AutoGenerator.Conditions
 
         protected readonly ConditionProvider<EValidator> _provider;
 
-        
 
+        protected readonly IConditionChecker _checker;
+
+        
 
      
 
@@ -41,14 +43,16 @@ namespace AutoGenerator.Conditions
 
 
 
-        public BaseValidator()
+        public BaseValidator(IConditionChecker checker)
         {
             _provider = new ConditionProvider<EValidator>();
-            
+            _checker = checker;
 
+            
 
             InitializeConditions();
-            
+            _checker.RegisterProvider(_provider);
+
 
         }
 

@@ -25,15 +25,16 @@ namespace ApiCore.Validators
     }
 
 
-    public class SubscriptionValidator : BaseValidator<SubscriptionResponseFilterDso, SpaceValidatorStates>, ITValidator
+    public class SubscriptionValidator : BaseValidator<SubscriptionResponseFilterDso, SubscriptionValidatorStates>, ITValidator
     {
-
-
+        public SubscriptionValidator(IConditionChecker checker) : base(checker)
+        {
+        }
 
         protected override void InitializeConditions()
         {
             _provider.Register(
-                SpaceValidatorStates.IsActive,
+                SubscriptionValidatorStates.IsActive,
                 new LambdaCondition<SubscriptionResponseFilterDso>(
                     nameof(SpaceValidatorStates.IsActive),
                     context => context.AllowedSpaces==10,
@@ -43,7 +44,7 @@ namespace ApiCore.Validators
 
 
             _provider.Register(
-                SpaceValidatorStates.IsActive,
+                SubscriptionValidatorStates.IsActive,
                 new LambdaCondition<SubscriptionOutputVM>(
                     nameof(SpaceValidatorStates.IsActive),
                     context => context.AllowedSpaces == 10,

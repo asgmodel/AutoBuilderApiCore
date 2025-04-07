@@ -14,19 +14,36 @@ using ApiCore.Repositorys.Builder;
 using AutoGenerator.Repositorys.Base;
 using AutoGenerator.Helper;
 using System;
+using AutoGenerator.Conditions;
+using ApiCore.Validators;
+using ApiCore.DyModels.Dso.ResponseFilters;
 
 namespace ApiCore.Services.Services
 {
     public class SpaceService : BaseService<SpaceRequestDso, SpaceResponseDso>, IUseSpaceService
     {
         private readonly ISpaceShareRepository _builder;
-        public SpaceService(ISpaceShareRepository buildSpaceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+        private readonly IConditionChecker _checker;
+        public SpaceService(ISpaceShareRepository buildSpaceShareRepository, IMapper mapper, ILoggerFactory logger, IConditionChecker checker) : base(mapper, logger)
         {
             _builder = buildSpaceShareRepository;
+            _checker = checker;
         }
 
         public override Task<int> CountAsync()
         {
+
+            _checker.Check(SpaceValidatorStates.IsActive, new SpaceResponseFilterDso
+            {
+                IsGlobal = true,
+                Subscription = new SubscriptionResponseFilterDso
+                {
+                }
+            });
+
+
+
+
             try
             {
                 _logger.LogInformation("Counting Space entities...");
@@ -41,6 +58,8 @@ namespace ApiCore.Services.Services
 
         public override async Task<SpaceResponseDso> CreateAsync(SpaceRequestDso entity)
         {
+
+           
             try
             {
                 _logger.LogInformation("Creating new Space entity...");

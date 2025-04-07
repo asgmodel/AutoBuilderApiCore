@@ -19,10 +19,10 @@ namespace AutoGenerator.Conditions
                 .AsParallel()
                 .ToList();
 
-            foreach(var validator in validators)
+            foreach (var validator in validators)
             {
-                var instance = Activator.CreateInstance(validator) as ITValidator;
-                instance?.Register(checker);
+                var instance = Activator.CreateInstance(validator, checker) as ITValidator;
+                //instance?.Register(checker);
             }
 
 

@@ -14,7 +14,7 @@ using System.Linq.Expressions;
 
 namespace ApiCore.Validators
 {
-   
+
 
 
     public enum SpaceValidatorStates
@@ -30,9 +30,9 @@ namespace ApiCore.Validators
     {
 
 
-        public SpaceValidator(IConditionChecker checker  ) : base(checker)
+        public SpaceValidator(IConditionChecker checker) : base(checker)
         {
-           
+
 
         }
         protected override void InitializeConditions()
@@ -49,33 +49,60 @@ namespace ApiCore.Validators
 
 
 
-            
+            _provider.Register(
+               SpaceValidatorStates.IsFull,
+               new LambdaCondition<SpaceResponseFilterDso>(
+                   nameof(SpaceValidatorStates.IsActive),
+
+                   context => IsActive(context),
+                   "Space is not active"
+               )
+           );
 
 
-            
+
+
 
         }
 
 
 
-        private  bool IsActive(SpaceResponseFilterDso context)
+        private bool IsActive(SpaceResponseFilterDso context)
         {
-            if (context.IsGlobal == true&& 
-                _checker.Check(SubscriptionValidatorStates.IsActive,context.Subscription))
+            if (context.IsGlobal == true &&
+                _checker.Check(SubscriptionValidatorStates.IsActive, context.Subscription))
             {
                 return true;
             }
             return false;
         }
 
-        private  bool IsFull(SpaceResponseFilterDso context)
+        private async Task<bool> IsFull(SpaceResponseFilterDso context)
         {
 
-            if (IsActive(context))
+            var res = await _checker.CheckAsync(SubscriptionValidatorStates.IsActive, context.Subscription);
+
+            if (res)
             {
                 return false;
             }
             return true;
         }
+
+
+
+
+        private async Task<ConditionResult> IsFullResuilt(SpaceResponseFilterDso context)
+        {
+
+            var res = await _checker.CheckAndResultAsync(SubscriptionValidatorStates.IsValid, context.Subscription);
+
+            
+            return res;
+        }
+
+
+
     }
 }
+       

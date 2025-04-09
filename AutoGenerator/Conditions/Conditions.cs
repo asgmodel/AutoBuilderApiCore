@@ -1,25 +1,37 @@
-
+using AutoGenerator.Data;
 using AutoGenerator.Helper.Translation;
+using AutoGenerator.Models;
+using AutoMapper;
+using Microsoft.Extensions.Options;
 using System;
 using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks; 
 
-namespace AutoGenerator.Conditions.V0
+namespace AutoGenerator.Conditions
 {
-    
+    public class ConditionResult
+    {
+        public bool? Success { get; set; }
+        public object? Result { get; set; }
+        public string? Message { get; set; }
+
+        public ConditionResult(bool success, object result, string message = "")
+        {
+            Success = success;
+            Result = result;
+            Message = message;
+        }
+    }
+
     public interface ICondition
     {
         string Name { get; }
         string? ErrorMessage { get; }
-        bool Evaluate(object context);
+    
+
+        Task<ConditionResult> Evaluate(object context);
     }
-
-    public interface IConditionProvider<TEnum> where TEnum : Enum
-    {
-        void Register(TEnum type, ICondition condition);
-        ICondition? Get(TEnum type);
-    }
-
-
 
     // Implementations
     public abstract class BaseCondition : ICondition
@@ -33,121 +45,91 @@ namespace AutoGenerator.Conditions.V0
             ErrorMessage = errorMessage;
         }
 
-        public abstract bool Evaluate(object context);
+        // œ«·… €Ì—  “«„‰Ì… ›ﬁÿ
+        public abstract Task<ConditionResult> Evaluate(object context);
+
+        
     }
 
+    // Implementation of async evaluation with ConditionResult
     public class LambdaCondition<T> : BaseCondition
     {
-        private readonly Func<T, bool> _predicate;
+        private readonly Func<T, Task<ConditionResult>> _predicate;
 
-        public LambdaCondition(string name, Func<T, bool> predicate, string? errorMessage = null)
+        public LambdaCondition(string name, Func<T, object> predicate, string? errorMessage = null)
             : base(name, errorMessage)
         {
-            _predicate = predicate;
+
+            _predicate = ConvertToConditionResult(predicate);
         }
 
-        public override bool Evaluate(object context)
+        public LambdaCondition(string name, Func<T, ConditionResult> predicate, string? errorMessage = null)
+            : base(name, errorMessage)
         {
-            if (context is T typedContext)
-                return _predicate(typedContext);
-
-            throw new ArgumentException($"Invalid context type: {context.GetType().Name}, expected {typeof(T).Name}");
-        }
-    }
-
-    public class ConditionProvider<TEnum> : IConditionProvider<TEnum> where TEnum : Enum
-    {
-        private readonly Dictionary<TEnum, ICondition> _conditions = new();
-
-        public void Register(TEnum type, ICondition condition)
-        {
-            _conditions[type] = condition;
+            _predicate = ConvertToConditionResult(predicate);
         }
 
-        public ICondition? Get(TEnum type)
+        public LambdaCondition(string name, Func<T, Task<ConditionResult>> predicate, string? errorMessage = null)
+            : base(name, errorMessage)
         {
-            return _conditions.TryGetValue(type, out var condition) ? condition : null;
-        }
-    }
-
-    public interface IConditionChecker
-    {
-        bool Check<TEnum>(TEnum type, object context) where TEnum : Enum;
-        bool CheckAll<TEnum>(object context, out Dictionary<TEnum, bool> results) where TEnum : Enum;
-        bool AreAllConditionsMet<TEnum>(object context, out List<string> failedConditions) where TEnum : Enum;
-        void RegisterProvider<TEnum>(IConditionProvider<TEnum> provider) where TEnum : Enum;
-    }
-
-    // ›∆… „œﬁﬁ «·‘—Êÿ
-    public class ConditionChecker : IConditionChecker
-    {
-        private readonly Dictionary<Type, object> _providers = new();
-
-        //  ”ÃÌ· „“Êœ «·‘—Êÿ
-        public void RegisterProvider<TEnum>(IConditionProvider<TEnum> provider) where TEnum : Enum
-        {
-            _providers[typeof(TEnum)] = provider;
+            _predicate =predicate;
         }
 
-        // «· Õﬁﬁ „‰ Õ«·… ‘—ÿ „⁄Ì‰
-        public bool Check<TEnum>(TEnum type, object context) where TEnum : Enum
+        private static Func<T, Task<ConditionResult>> ConvertToConditionResult(Func<T, object> predicate)
         {
-            if (_providers.TryGetValue(typeof(TEnum), out var rawProvider))
+
+            if (predicate == null)
             {
-                var provider = rawProvider as IConditionProvider<TEnum>;
-                var condition = provider?.Get(type);
-                if (condition != null)
-                    return condition.Evaluate(context);
-                return false;
+
+                throw new ArgumentNullException(nameof(predicate));
+
             }
-
-            throw new InvalidOperationException($"No provider registered for enum {typeof(TEnum).Name}");
+            return (T context) =>
+            {
+                var result = predicate(context);
+                return Task.FromResult(new ConditionResult(true, result));
+            };
         }
 
-        // «· Õﬁﬁ „‰ Ã„Ì⁄ «·‘—Êÿ
-        public bool CheckAll<TEnum>(object context, out Dictionary<TEnum, bool> results) where TEnum : Enum
+        private static Func<T, Task<ConditionResult>> ConvertToConditionResult(Func<T, ConditionResult> predicate)
         {
-            results = new Dictionary<TEnum, bool>();
-            if (_providers.TryGetValue(typeof(TEnum), out var rawProvider))
+
+            if (predicate == null)
             {
-                var provider = rawProvider as IConditionProvider<TEnum>;
-                if (provider != null)
+
+                throw new ArgumentNullException(nameof(predicate));
+
+            }
+            return (T context) =>
+            {
+             
+                return Task.FromResult(predicate(context));
+            };
+        }
+
+
+
+        public override async Task<ConditionResult> Evaluate(object context) 
+        {
+            try
+            {
+                if (context is T typedContext)
                 {
-                    foreach (TEnum type in Enum.GetValues(typeof(TEnum)))
-                    {
-                        var condition = provider.Get(type);
-                        results[type] = condition?.Evaluate(context) ?? false;
-                    }
+                    // «” Œœ«„ await „⁄ œ«·… «· ﬁÌÌ„ ≈–« ﬂ«‰  €Ì—  “«„‰Ì…
+                    ConditionResult result = await _predicate(typedContext);
+                    return result;
                 }
-            }
-            return results.All(r => r.Value);  //  Õﬁﬁ „‰ ‰Ã«Õ Ã„Ì⁄ «·‘—Êÿ
-        }
 
-        // «· Õﬁﬁ „‰ Ã„Ì⁄ «·‘—Êÿ Ê≈—Ã«⁄ «·‘—Êÿ «·›«‘·…
-        public bool AreAllConditionsMet<TEnum>(object context, out List<string> failedConditions) where TEnum : Enum
-        {
-            failedConditions = new List<string>();
-            if (_providers.TryGetValue(typeof(TEnum), out var rawProvider))
+                // ≈–« ﬂ«‰ «·”Ì«ﬁ €Ì— „ ÿ«»ﬁ „⁄ «·‰Ê⁄ «·„Õœœ° ‰—Ã⁄ —”«·… Œÿ√
+                return new ConditionResult(false, null, $"Invalid context type: {context.GetType().Name}, expected {typeof(T).Name}");
+            }
+            catch (Exception ex)
             {
-                var provider = rawProvider as IConditionProvider<TEnum>;
-                if (provider != null)
-                {
-                    foreach (TEnum type in Enum.GetValues(typeof(TEnum)))
-                    {
-                        var condition = provider.Get(type);
-                        if (condition == null || !condition.Evaluate(context))
-                        {
-                            failedConditions.Add($"{type} failed: {condition?.ErrorMessage}");
-                        }
-                    }
-                }
+                // ›Ì Õ«·… ÕœÊÀ «” À‰«¡° ‰—Ã⁄ —”«·… Œÿ√ „⁄ «· ›«’Ì·
+                return new ConditionResult(false, null, $"An error occurred: {ex.Message}");
             }
-            return failedConditions.Count == 0;
         }
-
-
-       
     }
 
-
+  
 }

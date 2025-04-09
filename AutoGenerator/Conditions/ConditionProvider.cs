@@ -26,6 +26,9 @@
         Task<ConditionResult> Check(TEnum type, object context) ;
 
 
+        
+
+
 
 
     }

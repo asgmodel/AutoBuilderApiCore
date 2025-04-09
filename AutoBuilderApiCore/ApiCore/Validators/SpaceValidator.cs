@@ -21,7 +21,8 @@ namespace ApiCore.Validators
     {
         IsActive,
         IsFull,
-        IsValid
+        IsValid,
+        H
 
     }
 
@@ -101,6 +102,23 @@ namespace ApiCore.Validators
             return res;
         }
 
+
+        private  ConditionResult test(SpaceResponseFilterDso context)
+        {
+
+
+
+
+
+
+            var res =  _checker.GetProvider<SubscriptionValidatorStates>().AnyPass(context);
+            if (res != null)
+            {
+                return res.FirstOrDefault();
+            }
+            return new ConditionResult(false, null, "No conditions passed");
+
+        }
 
 
     }

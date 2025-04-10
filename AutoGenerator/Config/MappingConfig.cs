@@ -8,6 +8,7 @@ using AutoGenerator.Helper.Translation;
 using AutoGenerator.Repositories.Share;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
 
@@ -56,7 +57,14 @@ namespace AutoGenerator.Config
 
 
 
-            
+
+
+
+            //serviceCollection.AddHttpContextAccessor();
+
+            //var  usercliems= assembly.GetTypes().Where(t => typeof(ITClaimsHelper).IsAssignableFrom(t)).AsParallel().ToList();
+
+
 
 
 

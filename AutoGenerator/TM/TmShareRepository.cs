@@ -3,7 +3,7 @@
 namespace AutoGenerator.TM
 {
 
-    public  class TmShareRepository
+    public class TmShareRepository
     {
 
         public static string GetTmShareRepository(string nameShareTM, TmOptions options = null)
@@ -270,7 +270,6 @@ namespace AutoGenerator.TM
             try
             {{
                 _logger.LogInformation(""[Share]Retrieving {nameShareTM} entity..."");
-                var results = await _builder.GetAllAsync();
                 return MapToShareResponseDto(await _builder.GetOneByAsync(conditions, options));
             }}
             catch (Exception ex)

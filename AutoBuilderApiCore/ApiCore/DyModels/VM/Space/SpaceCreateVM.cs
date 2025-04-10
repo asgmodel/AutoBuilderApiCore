@@ -30,7 +30,8 @@ namespace ApiCore.DyModels.VMs
         public String? Token { get; set; }
         ///
         public String? SubscriptionId { get; set; }
+        public SubscriptionCreateVM? Subscription { get; set; }
         //
-        public ICollection<RequestCreateVM>? Requests { get; set; }
+        public List<RequestCreateVM>? Requests { get; set; }
     }
 }

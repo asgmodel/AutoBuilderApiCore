@@ -26,6 +26,7 @@ namespace ApiCore.DyModels.VMs
         public Boolean IsActive { get; set; }
         ///
         public String? UserId { get; set; }
+        public ApplicationUserOutputVM? User { get; set; }
         ///
         public String? IpAddress { get; set; }
         ///

@@ -19,10 +19,10 @@ namespace ApiCore.Services.Services
 {
     public class PaymentService : BaseService<PaymentRequestDso, PaymentResponseDso>, IUsePaymentService
     {
-        private readonly IPaymentShareRepository _builder;
+        private readonly IPaymentShareRepository _share;
         public PaymentService(IPaymentShareRepository buildPaymentShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = buildPaymentShareRepository;
+            _share = buildPaymentShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -30,7 +30,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Payment entities...");
-                return _builder.CountAsync();
+                return _share.CountAsync();
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Creating new Payment entity...");
-                var result = await _builder.CreateAsync(entity);
+                var result = await _share.CreateAsync(entity);
                 var output = GetMapper().Map<PaymentResponseDso>(result);
                 _logger.LogInformation("Created Payment entity successfully.");
                 return output;
@@ -61,7 +61,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Deleting Payment entity with ID: {id}...");
-                return _builder.DeleteAsync(id);
+                return _share.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Payment entities...");
-                var results = await _builder.GetAllAsync();
+                var results = await _share.GetAllAsync();
                 return GetMapper().Map<IEnumerable<PaymentResponseDso>>(results);
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Retrieving Payment entity with ID: {id}...");
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 var item = GetMapper().Map<PaymentResponseDso>(result);
                 _logger.LogInformation("Retrieved Payment entity successfully.");
                 return item;
@@ -107,7 +107,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<PaymentResponseDso> for Payment entities...");
-                var queryable = _builder.GetQueryable();
+                var queryable = _share.GetQueryable();
                 var result = GetMapper().ProjectTo<PaymentResponseDso>(queryable);
                 return result;
             }
@@ -123,7 +123,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Updating Payment entity...");
-                var result = await _builder.UpdateAsync(entity);
+                var result = await _share.UpdateAsync(entity);
                 return GetMapper().Map<PaymentResponseDso>(result);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Checking if Payment exists with {Key}: {Value}", name, value);
-                var exists = await _builder.ExistsAsync(value, name);
+                var exists = await _share.ExistsAsync(value, name);
                 if (!exists)
                 {
                     _logger.LogWarning("Payment not found with {Key}: {Value}", name, value);
@@ -158,7 +158,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching all Payments with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
-                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var results = (await _share.GetAllAsync(includes, pageNumber, pageSize));
                 var items = GetMapper().Map<List<PaymentResponseDso>>(results.Data);
                 return new PagedResponse<PaymentResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
             }
@@ -174,7 +174,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching Payment by ID: {Id}", id);
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 if (result == null)
                 {
                     _logger.LogWarning("Payment not found with ID: {Id}", id);
@@ -196,7 +196,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Deleting Payment with {Key}: {Value}", key, value);
-                await _builder.DeleteAsync(value, key);
+                await _share.DeleteAsync(value, key);
                 _logger.LogInformation("Payment with {Key}: {Value} deleted successfully.", key, value);
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace ApiCore.Services.Services
             {
                 var builddtos = entities.OfType<PaymentRequestShareDto>().ToList();
                 _logger.LogInformation("Deleting {Count} Payments...", 201);
-                await _builder.DeleteRange(builddtos);
+                await _share.DeleteRange(builddtos);
                 _logger.LogInformation("{Count} Payments deleted successfully.", 202);
             }
             catch (Exception ex)
@@ -225,8 +225,8 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Payment entities...");
-                var results = await _builder.GetAllAsync();
-                var response = await _builder.GetAllByAsync(conditions, options);
+                var results = await _share.GetAllAsync();
+                var response = await _share.GetAllByAsync(conditions, options);
                 return response.ToResponse(GetMapper().Map<IEnumerable<PaymentResponseDso>>(response.Data));
             }
             catch (Exception ex)
@@ -241,8 +241,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving Payment entity...");
-                var results = await _builder.GetAllAsync();
-                return GetMapper().Map<PaymentResponseDso>(await _builder.GetOneByAsync(conditions, options));
+                return GetMapper().Map<PaymentResponseDso>(await _share.GetOneByAsync(conditions, options));
             }
             catch (Exception ex)
             {

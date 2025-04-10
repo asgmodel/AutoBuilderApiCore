@@ -1,5 +1,9 @@
 {
-
+  "Controllers": [
+    "Api",
+    "Auth",
+    "Admin"
+  ],
   "Repositories": [
     "Base",
     "Builder",
@@ -11,22 +15,25 @@
   ],
   "DyModels": [
     {
-      "VM": ["Create","Outputs"],
+      "VM": [],
       "Dto": {
         "Build": [
           "Request",
-          "Response"
+          "Response",
+          "ResponseFilter"
         ],
         "Share": [
           "Request",
-          "Response"
+          "Response",
+          "ResponseFilter"
         ]
       },
-        "Dso": [
-          "Request",
-          "Response"
-        ]
-      
+      "Dso": [
+        "Request",
+        "Response",
+        "ResponseFilter"
+      ]
+
     }
   ],
   "Config": [ "Mappers", "Scopes", "Singletons", "Transients" ],
@@ -34,9 +41,12 @@
   "Builders": [
     "Db"
   ],
-  
+
   "Helper": [],
   "Data": [],
-  "Enums": []
+  "Enums": [],
+  "Validators": ["Conditions"],
+
+  "Schedulers": [ ]
 
 }

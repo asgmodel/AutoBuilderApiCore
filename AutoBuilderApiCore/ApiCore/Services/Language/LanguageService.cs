@@ -19,10 +19,10 @@ namespace ApiCore.Services.Services
 {
     public class LanguageService : BaseService<LanguageRequestDso, LanguageResponseDso>, IUseLanguageService
     {
-        private readonly ILanguageShareRepository _builder;
+        private readonly ILanguageShareRepository _share;
         public LanguageService(ILanguageShareRepository buildLanguageShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = buildLanguageShareRepository;
+            _share = buildLanguageShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -30,7 +30,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Language entities...");
-                return _builder.CountAsync();
+                return _share.CountAsync();
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Creating new Language entity...");
-                var result = await _builder.CreateAsync(entity);
+                var result = await _share.CreateAsync(entity);
                 var output = GetMapper().Map<LanguageResponseDso>(result);
                 _logger.LogInformation("Created Language entity successfully.");
                 return output;
@@ -61,7 +61,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Deleting Language entity with ID: {id}...");
-                return _builder.DeleteAsync(id);
+                return _share.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Language entities...");
-                var results = await _builder.GetAllAsync();
+                var results = await _share.GetAllAsync();
                 return GetMapper().Map<IEnumerable<LanguageResponseDso>>(results);
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Retrieving Language entity with ID: {id}...");
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 var item = GetMapper().Map<LanguageResponseDso>(result);
                 _logger.LogInformation("Retrieved Language entity successfully.");
                 return item;
@@ -107,7 +107,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<LanguageResponseDso> for Language entities...");
-                var queryable = _builder.GetQueryable();
+                var queryable = _share.GetQueryable();
                 var result = GetMapper().ProjectTo<LanguageResponseDso>(queryable);
                 return result;
             }
@@ -123,7 +123,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Updating Language entity...");
-                var result = await _builder.UpdateAsync(entity);
+                var result = await _share.UpdateAsync(entity);
                 return GetMapper().Map<LanguageResponseDso>(result);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Checking if Language exists with {Key}: {Value}", name, value);
-                var exists = await _builder.ExistsAsync(value, name);
+                var exists = await _share.ExistsAsync(value, name);
                 if (!exists)
                 {
                     _logger.LogWarning("Language not found with {Key}: {Value}", name, value);
@@ -158,7 +158,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching all Languages with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
-                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var results = (await _share.GetAllAsync(includes, pageNumber, pageSize));
                 var items = GetMapper().Map<List<LanguageResponseDso>>(results.Data);
                 return new PagedResponse<LanguageResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
             }
@@ -174,7 +174,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching Language by ID: {Id}", id);
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 if (result == null)
                 {
                     _logger.LogWarning("Language not found with ID: {Id}", id);
@@ -196,7 +196,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Deleting Language with {Key}: {Value}", key, value);
-                await _builder.DeleteAsync(value, key);
+                await _share.DeleteAsync(value, key);
                 _logger.LogInformation("Language with {Key}: {Value} deleted successfully.", key, value);
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace ApiCore.Services.Services
             {
                 var builddtos = entities.OfType<LanguageRequestShareDto>().ToList();
                 _logger.LogInformation("Deleting {Count} Languages...", 201);
-                await _builder.DeleteRange(builddtos);
+                await _share.DeleteRange(builddtos);
                 _logger.LogInformation("{Count} Languages deleted successfully.", 202);
             }
             catch (Exception ex)
@@ -225,8 +225,8 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Language entities...");
-                var results = await _builder.GetAllAsync();
-                var response = await _builder.GetAllByAsync(conditions, options);
+                var results = await _share.GetAllAsync();
+                var response = await _share.GetAllByAsync(conditions, options);
                 return response.ToResponse(GetMapper().Map<IEnumerable<LanguageResponseDso>>(response.Data));
             }
             catch (Exception ex)
@@ -241,8 +241,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving Language entity...");
-                var results = await _builder.GetAllAsync();
-                return GetMapper().Map<LanguageResponseDso>(await _builder.GetOneByAsync(conditions, options));
+                return GetMapper().Map<LanguageResponseDso>(await _share.GetOneByAsync(conditions, options));
             }
             catch (Exception ex)
             {

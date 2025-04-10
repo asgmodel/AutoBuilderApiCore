@@ -22,5 +22,6 @@ namespace ApiCore.DyModels.VMs
         public String? Currency { get; set; }
         ///
         public DateOnly Date { get; set; }
+        public InvoiceCreateVM? Invoice { get; set; }
     }
 }

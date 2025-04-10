@@ -1,8 +1,14 @@
 ﻿using AutoGenerator;
+using AutoGenerator.Config;
 using System.ComponentModel.DataAnnotations;
 
 namespace LAHJAAPI.Models
 {
+
+
+    [ValidatorEnabled(true)]
+
+    [SchedulerEnabled(true)]
     public class Subscription : ITModel
     {
         [Key]

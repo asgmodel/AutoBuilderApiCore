@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-
-namespace AutoGenerator.TM
+﻿namespace AutoGenerator.TM
 {
     public class TmOptions
     {
-       
+
         public string Type { get; set; }
         public string SubType { get; set; }
         public string NamespaceName { get; set; }
@@ -14,7 +12,7 @@ namespace AutoGenerator.TM
 
     public class TmService
     {
-      
+
 
         public static string GetTmService(string classNameServiceTM, TmOptions options = null)
         {
@@ -22,10 +20,10 @@ namespace AutoGenerator.TM
 
 public class {classNameServiceTM}Service : BaseService<{classNameServiceTM}RequestDso, {classNameServiceTM}ResponseDso>, IUse{classNameServiceTM}Service
 {{
-    private readonly I{classNameServiceTM}ShareRepository _builder;
+    private readonly I{classNameServiceTM}ShareRepository _share;
     public {classNameServiceTM}Service(I{classNameServiceTM}ShareRepository build{classNameServiceTM}ShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
     {{
-        _builder = build{classNameServiceTM}ShareRepository;
+        _share = build{classNameServiceTM}ShareRepository;
     }}
 
 
@@ -34,7 +32,7 @@ public class {classNameServiceTM}Service : BaseService<{classNameServiceTM}Reque
         try
         {{
             _logger.LogInformation(""Counting {classNameServiceTM} entities..."");
-            return _builder.CountAsync();
+            return _share.CountAsync();
         }}
         catch (Exception ex)
         {{
@@ -48,7 +46,7 @@ public class {classNameServiceTM}Service : BaseService<{classNameServiceTM}Reque
         try
         {{
             _logger.LogInformation(""Creating new {classNameServiceTM} entity..."");
-            var result = await _builder.CreateAsync(entity);
+            var result = await _share.CreateAsync(entity);
             var output = GetMapper().Map<{classNameServiceTM}ResponseDso>(result);
             _logger.LogInformation(""Created {classNameServiceTM} entity successfully."");
             return output;
@@ -65,7 +63,7 @@ public class {classNameServiceTM}Service : BaseService<{classNameServiceTM}Reque
         try
         {{
             _logger.LogInformation($""Deleting {classNameServiceTM} entity with ID: {{id}}..."");
-            return _builder.DeleteAsync(id);
+            return _share.DeleteAsync(id);
         }}
         catch (Exception ex)
         {{
@@ -80,7 +78,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             try
             {{
                 _logger.LogInformation(""Retrieving all {classNameServiceTM} entities..."");
-                var results = await _builder.GetAllAsync();
+                var results = await _share.GetAllAsync();
                 return GetMapper().Map<IEnumerable<{classNameServiceTM}ResponseDso>>(results);
             }}
             catch (Exception ex)
@@ -95,7 +93,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             try
             {{
                 _logger.LogInformation($""Retrieving {classNameServiceTM} entity with ID: {{id}}..."");
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
 
                 var item = GetMapper().Map<{classNameServiceTM}ResponseDso>(result);
                 _logger.LogInformation(""Retrieved {classNameServiceTM} entity successfully."");
@@ -115,7 +113,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             try
             {{
                 _logger.LogInformation(""Retrieving IQueryable<{classNameServiceTM}ResponseDso> for {classNameServiceTM} entities..."");
-                var queryable = _builder.GetQueryable();
+                var queryable = _share.GetQueryable();
                 var result = GetMapper().ProjectTo<{classNameServiceTM}ResponseDso>(queryable);
                 return result;
             }}
@@ -134,7 +132,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             {{
                 _logger.LogInformation(""Updating {classNameServiceTM} entity..."");
 
-                var result = await _builder.UpdateAsync(entity);
+                var result = await _share.UpdateAsync(entity);
 
                 return GetMapper().Map<{classNameServiceTM}ResponseDso>(result);
             }}
@@ -150,7 +148,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
         try
         {{
             _logger.LogInformation(""Checking if {classNameServiceTM} exists with {{Key}}: {{Value}}"", name, value);
-            var exists = await _builder.ExistsAsync(value, name);
+            var exists = await _share.ExistsAsync(value, name);
 
             if (!exists)
             {{
@@ -171,7 +169,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
         try
         {{
             _logger.LogInformation(""Fetching all {classNameServiceTM}s with pagination: Page {{PageNumber}}, Size {{PageSize}}"", pageNumber, pageSize);
-            var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+            var results = (await _share.GetAllAsync(includes, pageNumber, pageSize));
             var items = GetMapper().Map<List<{classNameServiceTM}ResponseDso>>(results.Data);
             return new PagedResponse<{classNameServiceTM}ResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
         }}
@@ -187,7 +185,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
         try
         {{
             _logger.LogInformation(""Fetching {classNameServiceTM} by ID: {{Id}}"", id);
-            var result = await _builder.GetByIdAsync(id);
+            var result = await _share.GetByIdAsync(id);
 
             if (result == null)
             {{
@@ -210,7 +208,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
         try
         {{
             _logger.LogInformation(""Deleting {classNameServiceTM} with {{Key}}: {{Value}}"", key, value);
-            await _builder.DeleteAsync(value, key);
+            await _share.DeleteAsync(value, key);
             _logger.LogInformation(""{classNameServiceTM} with {{Key}}: {{Value}} deleted successfully."", key, value);
         }}
         catch (Exception ex)
@@ -225,7 +223,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
         {{
             var builddtos = entities.OfType<{classNameServiceTM}RequestShareDto>().ToList();
             _logger.LogInformation(""Deleting {{Count}} {classNameServiceTM}s..."", 201);
-            await _builder.DeleteRange(builddtos);
+            await _share.DeleteRange(builddtos);
             _logger.LogInformation(""{{Count}} {classNameServiceTM}s deleted successfully."", 202);
         }}
         catch (Exception ex)
@@ -244,8 +242,8 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             try
             {{
                 _logger.LogInformation(""Retrieving all {classNameServiceTM} entities..."");
-                var results = await _builder.GetAllAsync();
-                var response = await _builder.GetAllByAsync(conditions, options);
+                var results = await _share.GetAllAsync();
+                var response = await _share.GetAllByAsync(conditions, options);
                 return response.ToResponse(GetMapper().Map<IEnumerable<{classNameServiceTM}ResponseDso>>(response.Data));
             }}
             catch (Exception ex)
@@ -260,8 +258,7 @@ public override async Task<IEnumerable<{classNameServiceTM}ResponseDso>> GetAllA
             try
             {{
                 _logger.LogInformation(""Retrieving {classNameServiceTM} entity..."");
-                var results = await _builder.GetAllAsync();
-                return GetMapper().Map<{classNameServiceTM}ResponseDso>(await _builder.GetOneByAsync(conditions, options));
+                return GetMapper().Map<{classNameServiceTM}ResponseDso>(await _share.GetOneByAsync(conditions, options));
             }}
             catch (Exception ex)
             {{

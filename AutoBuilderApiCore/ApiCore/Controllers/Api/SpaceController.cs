@@ -9,8 +9,6 @@ using ApiCore.DyModels.Dso.Requests;
 using AutoGenerator.Helper.Translation;
 using System;
 
-using ApiCore.Validators;
-
 namespace ApiCore.Controllers.Api
 {
     //[ApiExplorerSettings(GroupName = "ApiCore")]
@@ -21,13 +19,11 @@ namespace ApiCore.Controllers.Api
         private readonly IUseSpaceService _spaceService;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
-        private readonly IConditionChecker _checker;
-        public SpaceController(IUseSpaceService spaceService, IMapper mapper, ILoggerFactory logger, IConditionChecker checker)
+        public SpaceController(IUseSpaceService spaceService, IMapper mapper, ILoggerFactory logger)
         {
             _spaceService = spaceService;
             _mapper = mapper;
             _logger = logger.CreateLogger(typeof(SpaceController).FullName);
-            _checker = checker;
         }
 
         // Get all Spaces.
@@ -37,9 +33,6 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<SpaceOutputVM>>> GetAll()
         {
-
-
-            var prov = _checker.GetProvider<SpaceValidatorStates>(); 
             try
             {
                 _logger.LogInformation("Fetching all Spaces...");

@@ -270,7 +270,6 @@ namespace ApiCore.Repositories.Share
             try
             {
                 _logger.LogInformation("[Share]Retrieving Request entity...");
-                var results = await _builder.GetAllAsync();
                 return MapToShareResponseDto(await _builder.GetOneByAsync(conditions, options));
             }
             catch (Exception ex)

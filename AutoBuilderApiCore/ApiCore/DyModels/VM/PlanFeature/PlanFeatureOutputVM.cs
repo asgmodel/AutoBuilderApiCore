@@ -18,5 +18,6 @@ namespace ApiCore.DyModels.VMs
         public string? Description { get; set; }
         ///
         public String? PlanId { get; set; }
+        public PlanOutputVM? Plan { get; set; }
     }
 }

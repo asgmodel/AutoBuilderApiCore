@@ -214,7 +214,9 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
             // إذا كان النوع من ضمن القائمة models
             if (models.Contains(prop.PropertyType))
             {
-               
+                propertyDeclarations.AppendLine($@"
+        public {prop.PropertyType.Name}{end}? {prop.Name} {{ get; set; }}");
+
             }
             // إذا كانت الخاصية من نوع Collection
             else if (prop.PropertyType.IsCollection())
@@ -236,7 +238,7 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
 
                     propertyDeclarations.AppendLine($@"
         //
-        public ICollection<{string.Join(", ", typeNames)}>? {prop.Name} {{ get; set; }}");
+        public List<{string.Join(", ", typeNames)}>? {prop.Name} {{ get; set; }}");
                 }
 
             }

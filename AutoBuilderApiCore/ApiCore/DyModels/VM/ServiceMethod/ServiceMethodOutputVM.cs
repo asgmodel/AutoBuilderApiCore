@@ -20,5 +20,6 @@ namespace ApiCore.DyModels.VMs
         public String? OutputParameters { get; set; }
         ///
         public String? ServiceId { get; set; }
+        public ServiceOutputVM? Service { get; set; }
     }
 }

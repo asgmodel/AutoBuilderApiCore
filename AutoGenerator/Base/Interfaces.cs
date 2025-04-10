@@ -73,6 +73,10 @@ namespace AutoGenerator
 
     }
 
+    public interface ITClaimsHelper
+    {
+
+    }
 
 
 

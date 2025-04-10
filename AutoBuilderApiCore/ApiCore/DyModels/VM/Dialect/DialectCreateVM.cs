@@ -16,5 +16,6 @@ namespace ApiCore.DyModels.VMs
         public TranslationData? Description { get; set; }
         ///
         public String? LanguageId { get; set; }
+        public LanguageCreateVM? Language { get; set; }
     }
 }

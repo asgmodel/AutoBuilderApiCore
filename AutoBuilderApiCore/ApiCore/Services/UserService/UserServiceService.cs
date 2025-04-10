@@ -19,10 +19,10 @@ namespace ApiCore.Services.Services
 {
     public class UserServiceService : BaseService<UserServiceRequestDso, UserServiceResponseDso>, IUseUserServiceService
     {
-        private readonly IUserServiceShareRepository _builder;
+        private readonly IUserServiceShareRepository _share;
         public UserServiceService(IUserServiceShareRepository buildUserServiceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = buildUserServiceShareRepository;
+            _share = buildUserServiceShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -30,7 +30,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting UserService entities...");
-                return _builder.CountAsync();
+                return _share.CountAsync();
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Creating new UserService entity...");
-                var result = await _builder.CreateAsync(entity);
+                var result = await _share.CreateAsync(entity);
                 var output = GetMapper().Map<UserServiceResponseDso>(result);
                 _logger.LogInformation("Created UserService entity successfully.");
                 return output;
@@ -61,7 +61,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Deleting UserService entity with ID: {id}...");
-                return _builder.DeleteAsync(id);
+                return _share.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all UserService entities...");
-                var results = await _builder.GetAllAsync();
+                var results = await _share.GetAllAsync();
                 return GetMapper().Map<IEnumerable<UserServiceResponseDso>>(results);
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Retrieving UserService entity with ID: {id}...");
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 var item = GetMapper().Map<UserServiceResponseDso>(result);
                 _logger.LogInformation("Retrieved UserService entity successfully.");
                 return item;
@@ -107,7 +107,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<UserServiceResponseDso> for UserService entities...");
-                var queryable = _builder.GetQueryable();
+                var queryable = _share.GetQueryable();
                 var result = GetMapper().ProjectTo<UserServiceResponseDso>(queryable);
                 return result;
             }
@@ -123,7 +123,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Updating UserService entity...");
-                var result = await _builder.UpdateAsync(entity);
+                var result = await _share.UpdateAsync(entity);
                 return GetMapper().Map<UserServiceResponseDso>(result);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Checking if UserService exists with {Key}: {Value}", name, value);
-                var exists = await _builder.ExistsAsync(value, name);
+                var exists = await _share.ExistsAsync(value, name);
                 if (!exists)
                 {
                     _logger.LogWarning("UserService not found with {Key}: {Value}", name, value);
@@ -158,7 +158,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching all UserServices with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
-                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var results = (await _share.GetAllAsync(includes, pageNumber, pageSize));
                 var items = GetMapper().Map<List<UserServiceResponseDso>>(results.Data);
                 return new PagedResponse<UserServiceResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
             }
@@ -174,7 +174,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching UserService by ID: {Id}", id);
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 if (result == null)
                 {
                     _logger.LogWarning("UserService not found with ID: {Id}", id);
@@ -196,7 +196,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Deleting UserService with {Key}: {Value}", key, value);
-                await _builder.DeleteAsync(value, key);
+                await _share.DeleteAsync(value, key);
                 _logger.LogInformation("UserService with {Key}: {Value} deleted successfully.", key, value);
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace ApiCore.Services.Services
             {
                 var builddtos = entities.OfType<UserServiceRequestShareDto>().ToList();
                 _logger.LogInformation("Deleting {Count} UserServices...", 201);
-                await _builder.DeleteRange(builddtos);
+                await _share.DeleteRange(builddtos);
                 _logger.LogInformation("{Count} UserServices deleted successfully.", 202);
             }
             catch (Exception ex)
@@ -225,8 +225,8 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all UserService entities...");
-                var results = await _builder.GetAllAsync();
-                var response = await _builder.GetAllByAsync(conditions, options);
+                var results = await _share.GetAllAsync();
+                var response = await _share.GetAllByAsync(conditions, options);
                 return response.ToResponse(GetMapper().Map<IEnumerable<UserServiceResponseDso>>(response.Data));
             }
             catch (Exception ex)
@@ -241,8 +241,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving UserService entity...");
-                var results = await _builder.GetAllAsync();
-                return GetMapper().Map<UserServiceResponseDso>(await _builder.GetOneByAsync(conditions, options));
+                return GetMapper().Map<UserServiceResponseDso>(await _share.GetOneByAsync(conditions, options));
             }
             catch (Exception ex)
             {

@@ -19,10 +19,10 @@ namespace ApiCore.Services.Services
 {
     public class SettingService : BaseService<SettingRequestDso, SettingResponseDso>, IUseSettingService
     {
-        private readonly ISettingShareRepository _builder;
+        private readonly ISettingShareRepository _share;
         public SettingService(ISettingShareRepository buildSettingShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
-            _builder = buildSettingShareRepository;
+            _share = buildSettingShareRepository;
         }
 
         public override Task<int> CountAsync()
@@ -30,7 +30,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Counting Setting entities...");
-                return _builder.CountAsync();
+                return _share.CountAsync();
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Creating new Setting entity...");
-                var result = await _builder.CreateAsync(entity);
+                var result = await _share.CreateAsync(entity);
                 var output = GetMapper().Map<SettingResponseDso>(result);
                 _logger.LogInformation("Created Setting entity successfully.");
                 return output;
@@ -61,7 +61,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Deleting Setting entity with ID: {id}...");
-                return _builder.DeleteAsync(id);
+                return _share.DeleteAsync(id);
             }
             catch (Exception ex)
             {
@@ -75,7 +75,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Setting entities...");
-                var results = await _builder.GetAllAsync();
+                var results = await _share.GetAllAsync();
                 return GetMapper().Map<IEnumerable<SettingResponseDso>>(results);
             }
             catch (Exception ex)
@@ -90,7 +90,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation($"Retrieving Setting entity with ID: {id}...");
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 var item = GetMapper().Map<SettingResponseDso>(result);
                 _logger.LogInformation("Retrieved Setting entity successfully.");
                 return item;
@@ -107,7 +107,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving IQueryable<SettingResponseDso> for Setting entities...");
-                var queryable = _builder.GetQueryable();
+                var queryable = _share.GetQueryable();
                 var result = GetMapper().ProjectTo<SettingResponseDso>(queryable);
                 return result;
             }
@@ -123,7 +123,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Updating Setting entity...");
-                var result = await _builder.UpdateAsync(entity);
+                var result = await _share.UpdateAsync(entity);
                 return GetMapper().Map<SettingResponseDso>(result);
             }
             catch (Exception ex)
@@ -138,7 +138,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Checking if Setting exists with {Key}: {Value}", name, value);
-                var exists = await _builder.ExistsAsync(value, name);
+                var exists = await _share.ExistsAsync(value, name);
                 if (!exists)
                 {
                     _logger.LogWarning("Setting not found with {Key}: {Value}", name, value);
@@ -158,7 +158,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching all Settings with pagination: Page {PageNumber}, Size {PageSize}", pageNumber, pageSize);
-                var results = (await _builder.GetAllAsync(includes, pageNumber, pageSize));
+                var results = (await _share.GetAllAsync(includes, pageNumber, pageSize));
                 var items = GetMapper().Map<List<SettingResponseDso>>(results.Data);
                 return new PagedResponse<SettingResponseDso>(items, results.PageNumber, results.PageSize, results.TotalPages);
             }
@@ -174,7 +174,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Fetching Setting by ID: {Id}", id);
-                var result = await _builder.GetByIdAsync(id);
+                var result = await _share.GetByIdAsync(id);
                 if (result == null)
                 {
                     _logger.LogWarning("Setting not found with ID: {Id}", id);
@@ -196,7 +196,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Deleting Setting with {Key}: {Value}", key, value);
-                await _builder.DeleteAsync(value, key);
+                await _share.DeleteAsync(value, key);
                 _logger.LogInformation("Setting with {Key}: {Value} deleted successfully.", key, value);
             }
             catch (Exception ex)
@@ -211,7 +211,7 @@ namespace ApiCore.Services.Services
             {
                 var builddtos = entities.OfType<SettingRequestShareDto>().ToList();
                 _logger.LogInformation("Deleting {Count} Settings...", 201);
-                await _builder.DeleteRange(builddtos);
+                await _share.DeleteRange(builddtos);
                 _logger.LogInformation("{Count} Settings deleted successfully.", 202);
             }
             catch (Exception ex)
@@ -225,8 +225,8 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving all Setting entities...");
-                var results = await _builder.GetAllAsync();
-                var response = await _builder.GetAllByAsync(conditions, options);
+                var results = await _share.GetAllAsync();
+                var response = await _share.GetAllByAsync(conditions, options);
                 return response.ToResponse(GetMapper().Map<IEnumerable<SettingResponseDso>>(response.Data));
             }
             catch (Exception ex)
@@ -241,8 +241,7 @@ namespace ApiCore.Services.Services
             try
             {
                 _logger.LogInformation("Retrieving Setting entity...");
-                var results = await _builder.GetAllAsync();
-                return GetMapper().Map<SettingResponseDso>(await _builder.GetOneByAsync(conditions, options));
+                return GetMapper().Map<SettingResponseDso>(await _share.GetOneByAsync(conditions, options));
             }
             catch (Exception ex)
             {

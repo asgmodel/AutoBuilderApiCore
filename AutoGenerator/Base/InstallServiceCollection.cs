@@ -133,6 +133,10 @@ namespace AutoGenerator
                     }
                 else
                     serviceCollection.AddAutoGenerateApiCore(option);
+              
+
+
+
 
 
             }

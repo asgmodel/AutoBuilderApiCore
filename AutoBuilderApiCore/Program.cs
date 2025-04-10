@@ -1,3 +1,4 @@
+//using ApiCore.Validators.Conditions;
 using ApiCore.Validators.Conditions;
 using AutoGenerator;
 
@@ -44,11 +45,11 @@ builder.Services.
         AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly
     }).
     AddAutoValidator();
-    
-  
 
 
-    var app = builder.Build();
+
+
+var app = builder.Build();
 
 
     //app.UseSchedulersCore(new OptionScheduler()

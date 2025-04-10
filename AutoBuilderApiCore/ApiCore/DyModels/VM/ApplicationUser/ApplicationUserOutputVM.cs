@@ -34,20 +34,21 @@ namespace ApiCore.DyModels.VMs
         public DateTime CreatedAt { get; set; }
         ///
         public DateTime UpdatedAt { get; set; }
+        public SubscriptionOutputVM? Subscription { get; set; }
         //
-        public ICollection<UserModelAiOutputVM>? UserModelAis { get; set; }
+        public List<UserModelAiOutputVM>? UserModelAis { get; set; }
         //
-        public ICollection<UserServiceOutputVM>? UserServices { get; set; }
+        public List<UserServiceOutputVM>? UserServices { get; set; }
         //
-        public ICollection<RequestOutputVM>? Requests { get; set; }
+        public List<RequestOutputVM>? Requests { get; set; }
         //
-        public ICollection<ApplicationUserClaim>? Claims { get; set; }
+        public List<ApplicationUserClaim>? Claims { get; set; }
         //
-        public ICollection<ApplicationUserLogin>? Logins { get; set; }
+        public List<ApplicationUserLogin>? Logins { get; set; }
         //
-        public ICollection<ApplicationUserToken>? Tokens { get; set; }
+        public List<ApplicationUserToken>? Tokens { get; set; }
         //
-        public ICollection<ApplicationUserRole>? UserRoles { get; set; }
+        public List<ApplicationUserRole>? UserRoles { get; set; }
         ///
         public String? Id { get; set; }
         ///

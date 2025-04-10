@@ -20,11 +20,12 @@ namespace ApiCore.DyModels.VMs
         public String? Token { get; set; }
         ///
         public String? ModelAiId { get; set; }
+        public ModelAiOutputVM? ModelAi { get; set; }
         //
-        public ICollection<ServiceMethodOutputVM>? ServiceMethods { get; set; }
+        public List<ServiceMethodOutputVM>? ServiceMethods { get; set; }
         //
-        public ICollection<UserServiceOutputVM>? UserServices { get; set; }
+        public List<UserServiceOutputVM>? UserServices { get; set; }
         //
-        public ICollection<RequestOutputVM>? Requests { get; set; }
+        public List<RequestOutputVM>? Requests { get; set; }
     }
 }

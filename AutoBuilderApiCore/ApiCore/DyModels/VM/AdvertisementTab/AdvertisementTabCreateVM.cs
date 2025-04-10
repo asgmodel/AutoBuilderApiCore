@@ -18,5 +18,6 @@ namespace ApiCore.DyModels.VMs
         public TranslationData? Description { get; set; }
         ///
         public String? ImageAlt { get; set; }
+        public AdvertisementCreateVM? Advertisement { get; set; }
     }
 }

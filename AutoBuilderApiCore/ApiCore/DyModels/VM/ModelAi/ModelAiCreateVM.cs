@@ -30,9 +30,10 @@ namespace ApiCore.DyModels.VMs
         public String? Type { get; set; }
         ///
         public String? ModelGatewayId { get; set; }
+        public ModelGatewayCreateVM? ModelGateway { get; set; }
         //
-        public ICollection<ServiceCreateVM>? Services { get; set; }
+        public List<ServiceCreateVM>? Services { get; set; }
         //
-        public ICollection<UserModelAiCreateVM>? UserModelAis { get; set; }
+        public List<UserModelAiCreateVM>? UserModelAis { get; set; }
     }
 }

@@ -16,5 +16,6 @@ namespace ApiCore.DyModels.VMs
         public TranslationData? Description { get; set; }
         ///
         public String? PlanId { get; set; }
+        public PlanCreateVM? Plan { get; set; }
     }
 }

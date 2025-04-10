@@ -20,5 +20,6 @@ namespace ApiCore.DyModels.VMs
         public DateTime CreatedAt { get; set; }
         ///
         public String? RequestId { get; set; }
+        public RequestOutputVM? Request { get; set; }
     }
 }

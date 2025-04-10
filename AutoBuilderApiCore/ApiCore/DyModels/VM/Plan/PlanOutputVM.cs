@@ -19,7 +19,7 @@ namespace ApiCore.DyModels.VMs
         //
         public string? Description { get; set; }
         //
-        public ICollection<String>? Images { get; set; }
+        public List<String>? Images { get; set; }
         ///
         public String? BillingPeriod { get; set; }
         ///
@@ -31,8 +31,8 @@ namespace ApiCore.DyModels.VMs
         ///
         public DateTime CreatedAt { get; set; }
         //
-        public ICollection<SubscriptionOutputVM>? Subscriptions { get; set; }
+        public List<SubscriptionOutputVM>? Subscriptions { get; set; }
         //
-        public ICollection<PlanFeatureOutputVM>? PlanFeatures { get; set; }
+        public List<PlanFeatureOutputVM>? PlanFeatures { get; set; }
     }
 }

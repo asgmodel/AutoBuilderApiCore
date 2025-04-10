@@ -45,8 +45,8 @@
   "Helper": [],
   "Data": [],
   "Enums": [],
-  "Validators": [],
+  "Validators": ["Conditions"],
 
-  "Schedulers": []
+  "Schedulers": [ ]
 
 }

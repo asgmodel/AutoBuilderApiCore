@@ -94,7 +94,7 @@ public class ApiFolderGenerator
             DsoGenerator.GeneratWithFolder(e);
         }
 
-        else if(e.Node.Name == "Repositories")
+        else if (e.Node.Name == "Repositories")
         {
             RepositoryGenerator.GeneratWithFolder(e);
         }
@@ -110,6 +110,17 @@ public class ApiFolderGenerator
         else if (e.Node.Name == "VM")
         {
             VMGenerator.GeneratWithFolder(e);
+        }
+        else if (e.Node.Name == "Validators")
+        {
+
+            ValidatorGenerator.GeneratWithFolder(e);
+        }
+
+        else if(e.Node.Name == "Schedulers")
+        {
+            SchedulerGenerator.GeneratWithFolder(e);
+
         }
     }
 

@@ -23,6 +23,6 @@ namespace ApiCore.DyModels.VMs
         ///
         public String? Url { get; set; }
         //
-        public ICollection<AdvertisementTabOutputVM>? AdvertisementTabs { get; set; }
+        public List<AdvertisementTabOutputVM>? AdvertisementTabs { get; set; }
     }
 }

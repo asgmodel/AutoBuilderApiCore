@@ -34,11 +34,13 @@ namespace ApiCore.DyModels.VMs
         public Nullable<DateTime> CanceledAt { get; set; }
         ///
         public String? PlanId { get; set; }
+        public PlanCreateVM? Plan { get; set; }
         ///
         public String? UserId { get; set; }
+        public ApplicationUserCreateVM? User { get; set; }
         //
-        public ICollection<RequestCreateVM>? Requests { get; set; }
+        public List<RequestCreateVM>? Requests { get; set; }
         //
-        public ICollection<SpaceCreateVM>? Spaces { get; set; }
+        public List<SpaceCreateVM>? Spaces { get; set; }
     }
 }

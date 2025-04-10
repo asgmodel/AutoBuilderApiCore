@@ -20,5 +20,6 @@ namespace ApiCore.DyModels.VMs
         public string? Description { get; set; }
         ///
         public String? ImageAlt { get; set; }
+        public AdvertisementOutputVM? Advertisement { get; set; }
     }
 }

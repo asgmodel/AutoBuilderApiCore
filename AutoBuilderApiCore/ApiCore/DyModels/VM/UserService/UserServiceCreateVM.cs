@@ -14,7 +14,9 @@ namespace ApiCore.DyModels.VMs
         public DateTime CreatedAt { get; set; }
         ///
         public String? UserId { get; set; }
+        public ApplicationUserCreateVM? User { get; set; }
         ///
         public String? ServiceId { get; set; }
+        public ServiceCreateVM? Service { get; set; }
     }
 }

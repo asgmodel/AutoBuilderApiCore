@@ -97,117 +97,85 @@ namespace AutoGenerator.Config
 
     public class MappingConfig : Profile
     {
-
-
         public static bool CheckIgnoreAutomateMapper(Type type)
         {
             var attribute = type.GetCustomAttribute<IgnoreAutomateMapperAttribute>();
-
-            // Return true if the attribute exists and IgnoreMapping is true, otherwise false
             return attribute != null && attribute.IgnoreMapping;
         }
 
         public MappingConfig()
         {
-
-            
-            var AssemblyModels = ApiFolderInfo.AssemblyModels;
-
+            var assemblyModels = ApiFolderInfo.AssemblyModels;
             var assembly = ApiFolderInfo.AssemblyShare;
-            var models = AssemblyModels.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
+            var models = assemblyModels.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
             var dtos = assembly.GetTypes().Where(t => typeof(ITBuildDto).IsAssignableFrom(t) && t.IsClass).ToList();
-            var dtosshare = assembly.GetTypes().Where(t => typeof(ITShareDto).IsAssignableFrom(t) && t.IsClass).ToList();
-
+            var dtosShare = assembly.GetTypes().Where(t => typeof(ITShareDto).IsAssignableFrom(t) && t.IsClass).ToList();
             var vms = assembly.GetTypes().Where(t => typeof(ITVM).IsAssignableFrom(t) && t.IsClass).ToList();
             var dsos = assembly.GetTypes().Where(t => typeof(ITDso).IsAssignableFrom(t) && t.IsClass).ToList();
 
-
-            // map daynamic  Model and DTO
-            foreach (var model in models)
+            // 1. Map Models <-> DTOs
+            foreach (var model in models.Where(m => !CheckIgnoreAutomateMapper(m)))
             {
-
-                if (!CheckIgnoreAutomateMapper(model))
+                foreach (var dto in dtos.Where(d => d.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)))
                 {
+                    AddTwoWayMap(model, dto);
 
-
-                    var dtoMatches = dtos.Where(d => d.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)).ToList();
-                    foreach (var dto in dtoMatches)
+                    if (!CheckIgnoreAutomateMapper(dto))
                     {
-
-                        CreateMap(model, dto).AfterMap((src, dest,context) =>
+                        foreach (var share in dtosShare.Where(s => s.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)))
                         {
+                            CreateMap(dto, share);
 
-
-                            HelperTranslation.MapToProcessAfter(src, dest, context);
-
-                        });
-
-                        CreateMap(dto,model).AfterMap((src, dest, context) =>
-                        {
-
-
-                            HelperTranslation.MapToProcessAfter(src, dest, context);
-
-                        });
-
-
-                        if (!CheckIgnoreAutomateMapper(dto))
-                        {
-                            var dtosharMatches = dtosshare.Where(d => d.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)).ToList();
-                            foreach (var share in dtosharMatches)
+                            foreach (var dso in dsos.Where(d => d.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)))
                             {
-                                CreateMap(dto, share).ReverseMap();
-
-                                var dsosMatches = dsos.Where(d => d.Name.Contains(model.Name, StringComparison.OrdinalIgnoreCase)).ToList();
-                                foreach (var dso in dsosMatches)
-                                {
-                                    CreateMap(share, dso).ReverseMap();
-                                }
-
+                                CreateMap(share, dso);
                             }
-
-
-
                         }
-
                     }
-
                 }
             }
 
-
-
-            //  map daynamic  VM and DSO
-
-            foreach (var dso in dsos)
+            // 2. Map DSO <-> VM
+            foreach (var dso in dsos.Where(d => !CheckIgnoreAutomateMapper(d)))
             {
-                if (!CheckIgnoreAutomateMapper(dso))
+                foreach (var vm in vms.Where(v => !CheckIgnoreAutomateMapper(v)))
                 {
-                    var vmMatches = vms;//.Where(v => v.Name.Contains(dso.Name.Replace("RequestDso", "").Replace("ResponseDso", ""), StringComparison.OrdinalIgnoreCase)).ToList();
-                    foreach (var vm in vmMatches)
-                    {
-                        if (!CheckIgnoreAutomateMapper(vm))
-                        {
-                            CreateMap(dso, vm).AfterMap((src, dest, context) =>
-                            {
+                    AddTwoWayMap(dso, vm);
+                }
+            }
 
+            // 3. Map DTO <-> VM
+            foreach (var dto in dtos.Where(d => !CheckIgnoreAutomateMapper(d)))
+            {
+                foreach (var vm in vms.Where(v => !CheckIgnoreAutomateMapper(v)))
+                {
+                    AddTwoWayMap(dto, vm);
+                }
+            }
 
-                                HelperTranslation.MapToProcessAfter(src, dest, context);
-
-                            });
-
-                            CreateMap(vm,dso).AfterMap((src, dest, context) =>
-                            {
-
-
-                                HelperTranslation.MapToProcessAfter(src, dest, context);
-
-                            });
-                        }
-                    }
+            // 4. Map Share <-> VM
+            foreach (var share in dtosShare.Where(s => !CheckIgnoreAutomateMapper(s)))
+            {
+                foreach (var vm in vms.Where(v => !CheckIgnoreAutomateMapper(v)))
+                {
+                    AddTwoWayMap(share, vm);
                 }
             }
         }
+
+        private void AddTwoWayMap(Type source, Type destination)
+        {
+            CreateMap(source, destination).AfterMap((src, dest, context) =>
+            {
+                HelperTranslation.MapToProcessAfter(src, dest, context);
+            });
+
+            CreateMap(destination, source).AfterMap((src, dest, context) =>
+            {
+                HelperTranslation.MapToProcessAfter(src, dest, context);
+            });
+        }
     }
+
 }

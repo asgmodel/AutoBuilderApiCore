@@ -1,11 +1,10 @@
 using AutoGenerator.Data;
 using AutoGenerator.Helper.Translation;
-
 using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System;
 using System.Reflection;
-using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks; 
 
 namespace AutoGenerator.Conditions
@@ -60,7 +59,7 @@ namespace AutoGenerator.Conditions
             : base(name, errorMessage)
         {
 
-            _predicate = ConvertToConditionResult(predicate);
+            _predicate = ConvertToConditionResult(predicate,errorMessage);
         }
 
         public LambdaCondition(string name, Func<T, ConditionResult> predicate, string? errorMessage = null)
@@ -75,7 +74,7 @@ namespace AutoGenerator.Conditions
             _predicate =predicate;
         }
 
-        private static Func<T, Task<ConditionResult>> ConvertToConditionResult(Func<T, object> predicate)
+        private static Func<T, Task<ConditionResult>> ConvertToConditionResult(Func<T, object> predicate,string errorMessage)
         {
 
             if (predicate == null)
@@ -87,7 +86,11 @@ namespace AutoGenerator.Conditions
             return (T context) =>
             {
                 var result = predicate(context);
-                return Task.FromResult(new ConditionResult(true, result));
+                if (result is bool flag)
+
+                    return Task.FromResult(new ConditionResult(flag, result, errorMessage));
+                
+                return Task.FromResult(new ConditionResult(true, result, errorMessage));
             };
         }
 

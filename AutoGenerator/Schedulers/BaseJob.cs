@@ -21,8 +21,8 @@ public class JobOptions
     }
     public string? Cron { get; set; } = "0 0/1 * * * ?"; // كل دقيقة
     public string JobName { get; set; } = "job1";
-    public string JobGroup { get; set; } = "group1"; // مجموعة المهمة
-    public string TriggerName { get; set; } = "trigger1";
+    public string JobGroup { get; set; } = "group"; // مجموعة المهمة
+    public string TriggerName { get; set; } = "trigger ";
     public string TriggerGroup { get; set; } = "group1"; // مجموعة الـ Trigger
     public string JobData { get; set; } = ""; // بيانات إضافية للمهمة
     public string JobDataType { get; set; } = ""; // نوع البيانات الإضافية
@@ -57,12 +57,14 @@ public abstract class BaseJob : CJober, ITJob
 {
     protected readonly JobOptions _options;
 
+    private readonly string? _id;
 
 
 
     public BaseJob()
     {
         _options = new JobOptions();
+        _id = Guid.NewGuid().ToString();
         initialize();
     }
     
@@ -74,6 +76,15 @@ public abstract class BaseJob : CJober, ITJob
     private  void initialize()
     {
         InitializeJobOptions();
+        _options.TriggerGroup += _id;
+
+        _options.JobGroup +=_id;
+        _options.JobName += _id;
+
+
+
+
+
     }
     abstract  protected void InitializeJobOptions();
 

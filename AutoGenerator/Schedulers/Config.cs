@@ -21,24 +21,46 @@ namespace AutoGenerator.Schedulers
     {
 
 
+        public static void AddAutoScheduler(this IServiceCollection serviceCollection, OptionScheduler? option = null)
+        {
+
+            serviceCollection.AddQuartz(q =>
+            {
+                q.UseMicrosoftDependencyInjectionJobFactory();
+            });
+
+            serviceCollection.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
+
+
+            serviceCollection.AddSingleton<IHostedService, JobScheduler>(pro =>
+            {
+                var jober = pro.GetRequiredService<ISchedulerFactory>();
+
+                 
+                return new JobScheduler(jober,option.Assembly);
+
+            });
+                 
+        }
+
         //public async static void UseSchedulersCore(this WebApplication app, OptionScheduler? option=null)
         //{
         //    using (var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
         //    {
-              
 
-               
 
-              
+
+
+
         //        var schedulerJobProvider = new SchedulerJobProvider(scope.ServiceProvider.GetRequiredService<ISchedulerFactory>(), jobOptions);
 
         //        await schedulerJobProvider.StartAsync();
         //    }
-        
+
         //}
         //public static Dictionary<string,JobOptions> getJobOptions(DataContext context, Assembly assembly)
         //{
-            
+
 
 
         //    var typesjobs = assembly.GetTypes()
@@ -60,7 +82,7 @@ namespace AutoGenerator.Schedulers
 
         //    }
 
-           
+
 
         //    return jobOptions;
 

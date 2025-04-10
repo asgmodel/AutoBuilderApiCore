@@ -1,4 +1,6 @@
-﻿namespace AutoGenerator.TM
+﻿using AutoGenerator.ApiFolder;
+
+namespace AutoGenerator.TM
 {
 
     public  class TmShareRepository
@@ -18,7 +20,7 @@
      /// <summary>
      /// Constructor for {nameShareTM}ShareRepository.
      /// </summary>
-     public {nameShareTM}ShareRepository(DataContext dbContext, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
+     public {nameShareTM}ShareRepository({ApiFolderInfo.TypeContext.Name} dbContext, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
      {{
          // Initialize the builder repository.
          _builder = new {nameShareTM}BuilderRepository(dbContext, mapper, logger.CreateLogger(typeof({nameShareTM}ShareRepository).FullName));

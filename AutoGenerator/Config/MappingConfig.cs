@@ -1,10 +1,11 @@
 ﻿
 
 
+using AutoGenerator.ApiFolder;
 using AutoGenerator.Conditions;
 using AutoGenerator.Data;
 using AutoGenerator.Helper.Translation;
-using AutoGenerator.Repositorys.Share;
+using AutoGenerator.Repositories.Share;
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -55,21 +56,12 @@ namespace AutoGenerator.Config
 
 
 
-            serviceCollection.AddScoped<ITFactoryInjector, TFactoryInjector>();
-            serviceCollection.AddScoped<IConditionChecker, ConditionChecker>(provider =>
-            {
-
-                var injector = provider.GetRequiredService<ITFactoryInjector>();
-
-
-                var checker = new ConditionChecker(injector);
+            
 
 
 
-                ConfigValidator.Register(checker, assembly);
-                return checker;
 
-            });
+
 
 
 
@@ -115,16 +107,14 @@ namespace AutoGenerator.Config
             return attribute != null && attribute.IgnoreMapping;
         }
 
-        public  static Assembly? AssemblyShare { get; set; }
         public MappingConfig()
         {
 
             
-            var assembly = AssemblyShare;
+            var AssemblyModels = ApiFolderInfo.AssemblyModels;
 
-            var assemblymodel = Assembly.GetExecutingAssembly();
-
-            var models = assemblymodel.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
+            var assembly = ApiFolderInfo.AssemblyShare;
+            var models = AssemblyModels.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
             var dtos = assembly.GetTypes().Where(t => typeof(ITBuildDto).IsAssignableFrom(t) && t.IsClass).ToList();
             var dtosshare = assembly.GetTypes().Where(t => typeof(ITShareDto).IsAssignableFrom(t) && t.IsClass).ToList();

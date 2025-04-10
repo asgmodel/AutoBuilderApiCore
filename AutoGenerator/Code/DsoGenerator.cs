@@ -43,7 +43,7 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
     {
 
 
-        var assembly = Assembly.GetExecutingAssembly();
+        var assembly = ApiFolderInfo.AssemblyModels;
 
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
@@ -62,7 +62,7 @@ public class DsoGenerator : GenericClassGenerator, ITGenerator
                 NamespaceName = $"{root}.DyModels.{type}.{NamespaceName}s",
                 AdditionalCode = @"",
                 Interfaces = new List<Type> { type1 },
-                Usings = new List<string> { "Microsoft.CodeAnalysis", "AutoGenerator" }
+                Usings = new List<string> {  "AutoGenerator" }
 
             };
 

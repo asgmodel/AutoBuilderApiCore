@@ -58,8 +58,24 @@ namespace AutoGenerator
     }
 
 
-   
+    public interface ITAutoDbContext
+    {
 
-   
-}
+    }
+
+    public interface ITUser
+    {
+
+    }
+     
+    public interface ITRole
+    {
+
+    }
+
+
+
+
+
+    }
 

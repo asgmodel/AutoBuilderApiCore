@@ -1,33 +1,28 @@
-using ApiCore.DyModels.Dso.Requests;
-using ApiCore.DyModels.Dso.Responses;
-using ApiCore.DyModels.Dto.Share.Requests;
-using ApiCore.DyModels.Dto.Share.Responses;
-using ApiCore.Repositorys.Builder;
-using ApiCore.Repositorys.Share;
-using ApiCore.Validators;
 using AutoGenerator;
-using AutoGenerator.Conditions;
-using AutoGenerator.Helper;
-using AutoGenerator.Models;
-using AutoGenerator.Repositorys.Base;
-using AutoGenerator.Services.Base;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
+using AutoGenerator.Services.Base;
+using ApiCore.DyModels.Dso.Requests;
+using ApiCore.DyModels.Dso.Responses;
+using LAHJAAPI.Models;
+using ApiCore.DyModels.Dto.Share.Requests;
+using ApiCore.DyModels.Dto.Share.Responses;
+using ApiCore.Repositories.Share;
 using System.Linq.Expressions;
+using ApiCore.Repositories.Builder;
+using AutoGenerator.Repositories.Base;
+using AutoGenerator.Helper;
+using System;
 
 namespace ApiCore.Services.Services
 {
     public class PlanService : BaseService<PlanRequestDso, PlanResponseDso>, IUsePlanService
     {
         private readonly IPlanShareRepository _builder;
-        private readonly IConditionChecker _checker;
-        public PlanService(IPlanShareRepository buildPlanShareRepository, IMapper mapper, ILoggerFactory logger,
-            IConditionChecker checker) : base(mapper, logger)
+        public PlanService(IPlanShareRepository buildPlanShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
             _builder = buildPlanShareRepository;
-            _checker = checker;
         }
 
         public override Task<int> CountAsync()
@@ -46,10 +41,6 @@ namespace ApiCore.Services.Services
 
         public override async Task<PlanResponseDso> CreateAsync(PlanRequestDso entity)
         {
-
-            
-
-            _checker.Check(SpaceValidatorStates.IsFull, entity);
             try
             {
                 _logger.LogInformation("Creating new Plan entity...");

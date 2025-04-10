@@ -1,6 +1,6 @@
 using AutoGenerator;
-using AutoGenerator.Models;
 using AutoGenerator.Helper.Translation;
+using LAHJAAPI.Models;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -10,6 +10,8 @@ namespace ApiCore.DyModels.VMs
     /// </summary>
     public class UserServiceOutputVM : ITVM
     {
+        ///
+        public Int32 Id { get; set; }
         ///
         public DateTime CreatedAt { get; set; }
         ///

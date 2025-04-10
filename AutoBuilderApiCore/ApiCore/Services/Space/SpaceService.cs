@@ -5,46 +5,28 @@ using System.Collections.Generic;
 using AutoGenerator.Services.Base;
 using ApiCore.DyModels.Dso.Requests;
 using ApiCore.DyModels.Dso.Responses;
-using AutoGenerator.Models;
+using LAHJAAPI.Models;
 using ApiCore.DyModels.Dto.Share.Requests;
 using ApiCore.DyModels.Dto.Share.Responses;
-using ApiCore.Repositorys.Share;
+using ApiCore.Repositories.Share;
 using System.Linq.Expressions;
-using ApiCore.Repositorys.Builder;
-using AutoGenerator.Repositorys.Base;
+using ApiCore.Repositories.Builder;
+using AutoGenerator.Repositories.Base;
 using AutoGenerator.Helper;
 using System;
-using AutoGenerator.Conditions;
-using ApiCore.Validators;
-using ApiCore.DyModels.Dso.ResponseFilters;
 
 namespace ApiCore.Services.Services
 {
     public class SpaceService : BaseService<SpaceRequestDso, SpaceResponseDso>, IUseSpaceService
     {
         private readonly ISpaceShareRepository _builder;
-        private readonly IConditionChecker _checker;
-        public SpaceService(ISpaceShareRepository buildSpaceShareRepository, IMapper mapper, ILoggerFactory logger, IConditionChecker checker) : base(mapper, logger)
+        public SpaceService(ISpaceShareRepository buildSpaceShareRepository, IMapper mapper, ILoggerFactory logger) : base(mapper, logger)
         {
             _builder = buildSpaceShareRepository;
-            _checker = checker;
         }
 
         public override Task<int> CountAsync()
         {
-
-
-            _checker.Check(SpaceValidatorStates.IsActive, new SpaceResponseFilterDso
-            {
-                IsGlobal = true,
-                Subscription = new SubscriptionResponseFilterDso
-                {
-                }
-            });
-
-
-
-
             try
             {
                 _logger.LogInformation("Counting Space entities...");
@@ -59,8 +41,6 @@ namespace ApiCore.Services.Services
 
         public override async Task<SpaceResponseDso> CreateAsync(SpaceRequestDso entity)
         {
-
-           
             try
             {
                 _logger.LogInformation("Creating new Space entity...");

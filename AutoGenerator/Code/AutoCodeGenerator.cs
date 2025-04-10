@@ -1,7 +1,9 @@
+using AutoGenerator.ApiFolder;
 using AutoGenerator.Code;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Reflection;
 
 public class GenericClassGenerator : ITGenerator
 {
@@ -11,6 +13,8 @@ public class GenericClassGenerator : ITGenerator
 
     private static  readonly HashSet<ITGenerator>  tGenerators= new HashSet<ITGenerator>();
     public bool IsEditFile { get;  set; } = true;
+
+   
 
     public static  HashSet<ITGenerator> TGenerators { get { return tGenerators; } }
     public string Generate(GenerationOptions options)

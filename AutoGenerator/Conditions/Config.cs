@@ -1,15 +1,15 @@
 
+using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
 namespace AutoGenerator.Conditions
 {
    
 
-    public  static class ConfigValidator
+    public  static class  BaseConfigValidator
     {
-
-
-        public static void Register(IConditionChecker checker,Assembly assembly)
+      
+        public static void Register(IBaseConditionChecker checker,Assembly assembly)
         {
             
 

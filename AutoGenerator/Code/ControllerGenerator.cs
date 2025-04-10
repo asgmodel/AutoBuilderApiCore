@@ -33,7 +33,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
     {
 
 
-        var assembly = Assembly.GetExecutingAssembly();
+        var assembly = ApiFolderInfo.AssemblyModels;
 
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
@@ -225,7 +225,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<{className}OutputVM>> Get{className}sByLg(string? lg)
+        public async Task<ActionResult<IEnumerable<{className}OutputVM>>> Get{className}sByLg(string? lg)
         {{
             
             if (string.IsNullOrWhiteSpace(lg))
@@ -243,7 +243,7 @@ public class ControllerGenerator : GenericClassGenerator, ITGenerator
                     _logger.LogWarning(""{className}s not found  by  "");
                     return NotFound();
                 }}
-                var items = _mapper.Map<{className}OutputVM>({nameObj}s,opt=>opt.Items.Add(HelperTranslation.KEYLG,lg));
+                var items = _mapper.Map<IEnumerable<{className}OutputVM>>({nameObj}s,opt=>opt.Items.Add(HelperTranslation.KEYLG,lg));
                 return Ok(items);
             }}
             catch (Exception ex)

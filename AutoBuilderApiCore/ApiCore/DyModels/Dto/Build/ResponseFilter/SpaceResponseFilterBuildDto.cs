@@ -1,7 +1,6 @@
-using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Helper.Translation;
-using AutoGenerator.Models;
+using LAHJAAPI.Models;
 using AutoGenerator.Config;
 using System;
 
@@ -55,8 +54,6 @@ namespace ApiCore.DyModels.Dto.Build.ResponseFilters
         public String? SubscriptionId { get; set; }
         public SubscriptionResponseFilterBuildDto? Subscription { get; set; }
         public ICollection<RequestResponseFilterBuildDto>? Requests { get; set; }
-        public ICollection<RequestResponseFilterBuildDto>? Requests2 { get; set; }
-        public RequestResponseFilterBuildDto[]? Requests3 { get; set; }
 
         [FilterLGEnabled]
         public string? Lg { get; set; }

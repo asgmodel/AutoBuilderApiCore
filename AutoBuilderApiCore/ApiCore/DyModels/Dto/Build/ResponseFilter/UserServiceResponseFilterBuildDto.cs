@@ -1,7 +1,6 @@
-using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Helper.Translation;
-using AutoGenerator.Models;
+using LAHJAAPI.Models;
 using AutoGenerator.Config;
 using System;
 
@@ -9,6 +8,10 @@ namespace ApiCore.DyModels.Dto.Build.ResponseFilters
 {
     public class UserServiceResponseFilterBuildDto : ITBuildDto
     {
+        /// <summary>
+        /// Id property for DTO.
+        /// </summary>
+        public Int32 Id { get; set; }
         /// <summary>
         /// CreatedAt property for DTO.
         /// </summary>

@@ -64,7 +64,6 @@
               Func<ConditionResult, Task>? onSuccess = null,
               Func<ConditionResult, Task>? onFailure = null)
               where TEnum : Enum;
-        public ITFactoryInjector Injector { get; }
         public IConditionProvider<TEnum>? GetProvider<TEnum>() where TEnum : Enum;
 
 
@@ -79,18 +78,16 @@
     public class BaseConditionChecker :  IBaseConditionChecker
     {
         private readonly Dictionary<Type, object> _providers = new();
-        private readonly ITFactoryInjector _injector;
-
-        public ITFactoryInjector Injector => _injector;
+        
         // الأحداث الخاصة بحالة الشرط
         public event EventHandler<ConditionResult> ConditionMet;
         public event EventHandler<ConditionResult> ConditionFailed;
 
 
 
-        public BaseConditionChecker(ITFactoryInjector injector)
+        public BaseConditionChecker()
         {
-            _injector = injector;
+           
         }
 
 

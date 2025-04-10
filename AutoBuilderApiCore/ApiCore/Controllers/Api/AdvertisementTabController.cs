@@ -119,7 +119,7 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<AdvertisementTabOutputVM>> GetAdvertisementTabsByLg(string? lg)
+        public async Task<ActionResult<IEnumerable<AdvertisementTabOutputVM>>> GetAdvertisementTabsByLg(string? lg)
         {
             if (string.IsNullOrWhiteSpace(lg))
             {
@@ -136,7 +136,7 @@ namespace ApiCore.Controllers.Api
                     return NotFound();
                 }
 
-                var items = _mapper.Map<AdvertisementTabOutputVM>(advertisementtabs, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                var items = _mapper.Map<IEnumerable<AdvertisementTabOutputVM>>(advertisementtabs, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
                 return Ok(items);
             }
             catch (Exception ex)

@@ -1,6 +1,6 @@
 using AutoGenerator;
-using AutoGenerator.Models;
 using AutoGenerator.Helper.Translation;
+using LAHJAAPI.Models;
 using System;
 
 namespace ApiCore.DyModels.VMs
@@ -32,9 +32,5 @@ namespace ApiCore.DyModels.VMs
         public String? SubscriptionId { get; set; }
         //
         public ICollection<RequestCreateVM>? Requests { get; set; }
-        //
-        public ICollection<RequestCreateVM>? Requests2 { get; set; }
-        //
-        public RequestCreateVM[]? Requests3 { get; set; }
     }
 }

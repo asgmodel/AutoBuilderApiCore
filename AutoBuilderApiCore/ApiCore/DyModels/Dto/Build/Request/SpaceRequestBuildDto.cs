@@ -1,7 +1,6 @@
-using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Helper.Translation;
-using AutoGenerator.Models;
+using LAHJAAPI.Models;
 using AutoGenerator.Config;
 using System;
 
@@ -55,7 +54,5 @@ namespace ApiCore.DyModels.Dto.Build.Requests
         public String? SubscriptionId { get; set; }
         public SubscriptionRequestBuildDto? Subscription { get; set; }
         public ICollection<RequestRequestBuildDto>? Requests { get; set; }
-        public ICollection<RequestRequestBuildDto>? Requests2 { get; set; }
-        public RequestRequestBuildDto[]? Requests3 { get; set; }
     }
 }

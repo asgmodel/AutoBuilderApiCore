@@ -34,7 +34,7 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
     {
 
 
-        var assembly = Assembly.GetExecutingAssembly();
+        var assembly = ApiFolderInfo.AssemblyModels;
 
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
@@ -85,8 +85,10 @@ public class VMGenerator : GenericClassGenerator, ITGenerator
                     Usings = new List<string>
                         {
                             "AutoGenerator",
-                            "AutoGenerator.Models",
-                            "AutoGenerator.Helper.Translation"
+                            
+                            "AutoGenerator.Helper.Translation",
+                             model.Namespace
+
 
 
 

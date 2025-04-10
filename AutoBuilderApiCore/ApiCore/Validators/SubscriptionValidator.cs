@@ -1,20 +1,13 @@
-using ApiCore.DyModels.Dso.Requests;
+
 using ApiCore.DyModels.Dso.ResponseFilters;
 using ApiCore.DyModels.VMs;
-using ApiCore.Repositorys.Builder;
-using ApiCore.Services.Services;
+using ApiCore.Repositories.Builder;
+
 using AutoGenerator.Conditions;
-using AutoGenerator.Helper.Translation;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 
 namespace ApiCore.Validators
 {
-   
+
 
 
     public enum SubscriptionValidatorStates
@@ -28,12 +21,12 @@ namespace ApiCore.Validators
 
     public class SubscriptionValidator : BaseValidator<SubscriptionResponseFilterDso, SubscriptionValidatorStates>, ITValidator
     {
-        //  «·«›÷· «· ⁄«„·  „⁄  context   
+        //  ?????? ???????  ??  context   
         /// <summary>
-        ///  «” Œœ„Â   ›Ì   ⁄„Ì„ «·‘—Êÿ «·Œ«’… »«·ÃœÊ·   
-        ///checker  ÌÃÌ» «·«” ›«œÂ „‰ «·‘—Êÿ «·„Õ„·Â   Ê«·„ Ê›—Â ›Ì  
+        ///  ???????   ??  ????? ?????? ?????? ???????   
+        ///checker  ???? ????????? ?? ?????? ???????   ????????? ??  
         /// </summary>
-        private readonly   SubscriptionBuilderRepository subscription  ; // Â–«  „Ã—œ „À«·  ÌÊ÷Õ ·ﬂ «‰ﬂ Ì„ﬂ‰   «·«” ›œÂ „‰ ﬂ·  ÿ»ﬁ«  «·—Ì»Ê“ Ì   
+        private readonly SubscriptionBuilderRepository subscription; // ???  ???? ????  ???? ?? ??? ????   ???????? ?? ??  ????? ?????????   
 
         public SubscriptionValidator(IConditionChecker checker) : base(checker)
         {
@@ -71,7 +64,7 @@ namespace ApiCore.Validators
 
         bool isAcive(SubscriptionResponseFilterDso context)
         {
-            if (context.AllowedRequests==10)
+            if (context.AllowedRequests == 10)
             {
                 return true;
             }

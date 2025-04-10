@@ -1,6 +1,6 @@
 ﻿
 using AutoGenerator.Helper;
-using AutoGenerator.Repositorys.Base;
+using AutoGenerator.Repositories.Base;
 using AutoMapper;
 
 using Microsoft.Extensions.Logging;

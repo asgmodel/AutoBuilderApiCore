@@ -119,7 +119,7 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserServiceOutputVM>> GetUserServicesByLg(string? lg)
+        public async Task<ActionResult<IEnumerable<UserServiceOutputVM>>> GetUserServicesByLg(string? lg)
         {
             if (string.IsNullOrWhiteSpace(lg))
             {
@@ -136,7 +136,7 @@ namespace ApiCore.Controllers.Api
                     return NotFound();
                 }
 
-                var items = _mapper.Map<UserServiceOutputVM>(userservices, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                var items = _mapper.Map<IEnumerable<UserServiceOutputVM>>(userservices, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
                 return Ok(items);
             }
             catch (Exception ex)

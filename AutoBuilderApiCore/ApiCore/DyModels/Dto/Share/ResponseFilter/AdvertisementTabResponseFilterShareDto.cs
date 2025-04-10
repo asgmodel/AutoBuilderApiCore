@@ -1,7 +1,6 @@
-using Microsoft.CodeAnalysis;
 using AutoGenerator;
 using AutoGenerator.Helper.Translation;
-using AutoGenerator.Models;
+using LAHJAAPI.Models;
 using ApiCore.DyModels.Dto.Build.ResponseFilters;
 using System;
 

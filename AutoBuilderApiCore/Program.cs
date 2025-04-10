@@ -1,14 +1,13 @@
-using ApiCore.Schedulers;
+using ApiCore.Validators.Conditions;
 using AutoGenerator;
-using AutoGenerator.ApiFolder;
-using AutoGenerator.Conditions;
-using AutoGenerator.Config;
+
 using AutoGenerator.Data;
-using Microsoft.AspNet.Identity.EntityFramework;
+using LAHJAAPI.Data;
+using LAHJAAPI.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using Models;
+
 
 using System.Reflection;
 var builder = WebApplication.CreateBuilder(args);
@@ -30,46 +29,25 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
 ///
 
 
-if (args.Length>0&&args[0].Contains("generate"))
-{
-    if(args.Length>1)
-    for (int i = 1; i < args.Length; i++)
-       builder.Services.AddAutoBuilderApiCore(new()
-       {
-
-        //ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
-        NameRootApi = args[i],
-        IsAutoBuild = true,
-       
-        });
-    else
-        builder.Services.AddAutoBuilderApiCore(new()
-        {
-
-            //ProjectPath = Directory.GetCurrentDirectory().Split("bin")[0],
-            NameRootApi = "ApiCore",
-            IsAutoBuild = true,
-
-        });
 
 
 
-}
-else
-{
-
-
-    builder.Services.AddAutoBuilderApiCore(new()
+builder.Services.
+    AddAutoBuilderApiCore(new()
     {
-        
-        NameRootApi = "ApiCore"
-        ,IsAutoBuild = false,
+
+        Arags = args,
+        NameRootApi = "ApiCore",
         IsMapper = true,
-        Assembly = Assembly.GetExecutingAssembly()
-    });
-    //builder.Services.AddAutoMapper(typeof(MappingConfig));
-    //builder.Services.AddScoped<IInvoiceShareRepository, InvoiceShareRepository>();
- 
+        TypeContext = typeof(DataContext),
+        Assembly = Assembly.GetExecutingAssembly(),
+        AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly
+    }).
+    AddAutoValidator();
+    
+  
+
+
     var app = builder.Build();
 
 
@@ -96,4 +74,3 @@ else
     app.MapControllers();
 
     app.Run();
-}

@@ -1,16 +1,10 @@
-using ApiCore.DyModels.Dso.Requests;
+
 using ApiCore.DyModels.Dso.ResponseFilters;
-using ApiCore.DyModels.VMs;
-using ApiCore.Services.Services;
+
 using AutoGenerator.Conditions;
-using AutoGenerator.Conditions;
-using AutoGenerator.Helper.Translation;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+
+using LAHJAAPI.Data;
+
 
 namespace ApiCore.Validators
 {
@@ -30,11 +24,12 @@ namespace ApiCore.Validators
     public class SpaceValidator : BaseValidator<SpaceResponseFilterDso, SpaceValidatorStates>, ITValidator
     {
 
-
+    
+        
         public SpaceValidator(IConditionChecker checker) : base(checker)
         {
 
-
+           
         }
         protected override void InitializeConditions()
         {
@@ -98,12 +93,12 @@ namespace ApiCore.Validators
 
             var res = await _checker.CheckAndResultAsync(SubscriptionValidatorStates.IsValid, context.Subscription);
 
-            
+
             return res;
         }
 
 
-        private  ConditionResult test(SpaceResponseFilterDso context)
+        private ConditionResult test(SpaceResponseFilterDso context)
         {
 
 
@@ -111,7 +106,7 @@ namespace ApiCore.Validators
 
 
 
-            var res =  _checker.GetProvider<SubscriptionValidatorStates>().AnyPass(context);
+            var res = _checker.GetProvider<SubscriptionValidatorStates>().AnyPass(context);
             if (res != null)
             {
                 return res.FirstOrDefault();
@@ -123,4 +118,3 @@ namespace ApiCore.Validators
 
     }
 }
-       

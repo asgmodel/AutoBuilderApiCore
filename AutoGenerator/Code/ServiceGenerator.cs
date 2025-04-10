@@ -40,10 +40,10 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
         {
 
 
-            var assembly = Assembly.GetExecutingAssembly();
+        var assembly = ApiFolderInfo.AssemblyModels;
 
 
-            var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
+        var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
 
 
@@ -82,15 +82,15 @@ public class ServiceGenerator : GenericClassGenerator, ITGenerator
                             "AutoGenerator.Services.Base",
                             $"{root}.DyModels.Dso.Requests",
                             $"{root}.DyModels.Dso.Responses",
-                            "AutoGenerator.Models",
+                            "LAHJAAPI.Models",
                             $"{root}.DyModels.Dto.Share.Requests",
                             $"{root}.DyModels.Dto.Share.Responses",
 
 
-                            $"{root}.Repositorys.Share",
+                            $"{root}.Repositories.Share",
                             "System.Linq.Expressions",
-                            $"{root}.Repositorys.Builder",
-                            "AutoGenerator.Repositorys.Base",
+                            $"{root}.Repositories.Builder",
+                            "AutoGenerator.Repositories.Base",
                             "AutoGenerator.Helper"
 
 

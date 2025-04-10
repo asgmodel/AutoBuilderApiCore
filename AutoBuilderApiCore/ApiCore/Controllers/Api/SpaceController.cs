@@ -9,6 +9,8 @@ using ApiCore.DyModels.Dso.Requests;
 using AutoGenerator.Helper.Translation;
 using System;
 
+using ApiCore.Validators;
+
 namespace ApiCore.Controllers.Api
 {
     //[ApiExplorerSettings(GroupName = "ApiCore")]
@@ -19,11 +21,13 @@ namespace ApiCore.Controllers.Api
         private readonly IUseSpaceService _spaceService;
         private readonly IMapper _mapper;
         private readonly ILogger _logger;
-        public SpaceController(IUseSpaceService spaceService, IMapper mapper, ILoggerFactory logger)
+        private readonly IConditionChecker _checker;
+        public SpaceController(IUseSpaceService spaceService, IMapper mapper, ILoggerFactory logger, IConditionChecker checker)
         {
             _spaceService = spaceService;
             _mapper = mapper;
             _logger = logger.CreateLogger(typeof(SpaceController).FullName);
+            _checker = checker;
         }
 
         // Get all Spaces.
@@ -33,6 +37,9 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<IEnumerable<SpaceOutputVM>>> GetAll()
         {
+
+
+            var prov = _checker.GetProvider<SpaceValidatorStates>(); 
             try
             {
                 _logger.LogInformation("Fetching all Spaces...");
@@ -119,7 +126,7 @@ namespace ApiCore.Controllers.Api
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<SpaceOutputVM>> GetSpacesByLg(string? lg)
+        public async Task<ActionResult<IEnumerable<SpaceOutputVM>>> GetSpacesByLg(string? lg)
         {
             if (string.IsNullOrWhiteSpace(lg))
             {
@@ -136,7 +143,7 @@ namespace ApiCore.Controllers.Api
                     return NotFound();
                 }
 
-                var items = _mapper.Map<SpaceOutputVM>(spaces, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
+                var items = _mapper.Map<IEnumerable<SpaceOutputVM>>(spaces, opt => opt.Items.Add(HelperTranslation.KEYLG, lg));
                 return Ok(items);
             }
             catch (Exception ex)

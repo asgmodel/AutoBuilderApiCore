@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Reflection.PortableExecutable;
 using static AutoGenerator.ApiFolder.FolderStructureReader;
 namespace AutoGenerator.ApiFolder;
@@ -14,7 +15,12 @@ public  class ApiFolderInfo
     public static FolderNode? ROOT { get; set; }
     public static string? AbsolutePath;
 
+    public static Type? TypeContext { get; set; }
 
+   
+    public static  Assembly? AssemblyShare { get;  set; }
+
+    public static Assembly? AssemblyModels { get; set; }
 
 
 

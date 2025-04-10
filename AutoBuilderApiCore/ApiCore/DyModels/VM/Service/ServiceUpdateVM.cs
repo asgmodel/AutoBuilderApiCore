@@ -1,6 +1,6 @@
 using AutoGenerator;
-using AutoGenerator.Models;
 using AutoGenerator.Helper.Translation;
+using LAHJAAPI.Models;
 using System;
 
 namespace ApiCore.DyModels.VMs

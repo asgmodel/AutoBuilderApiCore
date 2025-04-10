@@ -19,7 +19,7 @@ namespace AutoGenerator.Conditions
 
     public interface ITValidator
     {
-        void Register(IConditionChecker checker);
+        void Register(IBaseConditionChecker checker);
     }
 
     public abstract class BaseValidator<TContext, EValidator> : IValidator<TContext>, ITValidator
@@ -31,7 +31,7 @@ namespace AutoGenerator.Conditions
         protected readonly ConditionProvider<EValidator> _provider;
 
 
-        protected readonly IConditionChecker _checker;
+        protected readonly IBaseConditionChecker _checker;
 
 
 
@@ -43,7 +43,7 @@ namespace AutoGenerator.Conditions
 
 
 
-        public BaseValidator(IConditionChecker checker)
+        public BaseValidator(IBaseConditionChecker checker)
         {
             _provider = new ConditionProvider<EValidator>();
             _checker = checker;
@@ -56,7 +56,7 @@ namespace AutoGenerator.Conditions
 
         }
 
-        public virtual void Register(IConditionChecker checker)
+        public virtual void Register(IBaseConditionChecker checker)
         {
             checker.RegisterProvider(_provider);
         }

@@ -1,14 +1,13 @@
-using AutoGenerator.Data;
 using AutoMapper;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using AutoGenerator.Repositorys.Builder;
+using LAHJAAPI.Data;
+using LAHJAAPI.Models;
+using ApiCore.Repositories.Base;
+using AutoGenerator.Repositories.Builder;
 using ApiCore.DyModels.Dto.Build.Requests;
 using ApiCore.DyModels.Dto.Build.Responses;
-using AutoGenerator.Models;
 using System;
 
-namespace ApiCore.Repositorys.Builder
+namespace ApiCore.Repositories.Builder
 {
     /// <summary>
     /// TypeModel interface property for BuilderRepository.

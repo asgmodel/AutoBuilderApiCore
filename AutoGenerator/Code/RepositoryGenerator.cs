@@ -1,10 +1,12 @@
 ﻿using AutoGenerator.ApiFolder;
 using AutoGenerator.Helper.Translation;
+using AutoGenerator.TM;
 using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Options;
+using System;
+using System.Data;
 using System.Reflection;
 using System.Text;
-using AutoGenerator.TM;
 
 namespace AutoGenerator.Code;
 
@@ -36,12 +38,80 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
         
     }
+
+    private static readonly string TAG = "Repositories";
+    public static void GenerateBaseRep(string root,string type,string subtype,string pathfile)
+    {
+
+
+        //base
+        ITGenerator generator = new RepositoryGenerator();
+
+        var usings = new List<string>()
+        {
+
+            "AutoGenerator.Repositories.Base",
+            ApiFolderInfo.TypeContext.Namespace,
+            "LAHJAAPI.Models",
+            "Microsoft.AspNetCore.Identity"
+
+        };
+
+        var options = new GenerationOptions("BaseRepository",typeof(RepositoryGenerator),isProperties:false)
+        {
+
+            NamespaceName = $"{root}.{type}.Base",
+            Template = TmBaseRepository.GetTmBaseRepository("BaseRepository"),
+            Usings = usings
+        };
+
+        var generatedCode = generator.Generate(options);
+
+        string jsonFile = Path.Combine(pathfile, $"{subtype}/BaseRepository.cs");
+        generator.SaveToFile(jsonFile);
+
+        Console.WriteLine($"✅ {options.ClassName} has been created successfully!");
+
+        usings = new List<string>()
+        {
+
+           
+            ApiFolderInfo.TypeContext.Namespace,
+            "LAHJAAPI.Models",
+            "AutoMapper",
+            "AutoGenerator",
+            "AutoGenerator.Repositories.Builder"
+
+        };
+
+        var options2 = new GenerationOptions("BaseRepository", typeof(RepositoryGenerator), isProperties: false)
+        {
+
+            NamespaceName = $"{root}.{type}.Base",
+            Template = TmBaseRepository.GetTmBaseBuilderRepository("BaseRepository"),
+            Usings = usings
+        };
+
+         generatedCode = generator.Generate(options2);
+
+        jsonFile = Path.Combine(pathfile, $"{subtype}/BaseBuilderRepository.cs");
+        generator.SaveToFile(jsonFile);
+
+        Console.WriteLine($"✅ {options2.ClassName} has been created successfully!");
+
+
+
+
+
+
+
+    }
     public static void GenerateAll(string root,string type, string subtype, string NamespaceName, string pathfile)
     {
 
 
-        var assembly = Assembly.GetExecutingAssembly();
-
+        var assembly = ApiFolderInfo.AssemblyModels;
+        var nameContext = ApiFolderInfo.TypeContext.Name;
 
         var models = assembly.GetTypes().Where(t => typeof(ITModel).IsAssignableFrom(t) && t.IsClass).ToList();
 
@@ -62,7 +132,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
 
 
-        NamespaceName = $"{root}.Repositorys.{subtype}";
+        NamespaceName = $"{root}.{TAG}.{subtype}";
 
         foreach (var model in models)
         {
@@ -77,16 +147,16 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                     Template =func.ActionM(model.Name,type) ,
                     Usings = new List<string>
                         {
-                            "AutoGenerator.Data",
+                            
                             "AutoMapper",
-
-                            "Microsoft.Extensions.Logging",
-                            "System.Collections.Generic",
-
-                            "AutoGenerator.Repositorys.Builder",
-                            $"{root}.DyModels.Dto.Build.Requests",
+                            ApiFolderInfo.TypeContext.Namespace,
+                            "LAHJAAPI.Models",
+                            
+                           $"{root}.{type}.Base",
+                           $"AutoGenerator.{TAG}.Builder",
+                           $"{root}.DyModels.Dto.Build.Requests",
                            $"{root}.DyModels.Dto.Build.Responses",
-                            "AutoGenerator.Models"
+                            
 
                         }
 
@@ -100,16 +170,16 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
 
                     options.Usings.AddRange(new List<string> {
 
-                            $"{root}.DyModels.Dto.Share.Requests",
-                           $"{root}.DyModels.Dto.Share.Responses",
 
 
-                            $"{root}.Repositorys.Builder",
-                            "AutoGenerator.Repositorys.Share",
-                            "System.Linq.Expressions",
-                            "AutoGenerator.Repositorys.Base",
                             "AutoGenerator",
+                            $"{root}.{TAG}.Builder",
+                            $"AutoGenerator.{TAG}.Share",
+                            "System.Linq.Expressions",
+                           $"AutoGenerator.{TAG}.Base",
                             "AutoGenerator.Helper",
+                           $"{root}.DyModels.Dto.Share.Requests",
+                           $"{root}.DyModels.Dto.Share.Responses",
                 });
 
                 }
@@ -179,7 +249,7 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
                    /// </summary>
 
 
-             public {className}BuilderRepository(DataContext dbContext,
+             public {className}BuilderRepository({ApiFolderInfo.TypeContext.Name} dbContext,
                                                IMapper mapper, ILogger logger) 
                  : base(dbContext, mapper, logger) // Initialize  constructor.
              {{
@@ -225,16 +295,18 @@ public class RepositoryGenerator : GenericClassGenerator, ITGenerator
         return TmShareRepository.GetTmShareRepository(className);
     }
 
-    private static string[] UseRepositorys = new string[] { "Builder", "Share" };
+    private static string[] UseRepositories = new string[] { "Builder", "Share" };
     public static void GeneratWithFolder(FolderEventArgs e)
     {
         foreach (var node in e.Node.Children)
         {
+            var root = ApiFolderInfo.ROOT.Name;
 
-            if (UseRepositorys.Contains(node.Name))
+            if (UseRepositories.Contains(node.Name))
 
-                GenerateAll(ApiFolderInfo.ROOT.Name, e.Node.Name, node.Name, node.Name, e.FullPath);
-          
+                GenerateAll(root, e.Node.Name, node.Name, node.Name, e.FullPath);
+            else
+                GenerateBaseRep(root, e.Node.Name, node.Name, e.FullPath);
             //GenerateAll(e.Node.Name, node.Name, node.Name, e.FullPath);
 
 

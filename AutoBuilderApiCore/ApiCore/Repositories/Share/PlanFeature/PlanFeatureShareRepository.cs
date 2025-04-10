@@ -1,22 +1,21 @@
-using AutoGenerator.Data;
 using AutoMapper;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using AutoGenerator.Repositorys.Builder;
+using LAHJAAPI.Data;
+using LAHJAAPI.Models;
+using ApiCore.Repositories.Base;
+using AutoGenerator.Repositories.Builder;
 using ApiCore.DyModels.Dto.Build.Requests;
 using ApiCore.DyModels.Dto.Build.Responses;
-using AutoGenerator.Models;
+using AutoGenerator;
+using ApiCore.Repositories.Builder;
+using AutoGenerator.Repositories.Share;
+using System.Linq.Expressions;
+using AutoGenerator.Repositories.Base;
+using AutoGenerator.Helper;
 using ApiCore.DyModels.Dto.Share.Requests;
 using ApiCore.DyModels.Dto.Share.Responses;
-using ApiCore.Repositorys.Builder;
-using AutoGenerator.Repositorys.Share;
-using System.Linq.Expressions;
-using AutoGenerator.Repositorys.Base;
-using AutoGenerator;
-using AutoGenerator.Helper;
 using System;
 
-namespace ApiCore.Repositorys.Share
+namespace ApiCore.Repositories.Share
 {
     /// <summary>
     /// PlanFeature class for ShareRepository.

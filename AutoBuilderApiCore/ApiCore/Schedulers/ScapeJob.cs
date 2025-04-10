@@ -20,7 +20,7 @@ namespace ApiCore.Schedulers
 
             // _options.
             _options.JobName = "space1";
-            _options.Cron=""
+           
 
         }
     }

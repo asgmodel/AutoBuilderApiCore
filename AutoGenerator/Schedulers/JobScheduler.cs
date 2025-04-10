@@ -10,59 +10,57 @@ public class JobScheduler : IHostedService
     private IScheduler _scheduler;
 
 
-    private readonly Assembly? assemblyShare;
+
+
+    private readonly Dictionary<Type, JobOptions>? _jobs;
 
 
 
-    public JobScheduler(ISchedulerFactory schedulerFactory,Assembly assembly)
+
+    public JobScheduler(ISchedulerFactory schedulerFactory, Dictionary<Type, JobOptions> jobs)
     {
-      
+
         _schedulerFactory = schedulerFactory;
-        assemblyShare = assembly;
+        _jobs = jobs;
     }
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         _scheduler = await _schedulerFactory.GetScheduler();
 
-        if(assemblyShare != null)
+
+        foreach (var infjob in _jobs)
         {
-          
-       
-        var types = assemblyShare?.GetTypes()?
-            .Where(t => t.GetInterfaces().Contains(typeof(ITJob)) && !t.IsAbstract);
-            foreach (var type in types)
-            {
+            var type = infjob.Key;
 
-                //
 
-                var objob = Activator.CreateInstance(type) as BaseJob;
+            var objob = infjob.Value;
 
-                IJobDetail job = JobBuilder.Create(type)
+            IJobDetail job = JobBuilder.Create(type)
 
-                .WithIdentity(objob.Options.JobName,
-                    objob.Options.JobGroup)
+             .WithIdentity(type.Name,
+                 $"{objob.JobGroup}")
+             .Build();
+
+            ITrigger trigger = TriggerBuilder.Create()
+                .WithIdentity(
+                    objob.TriggerName,
+                    objob.TriggerGroup)
+                .StartNow()
+                .WithCronSchedule(
+                    objob.Cron)
                 .Build();
 
-                ITrigger trigger = TriggerBuilder.Create()
-                    .WithIdentity(
-                        objob.Options.TriggerName,
-                        objob.Options.TriggerGroup)
-                    .StartNow()
-                    .WithCronSchedule(
-                        objob.Options.Cron)
-                    .Build();
 
 
-
-                await _scheduler.ScheduleJob(job, trigger);
-            }
+            await _scheduler.ScheduleJob(job, trigger);
         }
     }
 
+
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        
+
         if (_scheduler != null)
         {
             await _scheduler.Shutdown();

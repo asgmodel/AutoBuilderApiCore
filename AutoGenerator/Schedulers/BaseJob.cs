@@ -39,6 +39,8 @@ public class JobEventArgs : EventArgs
     public DateTime Timestamp { get; set; }
     public string? Status { get; set; }
     public object? AdditionalData { get; set; }
+
+    public  object?  Injector { get; set; }
 }
 
 public class CJober : IJob
@@ -80,6 +82,7 @@ public abstract class BaseJob : CJober, ITJob
 
         _options.JobGroup +=_id;
         _options.JobName += _id;
+        _options.TriggerName += _id;
 
 
 

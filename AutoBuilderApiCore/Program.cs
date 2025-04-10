@@ -1,4 +1,5 @@
 //using ApiCore.Validators.Conditions;
+using ApiCore.Schedulers;
 using ApiCore.Validators.Conditions;
 using AutoGenerator;
 
@@ -44,7 +45,8 @@ builder.Services.
         Assembly = Assembly.GetExecutingAssembly(),
         AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly
     }).
-    AddAutoValidator();
+    AddAutoValidator().
+    AddAutoConfigScheduler();
 
 
 

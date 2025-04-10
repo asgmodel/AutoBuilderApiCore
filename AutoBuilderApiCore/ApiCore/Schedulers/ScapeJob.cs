@@ -1,3 +1,5 @@
+using ApiCore.Validators;
+using ApiCore.Validators.Conditions;
 using AutoGenerator.Schedulers;
 
 namespace ApiCore.Schedulers
@@ -5,7 +7,18 @@ namespace ApiCore.Schedulers
 
 
     public class ScapeJob : BaseJob
+
     {
+
+        private readonly IConditionChecker _checker;
+        public ScapeJob(IConditionChecker  checker) :base(){
+
+
+            _checker = checker;
+
+
+         
+        }
         public override Task Execute(JobEventArgs context)
         {
 
@@ -20,6 +33,7 @@ namespace ApiCore.Schedulers
 
             // _options.
             _options.JobName = "space1";
+          
            
 
         }

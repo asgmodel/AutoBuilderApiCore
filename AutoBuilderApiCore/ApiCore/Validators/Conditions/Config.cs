@@ -7,7 +7,7 @@ namespace ApiCore.Validators.Conditions
 {
     public static class ConfigValidator
     {
-        public static void AddAutoValidator(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddAutoValidator(this IServiceCollection serviceCollection)
         {
             Assembly? assembly = Assembly.GetExecutingAssembly();
             serviceCollection.AddScoped<ITFactoryInjector, TFactoryInjector>();
@@ -18,6 +18,8 @@ namespace ApiCore.Validators.Conditions
                 BaseConfigValidator.Register(checker, assembly);
                 return checker;
             });
+
+            return serviceCollection;
         }
     }
 }

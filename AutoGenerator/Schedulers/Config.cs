@@ -1,10 +1,12 @@
 
+using AutoGenerator.Conditions;
 using AutoGenerator.Data;
 using AutoGenerator.Schedulers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace AutoGenerator.Schedulers
@@ -15,11 +17,39 @@ namespace AutoGenerator.Schedulers
     {
         
         public Assembly? Assembly { get; set; }
+
+      
     }
+
+
+
+
 
     public  static class ConfigScheduler
     {
 
+
+        public static Dictionary<Type, JobOptions> getJobOptions(IBaseConditionChecker checker, Assembly assembly)
+        {
+
+            var typesjobs = assembly.GetTypes()
+          .Where(t => t.IsClass && !t.IsAbstract && typeof(ITJob).IsAssignableFrom(t))
+          .AsParallel()
+          .ToList();
+
+            Dictionary<Type, JobOptions> jobs = new();
+
+            foreach (var type in typesjobs)
+            {
+
+                var instance = Activator.CreateInstance(type, checker) as BaseJob;
+
+
+                jobs[type] = instance.Options;
+
+            }
+            return jobs;
+        }
 
         public static void AddAutoScheduler(this IServiceCollection serviceCollection, OptionScheduler? option = null)
         {
@@ -32,15 +62,24 @@ namespace AutoGenerator.Schedulers
             serviceCollection.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);
 
 
-            serviceCollection.AddSingleton<IHostedService, JobScheduler>(pro =>
+      
+
+            var typesjobs =option.Assembly.GetTypes()
+                .Where(t => t.IsClass && !t.IsAbstract && typeof(ITJob).IsAssignableFrom(t))
+                .AsParallel()
+                .ToList();
+
+            foreach (var type in typesjobs)
             {
-                var jober = pro.GetRequiredService<ISchedulerFactory>();
 
-                 
-                return new JobScheduler(jober,option.Assembly);
+               
 
-            });
-                 
+
+                serviceCollection.AddScoped(type);
+
+
+            }
+
         }
 
         //public async static void UseSchedulersCore(this WebApplication app, OptionScheduler? option=null)

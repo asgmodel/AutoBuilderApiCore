@@ -1,4 +1,5 @@
 
+using AutoGenerator.Schedulers;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
@@ -24,6 +25,10 @@ namespace AutoGenerator.Conditions
                 var instance = Activator.CreateInstance(validator, checker) as ITValidator;
                 //instance?.Register(checker);
             }
+
+            
+
+
 
 
 

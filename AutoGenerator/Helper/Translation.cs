@@ -274,7 +274,7 @@ namespace AutoGenerator.Helper.Translation
                 var destitem = dest.GetType().GetProperty(kname);
 
 
-                if (!(destitem is ITranslationData))
+                if (!typeof(ITranslationData).IsAssignableFrom(destitem.PropertyType))
                 {
 
 

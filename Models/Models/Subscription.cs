@@ -30,7 +30,8 @@ namespace LAHJAAPI.Models
 
         public string? PlanId { get; set; }
         public Plan? Plan { get; set; }
-
+         
+        //ISUSERID
         public string? UserId { get; set; }
         public ApplicationUser? User { get; set; }
         public ICollection<Request>? Requests { get; set; } = [];

@@ -12,7 +12,7 @@ public class GenericClassGenerator : ITGenerator
     public event EventHandler<string>? OnCodeSaved;
 
     private static  readonly HashSet<ITGenerator>  tGenerators= new HashSet<ITGenerator>();
-    public bool IsEditFile { get;  set; } = true;
+    public bool IsEditFile { get;  set; } = false;
 
    
 

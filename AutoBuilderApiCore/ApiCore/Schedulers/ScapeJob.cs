@@ -1,5 +1,4 @@
 using ApiCore.Validators;
-using ApiCore.Validators.Conditions;
 using AutoGenerator.Schedulers;
 
 namespace ApiCore.Schedulers
@@ -14,7 +13,9 @@ namespace ApiCore.Schedulers
         public ScapeJob(IConditionChecker  checker) :base(){
 
 
+            
             _checker = checker;
+
 
 
          
@@ -37,6 +38,10 @@ namespace ApiCore.Schedulers
            
 
         }
+
+
+
+       
     }
 
 

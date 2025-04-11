@@ -1,8 +1,12 @@
 ﻿using AutoGenerator;
+using AutoGenerator.Config;
 using System.ComponentModel.DataAnnotations;
 
 namespace LAHJAAPI.Models
 {
+
+    [ValidatorEnabled(true)]
+
     public class Setting : ITModel
     {
         [Key]

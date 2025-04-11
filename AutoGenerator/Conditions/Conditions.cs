@@ -90,7 +90,7 @@ namespace AutoGenerator.Conditions
 
                     return Task.FromResult(new ConditionResult(flag, result, errorMessage));
                 
-                return Task.FromResult(new ConditionResult(true, result, errorMessage));
+                return Task.FromResult(new ConditionResult(false, result, errorMessage));
             };
         }
 

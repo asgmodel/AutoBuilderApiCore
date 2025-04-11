@@ -24,6 +24,7 @@ namespace ApiCore.Schedulers
         {
             // _options.
             _options.JobName = "Subscription1";
+            
 
 
         }

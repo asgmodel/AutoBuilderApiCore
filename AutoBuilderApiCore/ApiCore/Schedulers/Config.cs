@@ -23,6 +23,7 @@ namespace ApiCore.Schedulers
              serviceCollection.AddHostedService<JobScheduler>(pro =>
             {
                 var jober = pro.GetRequiredService<ISchedulerFactory>();
+
                 var checker = new ConditionChecker(null);
 
                var jobs= ConfigScheduler.getJobOptions(checker, assembly);
@@ -33,7 +34,11 @@ namespace ApiCore.Schedulers
 
 
 
-           
+            
+
+
+
+
         }
     }
 }

@@ -11,6 +11,7 @@ namespace ApiCore.Validators
 
         public ConditionChecker(ITFactoryInjector injector) : base()
         {
+            _injector = injector;
         }
     // الدوال السابقة تبقى كما هي
     }

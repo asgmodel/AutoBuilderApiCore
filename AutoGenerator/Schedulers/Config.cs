@@ -57,6 +57,7 @@ namespace AutoGenerator.Schedulers
             serviceCollection.AddQuartz(q =>
             {
                 q.UseMicrosoftDependencyInjectionJobFactory();
+               
             });
 
             serviceCollection.AddQuartzHostedService(q => q.WaitForJobsToComplete = true);

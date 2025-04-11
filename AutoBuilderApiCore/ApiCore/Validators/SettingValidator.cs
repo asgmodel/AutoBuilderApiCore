@@ -18,6 +18,8 @@ namespace ApiCore.Validators
             _provider.Register(SettingValidatorStates.IsActive,
                 new LambdaCondition<SettingResponseFilterDso>(nameof(SettingValidatorStates.IsActive),
                 context => IsActive(context), "Setting is not active"));
+
+
         }
 
         private bool IsActive(SettingResponseFilterDso context)

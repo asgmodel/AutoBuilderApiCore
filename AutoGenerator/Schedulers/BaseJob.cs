@@ -2,11 +2,24 @@
 using Quartz;
 
 namespace AutoGenerator.Schedulers;
+public readonly struct CronSchedule
+{
+    public static string EveryMinute => "0 0/1 * 1/1 * ? *";
+    public static string EveryHour => "0 0 0/1 1/1 * ? *";
+    public static string Every4Hours => "0 0 0/4 1/1 * ? *";
+    public static string Every12Hours => "0 0 0/12 1/1 * ? *";
+    public static string EveryDay => "0 0 0 1/1 * ? *";
+    public static string Every2Days => "0 0 0 1/2 * ? *";
+    public static string EveryWeek => "0 0 0 ? * 1 *";
+    public static string EveryMonth => "0 0 0 1 1/1 ? *";
+    public static string Every2Months => "0 0 0 1 1/2 ? *";
+    public static string EveryYear => "0 0 0 1 1 ? *";
+}
 
 public class JobOptions
 {
 
-    public Type? JobType { get; set; } 
+    public Type? JobType { get; set; }
     public JobOptions()
     {
     }
@@ -19,7 +32,7 @@ public class JobOptions
         Cron = cron;
         JobName = jobName;
     }
-    public string? Cron { get; set; } = "0 0/1 * * * ?"; // كل دقيقة
+    public string? Cron { get; set; } = CronSchedule.EveryMinute; // كل دقيقة
     public string JobName { get; set; } = "job1";
     public string JobGroup { get; set; } = "group"; // مجموعة المهمة
     public string TriggerName { get; set; } = "trigger ";

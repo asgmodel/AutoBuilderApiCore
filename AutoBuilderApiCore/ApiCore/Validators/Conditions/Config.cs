@@ -11,7 +11,7 @@ namespace ApiCore.Validators.Conditions
         {
             Assembly? assembly = Assembly.GetExecutingAssembly();
             serviceCollection.AddScoped<ITFactoryInjector, TFactoryInjector>();
-            serviceCollection.AddScoped<IConditionChecker, ConditionChecker>(pro =>
+            serviceCollection.AddScoped<IConditionChecker>(pro =>
             {
                 var injctor = pro.GetRequiredService<ITFactoryInjector>();
                 var checker = new ConditionChecker(injctor);

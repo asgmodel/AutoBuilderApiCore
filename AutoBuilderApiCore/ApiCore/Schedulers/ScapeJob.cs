@@ -12,9 +12,10 @@ namespace ApiCore.Schedulers
         private readonly IConditionChecker _checker;
         public ScapeJob(IConditionChecker  checker) :base(){
 
-
+            
             
             _checker = checker;
+
 
 
 
@@ -22,8 +23,8 @@ namespace ApiCore.Schedulers
         }
         public override Task Execute(JobEventArgs context)
         {
-
-
+           var  item=_checker.Check(SpaceValidatorStates.IsFull, context);
+            
             Console.WriteLine($"Executing job: {_options.JobName} with cron: {_options.Cron}");
 
             return Task.CompletedTask;
@@ -34,6 +35,10 @@ namespace ApiCore.Schedulers
 
             // _options.
             _options.JobName = "space1";
+            _options.Cron = CronSchedule.EveryMinute;
+
+
+
           
            
 

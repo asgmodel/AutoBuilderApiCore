@@ -1,4 +1,5 @@
 using AutoGenerator.Config;
+using Hangfire;
 using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Spi;
@@ -21,6 +22,9 @@ public class JobScheduler : IHostedService
     {
 
         _schedulerFactory = schedulerFactory;
+        BackgroundJob.Schedule(
+    () => Console.WriteLine("JobScheduler!"),
+    TimeSpan.FromDays(7));
         _jobs = jobs;
     }
 
@@ -54,6 +58,8 @@ public class JobScheduler : IHostedService
 
 
             await _scheduler.ScheduleJob(job, trigger);
+            var jobId = BackgroundJob.Enqueue(
+    () => Console.WriteLine(infjob));
         }
     }
 

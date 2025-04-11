@@ -4,6 +4,7 @@ using ApiCore.Validators.Conditions;
 using AutoGenerator;
 
 using AutoGenerator.Data;
+using AutoGenerator.Schedulers;
 using LAHJAAPI.Data;
 using LAHJAAPI.Models;
 using Microsoft.AspNetCore.Identity;
@@ -43,7 +44,9 @@ builder.Services.
         IsMapper = true,
         TypeContext = typeof(DataContext),
         Assembly = Assembly.GetExecutingAssembly(),
-        AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly
+        AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly,
+        DbConnectionString= builder.Configuration.GetConnectionString("DefaultConnection"),
+
     }).
     AddAutoValidator().
     AddAutoConfigScheduler();
@@ -52,17 +55,17 @@ builder.Services.
 
 
 var app = builder.Build();
-
+app.UseSchedulerDashboard();
 
     //app.UseSchedulersCore(new OptionScheduler()
     //{
     //    Assembly = Assembly.GetExecutingAssembly(),
-    
-    
-       
-    //});
 
-    // Configure the HTTP request pipeline.
+
+
+//});
+
+// Configure the HTTP request pipeline.
     if (app.Environment.IsDevelopment())
     {
         app.UseSwagger();

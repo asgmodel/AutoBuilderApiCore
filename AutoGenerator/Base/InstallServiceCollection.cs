@@ -37,7 +37,7 @@ namespace AutoGenerator
         public Assembly? Assembly { get; set; }
         public Assembly? AssemblyModels { get; set; }
 
-
+        public string? DbConnectionString { get; set; }
         public string[]? Arags { get; set; }
 
 
@@ -163,7 +163,9 @@ namespace AutoGenerator
                 serviceCollection.AddAutoSingleton(option.Assembly);
 
                 serviceCollection.AddAutoScheduler(new() {
-                    Assembly=option.Assembly} );
+                    Assembly=option.Assembly,
+                    DbConnectionString=option.DbConnectionString,
+                 } );
             }
         }
 

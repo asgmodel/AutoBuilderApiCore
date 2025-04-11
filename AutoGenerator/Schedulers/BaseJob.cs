@@ -1,4 +1,5 @@
 ﻿
+using Hangfire;
 using Quartz;
 
 namespace AutoGenerator.Schedulers;
@@ -116,6 +117,10 @@ public abstract class BaseJob : CJober, ITJob
             Status = "Success",
             AdditionalData = null
         };
+        RecurringJob.AddOrUpdate(
+    _options.JobName,
+    () => Execute(jobeventArgs),
+    Cron.Daily);
         return Execute(jobeventArgs);
     }
     abstract public Task Execute(JobEventArgs context);

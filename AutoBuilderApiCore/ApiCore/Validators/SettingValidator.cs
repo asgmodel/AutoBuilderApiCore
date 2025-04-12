@@ -8,18 +8,13 @@ namespace ApiCore.Validators
 {
     public class SettingValidator : BaseValidator<SettingResponseFilterDso, SettingValidatorStates>, ITValidator
     {
-
         public SettingValidator(IConditionChecker checker) : base(checker)
         {
         }
 
         protected override void InitializeConditions()
         {
-            _provider.Register(SettingValidatorStates.IsActive,
-                new LambdaCondition<SettingResponseFilterDso>(nameof(SettingValidatorStates.IsActive),
-                context => IsActive(context), "Setting is not active"));
-
-
+            _provider.Register(SettingValidatorStates.IsActive, new LambdaCondition<SettingResponseFilterDso>(nameof(SettingValidatorStates.IsActive), context => IsActive(context), "Setting is not active"));
         }
 
         private bool IsActive(SettingResponseFilterDso context)

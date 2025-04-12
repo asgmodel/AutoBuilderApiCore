@@ -17,6 +17,7 @@ namespace AutoGenerator.TM
         public ITFactoryInjector Injector => _injector;
         public ConditionChecker(ITFactoryInjector injector) : base()
         {{
+               _injector = injector;
         }}
 
         // الدوال السابقة تبقى كما هي
@@ -123,7 +124,7 @@ namespace AutoGenerator.TM
             return @$"
      public  static class ConfigValidator
     {{
-        public static void AddAutoValidator(this IServiceCollection serviceCollection)
+        public static IServiceCollection AddAutoValidator(this IServiceCollection serviceCollection)
         {{
 
 
@@ -144,7 +145,7 @@ namespace AutoGenerator.TM
             }});
 
 
-
+           return serviceCollection;
 
         }}
      

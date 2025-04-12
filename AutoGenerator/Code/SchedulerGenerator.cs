@@ -34,7 +34,41 @@ public class SchedulerGenerator : GenericClassGenerator, ITGenerator
    public  static void  CinfgGenerate(string type, string subtype, string NamespaceName, string pathfile)
     {
 
-      
+        var root = ApiFolderInfo.ROOT.Name;
+
+        ITGenerator generator = new SchedulerGenerator();
+
+        NamespaceName = $"{root}.Schedulers";
+        var option1 = new GenerationOptions("t", typeof(SchedulerGenerator), isProperties: false)
+        {
+            NamespaceName = $"{NamespaceName}",
+            Template = TmSchedulers.GetTmConfigScheduler("")
+                               ,
+            Usings = new List<string>
+                        {
+                            "Quartz",
+                            $"{root}.Validators",
+
+                            "AutoGenerator.Schedulers",
+
+                            "System.Reflection"
+
+                        }
+
+
+        };
+
+        //
+
+        generator.Generate(option1);
+
+        string jsonFile = Path.Combine(pathfile, $"Config.cs");
+        generator.SaveToFile(jsonFile);
+
+        Console.WriteLine($"✅ {option1.ClassName} has been created successfully!");
+
+
+
 
     }
 
@@ -101,8 +135,8 @@ public class SchedulerGenerator : GenericClassGenerator, ITGenerator
                     Usings = new List<string>
                         {
                             "AutoGenerator.Schedulers",
+                            $"{root}.Validators"
 
-                          
 
 
 

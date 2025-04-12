@@ -19,6 +19,5 @@ namespace ApiCore.Validators.Conditions
 
         public IMapper Mapper => _mapper;
         public DataContext Context => _context;
-
     }
 }

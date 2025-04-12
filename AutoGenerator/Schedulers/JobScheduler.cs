@@ -8,7 +8,7 @@ namespace AutoGenerator.Schedulers;
 public class JobScheduler : IHostedService
 {
     private readonly ISchedulerFactory _schedulerFactory;
-    private IScheduler _scheduler;
+    private IScheduler? _scheduler;
 
 
 
@@ -25,6 +25,9 @@ public class JobScheduler : IHostedService
         BackgroundJob.Schedule(
     () => Console.WriteLine("JobScheduler!"),
     TimeSpan.FromDays(7));
+
+
+
         _jobs = jobs;
     }
 
@@ -60,7 +63,11 @@ public class JobScheduler : IHostedService
             await _scheduler.ScheduleJob(job, trigger);
             var jobId = BackgroundJob.Enqueue(
     () => Console.WriteLine(infjob));
+
+            BackgroundJob.ContinueJobWith(jobId, () => Console.WriteLine("Job 2"));
+
         }
+
     }
 
 

@@ -13,6 +13,24 @@ namespace AutoGenerator.TM
             return @$"
   public class {classNameSchedulerTM}Job : BaseJob
     {{
+
+
+
+        private readonly IConditionChecker _checker;
+        public {classNameSchedulerTM}Job(IConditionChecker  checker) :base(){{
+
+            
+            
+            _checker = checker;
+
+
+
+
+         
+        }}
+
+
+
         public override Task Execute(JobEventArgs context)
         {{
 
@@ -27,7 +45,8 @@ namespace AutoGenerator.TM
 
             // _options.
             _options.JobName = ""{classNameSchedulerTM}1"";
-           
+            _options.Cron = CronSchedule.EveryMinute;
+
 
         }}
     }}
@@ -38,7 +57,47 @@ namespace AutoGenerator.TM
 
         }
 
+        public static string GetTmConfigScheduler(string classNameSchedulerTM, TmOptions options = null)
+        {
+            return @$"
+ public static class ConfigMScheduler
+ {{
 
+
+     public static IServiceCollection AddAutoConfigScheduler(this IServiceCollection serviceCollection)
+     {{
+         Assembly? assembly = Assembly.GetExecutingAssembly();
+
+
+
+
+          serviceCollection.AddHostedService<JobScheduler>(pro =>
+         {{
+             var jober = pro.GetRequiredService<ISchedulerFactory>();
+
+             var checker = new ConditionChecker(null);
+
+            var jobs= ConfigScheduler.getJobOptions(checker, assembly);
+
+             return new JobScheduler(jober, jobs);
+
+         }});
+
+
+
+         
+          return serviceCollection;
+
+
+
+     }}
+
+   }}
+";
+
+
+
+        }
 
     }
 

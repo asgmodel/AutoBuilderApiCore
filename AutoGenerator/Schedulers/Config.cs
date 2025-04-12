@@ -12,8 +12,6 @@ using System.Reflection;
 
 namespace AutoGenerator.Schedulers
 {
-
-
     public class OptionScheduler
     {
         

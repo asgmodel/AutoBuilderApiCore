@@ -1,4 +1,5 @@
 using ApiCore.Validators;
+using AutoGenerator.Notifications;
 using AutoGenerator.Schedulers;
 using AutoNotificationService.Services.Email;
 using System;
@@ -14,14 +15,17 @@ namespace ApiCore.Schedulers
 
             
         }
-        bool isons=false;
+      static  bool isons=false;
+   
+        static   string confirmationLink = "https://example.com/confirm?token=123456";
+      
         public override async Task Execute(JobEventArgs context)
         {   // „À«· 
             if (!isons)
             {
                 await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
                 {
-                    Body = "hi anas",
+                    Body = TemplateEmail.GetConfirmationEmailHtml(confirmationLink),
                     Subject = "wht",
                     ToEmail = "modelasg@gmail.com"
                 });

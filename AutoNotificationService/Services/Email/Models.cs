@@ -51,3 +51,6 @@ public class EmailTemplateModel : EmailModel, ITEmailModel
 }
 
 
+//    هنا يمكن   انشاء  كل قوالب    العرض للايميل او تمريريها  
+
+

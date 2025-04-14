@@ -18,7 +18,7 @@ public abstract class BaseNotificationService<TNotification, TDataSender, TModel
     public  bool HasModel(Type type)
     {
 
-        if (type is TNotification)
+        if (typeof(TNotification).IsAssignableFrom(type) )
             return true;
         return false;
     }

@@ -1,9 +1,18 @@
-﻿namespace AutoNotificationService.Notifications;
+﻿using AutoNotificationService.Services.Sms;
+
+namespace AutoNotificationService.Notifications;
 public interface ISmsNotifier : IProviderNotifier
 {
 }
 public class SmsNotifier : ISmsNotifier
 {
+
+    private readonly IBaseSmsService sender;
+    public SmsNotifier(IBaseSmsService smsService)
+    {
+        sender = smsService;
+    }
+
     public NotificationType Type => NotificationType.Sms;
 
     public bool HasNotifierModel<T>(T model) where T : class

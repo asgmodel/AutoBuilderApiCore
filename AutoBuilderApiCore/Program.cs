@@ -6,6 +6,7 @@ using ApiCore.Validators.Conditions;
 using AutoGenerator;
 
 using AutoGenerator.Data;
+using AutoGenerator.Notifications.Config;
 using AutoGenerator.Schedulers;
 using LAHJAAPI.Data;
 using LAHJAAPI.Models;
@@ -49,9 +50,24 @@ builder.Services.
         AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly,
         DbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection"),
 
-    }).
-     AddAutoValidator().
-    AddAutoConfigScheduler();
+    })
+    .AddAutoValidator()
+    .AddAutoConfigScheduler()
+    .AddAutoNotifier(new()
+    {
+
+        MailConfiguration = new MailConfig()
+        {
+            SmtpUsername = "gamal333ge@gmail.com",
+            SmtpPassword = "bxed hnwv vqlt ddwy",
+            SmtpHost = "smtp.gmail.com",
+            SmtpPort = 587,
+            FromEmail = "gamal333ge@gmail.com",
+            NameApp = "ASG" // ⁄Ì¯‰ «”„ «· ÿ»Ìﬁ Â‰« ﬂ„« Ì‰«”»ﬂ
+
+        }
+
+    });
 
 
 

@@ -1,5 +1,6 @@
-using AutoGenerator.Schedulers;
 using ApiCore.Validators;
+using AutoGenerator.Schedulers;
+using AutoNotificationService.Services.Email;
 using System;
 
 namespace ApiCore.Schedulers
@@ -10,12 +11,26 @@ namespace ApiCore.Schedulers
         public SubscriptionJob(IConditionChecker checker) : base()
         {
             _checker = checker;
-        }
 
-        public override Task Execute(JobEventArgs context)
-        {
+            
+        }
+        bool isons=false;
+        public override async Task Execute(JobEventArgs context)
+        {   // „À«· 
+            if (!isons)
+            {
+                await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
+                {
+                    Body = "hi anas",
+                    Subject = "wht",
+                    ToEmail = "modelasg@gmail.com"
+                });
+
+                isons=true;
+            }
+
             Console.WriteLine($"Executing job: {_options.JobName} with cron: {_options.Cron}");
-            return Task.CompletedTask;
+             
         }
 
         protected override void InitializeJobOptions()

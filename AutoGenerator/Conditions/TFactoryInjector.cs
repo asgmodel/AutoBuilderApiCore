@@ -1,8 +1,6 @@
 ﻿
-using AutoGenerator.Data;
-
+using AutoGenerator.Notifications;
 using AutoMapper;
-using Microsoft.AspNetCore.Identity;
 
 
 namespace AutoGenerator.Conditions
@@ -15,17 +13,37 @@ namespace AutoGenerator.Conditions
 
         public IMapper Mapper { get; }
 
+        public IAutoNotifier Notifier { get; }
 
-         
 
-        
 
-         
+
+
 
 
 
     }
+
+
+    public class TBaseFactoryInjector : ITBaseFactoryInjector
+    {
+
+        private  readonly IMapper _mapper;
+        private readonly IAutoNotifier _notifier;
+        public TBaseFactoryInjector( IMapper mapper, IAutoNotifier notifier)
+        {
+            _mapper = mapper;
+            _notifier = notifier;
+        }
+
+        public IMapper Mapper =>_mapper;
+
+        public IAutoNotifier Notifier => _notifier;
+   
     
+    }
+
+
 
 
 }

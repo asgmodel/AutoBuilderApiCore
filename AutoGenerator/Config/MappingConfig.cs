@@ -19,6 +19,9 @@ namespace AutoGenerator.Config
     public static class AutoConfigall
     {
        
+
+
+
         public static void AddAutoScope(this IServiceCollection serviceCollection, Assembly? assembly)
         {
 

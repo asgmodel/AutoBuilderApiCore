@@ -1,23 +1,21 @@
 using AutoGenerator;
 using AutoGenerator.Conditions;
+using AutoGenerator.Notifications;
 using AutoMapper;
 using LAHJAAPI.Data;
 using System;
 
 namespace ApiCore.Validators.Conditions
 {
-    public class TFactoryInjector : ITFactoryInjector
+    public class TFactoryInjector : TBaseFactoryInjector, ITFactoryInjector
     {
-        private readonly IMapper _mapper;
         private readonly DataContext _context;
         // يمكنك حقن اي طبقة
-        public TFactoryInjector(IMapper mapper, DataContext context)
+        public TFactoryInjector(IMapper mapper,IAutoNotifier notifier, DataContext context):base(mapper,notifier)
         {
-            _mapper = mapper;
             _context = context;
         }
 
-        public IMapper Mapper => _mapper;
         public DataContext Context => _context;
     }
 }

@@ -1,3 +1,4 @@
+using ApiCore.Helper;
 using ApiCore.Validators;
 using AutoGenerator.Notifications;
 using AutoGenerator.Schedulers;
@@ -25,12 +26,39 @@ namespace ApiCore.Schedulers
             {
                 await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
                 {
-                    Body = TemplateEmail.GetConfirmationEmailHtml(confirmationLink),
-                    Subject = "wht",
+                    Body = TemplateTagEmail.GetConfirmationEmailHtml(confirmationLink),
+                    Subject = "LHJA",
                     ToEmail = "modelasg@gmail.com"
                 });
 
-                isons=true;
+
+                await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
+                {
+                    Body = TemplateTagEmail.PasswordResetTemplate(confirmationLink),
+                    Subject = "LHJA",
+                    ToEmail = "modelasg@gmail.com"
+                });
+
+                await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
+                {
+                    Body = TemplateTagEmail.PaymentFailedTemplate(),
+                    Subject = "LHJA",
+                    ToEmail = "modelasg@gmail.com"
+                });
+                await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
+                {
+                    Body = TemplateTagEmail.SecurityAlertTemplate("",""),
+                    Subject = "LHJA",
+                    ToEmail = "modelasg@gmail.com"
+                });
+
+                await _checker.Injector.Notifier.NotifyAsyn(new EmailModel()
+                {
+                    Body = TemplateTagEmail.WelcomeEmailTemplate("Anas"),
+                    Subject = "LHJA",
+                    ToEmail = "modelasg@gmail.com"
+                });
+                isons =true;
             }
 
             Console.WriteLine($"Executing job: {_options.JobName} with cron: {_options.Cron}");

@@ -42,4 +42,8 @@
 	
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\AutoNotificationService\AutoNotificationService.csproj" />
+	</ItemGroup>
+
 </Project>

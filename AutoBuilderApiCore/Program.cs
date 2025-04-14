@@ -1,4 +1,6 @@
 //using ApiCore.Validators.Conditions;
+//using ApiCore.Schedulers;
+//using ApiCore.Validators.Conditions;
 using ApiCore.Schedulers;
 using ApiCore.Validators.Conditions;
 using AutoGenerator;
@@ -45,10 +47,10 @@ builder.Services.
         TypeContext = typeof(DataContext),
         Assembly = Assembly.GetExecutingAssembly(),
         AssemblyModels = typeof(LAHJAAPI.Models.Advertisement).Assembly,
-        DbConnectionString= builder.Configuration.GetConnectionString("DefaultConnection"),
+        DbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection"),
 
     }).
-    AddAutoValidator().
+     AddAutoValidator().
     AddAutoConfigScheduler();
 
 

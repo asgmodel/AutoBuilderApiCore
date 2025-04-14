@@ -1,4 +1,5 @@
 ﻿using AutoGenerator;
+using AutoGenerator.Config;
 using System.ComponentModel.DataAnnotations;
 
 namespace LAHJAAPI.Models
@@ -16,5 +17,7 @@ namespace LAHJAAPI.Models
 
 
     }
+
+    
 
 }

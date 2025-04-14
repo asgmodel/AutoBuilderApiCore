@@ -119,7 +119,7 @@ public abstract class BaseJob : CJober, ITJob
         };
         RecurringJob.AddOrUpdate(
     _options.JobName,
-    () => Execute(jobeventArgs),
+    () => Console.WriteLine(jobeventArgs),
     Cron.Daily);
         return Execute(jobeventArgs);
     }
